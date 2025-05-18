@@ -16,7 +16,7 @@ pip install -r requirements
 python manage.py migrate
 
 ## Llenar base de datos con fixture
-python manage.py loaddata events.json
+python manage.py loaddata products.json
 
 ## Correr app
 python manage.py runserver
