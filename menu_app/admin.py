@@ -3,7 +3,7 @@ from .models import Product
 
 
 class MenuAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "price", "quantity")
+    list_display = ("title", "description", "price", "quantity")
     search_fields = ("name", "price")
     list_filter = ("price", "quantity")
 
