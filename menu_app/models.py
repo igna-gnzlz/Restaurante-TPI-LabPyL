@@ -6,7 +6,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField() # stock
     image = models.ImageField(upload_to="products/", null=True, blank=True)
-    # En diagrama solo permite una category
+    # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -20,7 +20,7 @@ class Product(models.Model):
             errors["name"] = "Por favor ingrese un nombre"
 
         if description == "":
-            errors["description"] = "Por favor ingrese una descripcion"
+            errors["description"] = "Por favor ingrese una descripción"
 
         if price <= 0:
             errors["price"] = "Por favor ingrese un precio mayor a 0"
@@ -39,7 +39,7 @@ class Product(models.Model):
             description=description,
             price=price,
             quantity=quantity,
-            image=image,
+            image=image 
         )
 
         return True, None
@@ -59,6 +59,40 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @classmethod
+    def validate(cls, name, description):
+        errors = {}
+
+        if name == "":
+            errors["name"] = "Por favor ingrese un nombre"
+
+        if description == "":
+            errors["description"] = "Por favor ingrese una descripción"
+
+        return errors
+    
+    @classmethod
+    def new(cls, name, description):
+        errors = Category.validate(name, description)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+
+        Category.objects.create(
+            name=name,
+            description=description,
+        )
+
+        return True, None
+    
+    def update(self, name, description, isActive=None):
+        if isActive is not None:
+            self.isActive = isActive
+        self.name = name or self.name
+        self.description = description or self.description
+
+        self.save()
 
 class Rating(models.Model):
     title = models.CharField(max_length=15)
@@ -67,8 +101,48 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
+
     def __str__(self):
         return self.title
+    
+    @classmethod
+    def validate(cls, title, text, rating):
+        errors = {}
+
+        if title == "":
+            errors["title"] = "Por favor ingrese un título"
+
+        if text == "":
+            errors["text"] = "Por favor ingrese un comentario"
+
+        if rating < 1 or rating > 5:
+            errors["rating"] = "Por favor ingrese una calificación entre 1 y 5"
+
+        return errors
+    
+    @classmethod
+    def new(cls, title, text, rating, product, user):
+        errors = Rating.validate(title, text, rating)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+
+        Rating.objects.create(
+            title=title,
+            text=text,
+            rating=rating,
+            product=product,
+            user=user
+        )
+
+        return True, None
+    
+    def update(self, title, text, rating):
+        self.title = title or self.title
+        self.text = text or self.text
+        self.rating = rating or self.rating
+
+        self.save()
 
 class Booking(models.Model):
     approved = models.BooleanField(default=False)
@@ -77,18 +151,54 @@ class Booking(models.Model):
     observations = models.TextField(blank=True)
     date = models.DateField()
     user = models.ForeignKey('User', on_delete=models.CASCADE)
+
     def __str__(self):
-        return 'Booking '+self.code
+        return 'Booking code: '+self.code
+    
+    @classmethod
+    def validate(cls, code, date):
+        errors = {}
+
+        if code == "":
+            errors["code"] = "Por favor ingrese un código"
+
+        if date is None:
+            errors["date"] = "Por favor ingrese una fecha"
+
+        return errors
+    
+    @classmethod
+    def new(cls, code, date, user, observations=None):
+        errors = Booking.validate(code, date)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+
+        Booking.objects.create(
+            code=code,
+            date=date,
+            user=user,
+            observations=observations
+        )
+
+        return True, None
+    
+    def update(self, code=None, date=None, observations=None):
+        self.code = code or self.code
+        self.date = date or self.date
+        self.observations = observations or self.observations
+
+        self.save()
 
 class Table(models.Model):
     capacity = models.IntegerField()
-    # number = models.IntegerField() #
+    number = models.IntegerField()
     description = models.TextField(blank=True)
     is_reserved = models.BooleanField(default=False)
     booking = models.ForeignKey('Booking', models.SET_NULL, null=True)
 
-    #def __str__(self):
-    #    return 'Table '+self.number
+    def __str__(self):
+        return 'Table '+self.number
 
 class TableHasTimeSlot(models.Model):
     table = models.ForeignKey('Table', on_delete=models.SET_NULL, null=True)
