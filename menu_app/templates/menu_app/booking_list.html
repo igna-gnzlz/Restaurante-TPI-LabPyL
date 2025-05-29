@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Bookings{% endblock %}
+
+{% block content %}
+    <h1>Reservas</h1>
+    <table border="1">
+        <thead>
+          <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Mesas</th>
+              <th>Observaciones</th>
+              <th>Fecha de aprobación</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.code }}</td>
+                <td>
+                    {% if booking.approved %}
+                    Aprobada
+                    {% else %}
+                    Pendiente
+                    {% endif %}
+                </td>
+                <td>{{ booking.date }}</td>
+                <td>{{ booking.user.username }}</td>
+                <td>
+                    {% for table in booking.tables.all %}
+                    {{ table.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ booking.observations }}</td>
+                <td>{{ booking.approval_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

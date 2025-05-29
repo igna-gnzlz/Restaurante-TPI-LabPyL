@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product
+from .models import Product, Booking, User
 
 
 class MenuAdmin(admin.ModelAdmin):
@@ -9,3 +9,5 @@ class MenuAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Product, MenuAdmin)
+admin.site.register(User)
+admin.site.register(Booking)
