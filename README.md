@@ -9,6 +9,9 @@ python -m venv env
 - Windows: source env/Scripts/activate
 - Windows (alternativa): ./env/Scripts.activate
 
+## Actualizar pip
+python.exe -m pip install --upgrade pip
+
 ## Instalar dependencias
 pip install -r requirements.txt
 
