@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Listado de Notificaciones</h1>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Mensaje</th>
+                <th scope="col">Fecha de Creación</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications %}
+                <tr>
+                    <td>{{ notification.title }}</td>
+                    <td>{{ notification.message }}</td>
+                    <td>{{ notification.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if notification.is_read %}
+                            <span class="badge bg-success">Leída</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">No leída</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'notification_receivers' notification.pk %}" class="btn btn-primary btn-sm">
+                            Ver destinatarios
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay notificaciones disponibles</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

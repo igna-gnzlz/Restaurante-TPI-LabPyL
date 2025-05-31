@@ -4,7 +4,7 @@ class Product(models.Model):
     title = models.CharField(max_length=20,default="")
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField() # stock
+    quantity = models.IntegerField(default=0) # stock
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
@@ -97,7 +97,7 @@ class Category(models.Model):
 class Rating(models.Model):
     title = models.CharField(max_length=15)
     text = models.TextField()
-    rating = models.IntegerField()
+    rating = models.IntegerField(default=1)  # Calificación entre 1 y 5
     created_at = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -191,8 +191,8 @@ class Booking(models.Model):
         self.save()
 
 class Table(models.Model):
-    capacity = models.IntegerField()
-    number = models.IntegerField()
+    capacity = models.IntegerField(default=2)  # Capacidad por defecto, puede ser modificada
+    number = models.IntegerField(default=1, unique=True)  # Número de la mesa, debe ser único
     description = models.TextField(blank=True)
     is_reserved = models.BooleanField(default=False)
     booking = models.ForeignKey('Booking', models.SET_NULL, null=True)
@@ -218,16 +218,30 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+    
+    def get_notifications(self):
+        return Notification.objects.filter(userrecievesnotification__user=self)
+
 
 class UserRecievesNotification(models.Model):
     user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     notification = models.ForeignKey('Notification', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Notificación: '{self.notification.title}' para {self.user.username if self.user else 'Usuario eliminado'}"
+
 class Notification(models.Model):
     title = models.CharField(max_length=100)
     message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True) # date o datetime?
+    created_at = models.DateTimeField(auto_now_add=True) #Lo deje como datatime
     is_read = models.BooleanField(default=False)
+
+    def get_receivers(self):
+        return User.objects.filter(userrecievesnotification__notification=self)
+
+    def __str__(self):
+        return f"{self.title} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+    
 
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)

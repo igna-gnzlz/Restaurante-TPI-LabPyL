@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, ListView, DetailView
-from .models import Product, Booking
+from django.shortcuts import get_object_or_404
+from .models import Product, Booking, Notification, UserRecievesNotification
 
 
 class HomeView(TemplateView):
@@ -35,5 +36,30 @@ class BookingListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['booking'] = Booking.objects.order_by("approval_date","date")
-   
+        return context
+    
+class NotificationListView(ListView):
+    model = Notification
+    template_name = "menu_app/notification_list.html"
+    context_object_name = "notifications"
+
+    def get_queryset(self):
+        return Notification.objects.order_by("-created_at")
+
+class NotificationReceiversView(DetailView):
+    model = Notification
+    template_name = "menu_app/notification_receivers.html"
+    context_object_name = "notification"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener la notificación actual (ya está en context['notification'], pero OK)
+        notification = context['notification']
+
+        # Obtener los UserRecievesNotification para esta notificación con usuarios no nulos
+        receivers = UserRecievesNotification.objects.filter(notification=notification, user__isnull=False)
+        
+        # Pasar la lista de usuarios al contexto (puedes pasar solo los usuarios si quieres)
+        context['receivers'] = [ur.user for ur in receivers]
+
         return context
