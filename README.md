@@ -10,7 +10,7 @@ python -m venv env
 - Windows (alternativa): ./env/Scripts.activate
 
 ## Instalar dependencias
-pip install -r requirements
+pip install -r requirements.txt
 
 ## Hacer migraciones
 python manage.py migrate
