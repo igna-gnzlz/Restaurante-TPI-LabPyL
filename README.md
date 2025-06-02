@@ -9,10 +9,10 @@ Integrantes:
 - Eliezer Sardinas
 
 ## Clonar repositorio en un directorio
-git clone 
+git clone https://github.com/igna-gnzlz/Restaurante-TPI-LabPyL.git
 
 ## Aplicar entorno virtual en el repo clonado
-cd Restaurante-TPI-LabPyL
+cd Restaurante-TPI-LabPyL  
 python -m venv env
 
 ## Activar entorno virtual
