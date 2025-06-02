@@ -18,8 +18,10 @@ pip install -r requirements.txt
 ## Instalar navegadores para correr tests E2E
 playwright install
 
-## Hacer migraciones
-python manage.py makemigrations (solo si hay modelos agregados o modificados)  
+## Hacer migraciones (si hay modelos nuevos o modificados)
+python manage.py makemigrations
+
+## Ejecutar migraciones
 python manage.py migrate
 
 ## Llenar base de datos con fixture
