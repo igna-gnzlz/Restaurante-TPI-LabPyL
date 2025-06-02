@@ -15,7 +15,11 @@ python.exe -m pip install --upgrade pip
 ## Instalar dependencias
 pip install -r requirements.txt
 
+## Instalar navegadores para correr tests E2E
+playwright install
+
 ## Hacer migraciones
+python manage.py makemigrations (solo si hay modelos agregados o modificados)
 python manage.py migrate
 
 ## Llenar base de datos con fixture
