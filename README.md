@@ -8,7 +8,11 @@ Integrantes:
 - Daniel Sardinas
 - Eliezer Sardinas
 
-## Aplicar entorno virtual
+## Clonar repositorio en un directorio
+git clone 
+
+## Aplicar entorno virtual en el repo clonado
+cd Restaurante-TPI-LabPyL
 python -m venv env
 
 ## Activar entorno virtual
