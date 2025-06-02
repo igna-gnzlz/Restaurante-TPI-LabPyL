@@ -1,6 +1,13 @@
 # Restaurante
 Aplicación web para gestionar el menú, pedidos y órdenes de un restaurante.
 
+## Proyecto del Grupo 1
+Integrantes:
+- Alejo Arce
+- Ignacio González
+- Daniel Sardinas
+- Eliezer Sardinas
+
 ## Aplicar entorno virtual
 python -m venv env
 
