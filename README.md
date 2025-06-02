@@ -19,7 +19,7 @@ pip install -r requirements.txt
 playwright install
 
 ## Hacer migraciones
-python manage.py makemigrations (solo si hay modelos agregados o modificados)
+python manage.py makemigrations (solo si hay modelos agregados o modificados)  
 python manage.py migrate
 
 ## Llenar base de datos con fixture
