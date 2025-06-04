@@ -12,9 +12,8 @@ Integrantes:
 ```bash
 git clone https://github.com/igna-gnzlz/Restaurante-TPI-LabPyL.git
 ```
-## Aplicar entorno virtual en el repo clonado
+## Aplicar entorno virtual
 ```bash
-cd Restaurante-TPI-LabPyL  
 python -m venv env
 ```
 ## Activar entorno virtual
