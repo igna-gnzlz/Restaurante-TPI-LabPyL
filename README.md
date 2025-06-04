@@ -25,8 +25,9 @@ python -m venv venv
 ```bash
 python.exe -m pip install --upgrade pip
 ```
-## Instalar dependencias
+## Instalar dependencias desde el repo clonado
 ```bash
+cd Restaurante-TPI-LabPyL
 pip install -r requirements.txt
 ```
 ## Instalar navegadores para correr tests E2E
