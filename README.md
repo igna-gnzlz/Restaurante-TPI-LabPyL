@@ -50,3 +50,7 @@ python manage.py loaddata products.json
 ```bash
 python manage.py runserver
 ```
+## Correr tests
+```bash
+python manage.py test
+```
