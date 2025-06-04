@@ -14,12 +14,12 @@ git clone https://github.com/igna-gnzlz/Restaurante-TPI-LabPyL.git
 ```
 ## Aplicar entorno virtual
 ```bash
-python -m venv env
+python -m venv venv
 ```
 ## Activar entorno virtual
-- Linux/Mac: `source env/bin/activate`
-- Windows: `source env/Scripts/activate`
-- Windows (alternativa): `./env/Scripts.activate`
+- Linux/Mac: `source venv/bin/activate`
+- Windows: `source venv/Scripts/activate`
+- Windows (alternativa): `./venv/Scripts.activate`
 
 ## Actualizar pip
 ```bash
