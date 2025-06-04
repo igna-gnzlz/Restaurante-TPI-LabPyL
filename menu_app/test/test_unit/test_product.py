@@ -34,7 +34,7 @@ class ProductModelTest(TestCase):
         """Test que verifica la validación de productos con descripción vacía"""
         errors = Product.validate("Título válido", "", 10)
         self.assertIn("description", errors)
-        self.assertEqual(errors["description"], "Por favor ingrese una descripcion")
+        self.assertEqual(errors["description"], "Por favor ingrese una descripción")
 
     def test_product_new_with_valid_data(self):
         """Test que verifica la creación de productos con datos válidos"""
