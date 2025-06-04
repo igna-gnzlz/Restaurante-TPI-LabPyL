@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, ListView, DetailView
-from .models import Product, Booking
+from .models import Product
+from bookings_app.models import Booking
 
 
 class HomeView(TemplateView):
@@ -12,7 +13,7 @@ class MenuListView(ListView):
     context_object_name = "menu_items"
 
     def get_queryset(self):
-        return Product.objects.all().order_by("title")
+        return Product.objects.all().order_by("name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

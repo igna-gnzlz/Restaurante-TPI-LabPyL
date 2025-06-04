@@ -1,13 +1,14 @@
 from django.contrib import admin
-from .models import Product, Booking, User
+from .models import Product
+#from models_copy import Booking, User
 
 
 class MenuAdmin(admin.ModelAdmin):
-    list_display = ("title", "description", "price", "quantity")
+    list_display = ("name", "description", "price", "quantity")
     search_fields = ("name", "price")
     list_filter = ("price", "quantity")
 
 
 admin.site.register(Product, MenuAdmin)
-admin.site.register(User)
-admin.site.register(Booking)
+#admin.site.register(User)
+#admin.site.register(Booking)
