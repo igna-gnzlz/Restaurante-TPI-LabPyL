@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="p-5 bg-light rounded-3">
+        <h2 class="fw-bold mb-4">Realizar Reserva</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre y Apellido</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="personas" class="form-label">Cantidad de personas</label>
+                <input type="number" class="form-control" id="personas" name="personas" min="1" max="20" required>
+            </div>
+            <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" required>
+            </div>
+            <div class="mb-3">
+                <label for="hora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="hora" name="hora" required>
+            </div>
+            <div class="mb-3">
+                <label for="notas" class="form-label">Notas (opcional)</label>
+                <textarea class="form-control" id="notas" name="notas" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Reservar</button>
+            <a href="/" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

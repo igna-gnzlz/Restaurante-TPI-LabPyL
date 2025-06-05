@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, ListView, DetailView
 from .models import Product, Booking
+from django.shortcuts import render
 
 
 class HomeView(TemplateView):
@@ -37,3 +38,9 @@ class BookingListView(ListView):
         context['booking'] = Booking.objects.order_by("approval_date","date")
    
         return context
+
+def realizar_reserva(request):
+    return render(request, 'realizar_reserva.html')
+
+def realizar_pedido(request):
+    return render(request, 'realizar_pedido.html')

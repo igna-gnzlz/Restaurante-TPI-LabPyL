@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="p-5 bg-light rounded-3">
+        <h2 class="fw-bold mb-4">Realizar Pedido</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre y Apellido</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="productos" class="form-label">Productos</label>
+                <select class="form-select" id="productos" name="productos" multiple required>
+                    <!-- Acá deberías cargar dinámicamente los productos disponibles -->
+                    <option value="1">Producto 1</option>
+                    <option value="2">Producto 2</option>
+                    <option value="3">Producto 3</option>
+                </select>
+                <small class="text-muted">Usá Ctrl (Windows) o Cmd (Mac) para seleccionar varios productos.</small>
+            </div>
+            <div class="mb-3">
+                <label for="notas" class="form-label">Notas (opcional)</label>
+                <textarea class="form-control" id="notas" name="notas" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar pedido</button>
+            <a href="/" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -5,7 +5,41 @@
     <div class="p-5 bg-light rounded-3">
         <h1 class="display-5 fw-bold">Restaurant App</h1>
         <p class="fs-4">Hacé tus pedidos y reservá mesas.</p>
-        <div>
+
+        <div class="d-flex gap-3 mt-4">
+            <!-- Dropdown Pedidos -->
+            <div class="btn-group">
+                <button 
+                    type="button" 
+                    class="btn btn-primary dropdown-toggle" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                >
+                    Pedidos
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Ver lista de pedidos</a></li>
+                    <li><a class="dropdown-item" href="{% url 'realizar_pedido' %}">Realizar pedido</a></li>
+                </ul>
+            </div>
+
+            <!-- Dropdown Reserva -->
+            <div class="btn-group">
+                <button 
+                    type="button" 
+                    class="btn btn-secondary dropdown-toggle" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                >
+                    Reserva
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'realizar_reserva' %}">Realizar reserva</a></li>
+                    <li><a class="dropdown-item" href="#">Mi reserva</a></li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock content %}
