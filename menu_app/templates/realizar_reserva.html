@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,31 +9,27 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre y Apellido</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Tu nombre completo" required>
             </div>
             <div class="mb-3">
                 <label for="personas" class="form-label">Cantidad de personas</label>
                 <input type="number" class="form-control" id="personas" name="personas" min="1" max="20" required>
             </div>
             <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha</label>
+                <label for="fecha" class="form-label">Fecha de la reserva</label>
                 <input type="date" class="form-control" id="fecha" name="fecha" required>
             </div>
             <div class="mb-3">
-                <label for="hora" class="form-label">Hora</label>
+                <label for="hora" class="form-label">Hora de la reserva</label>
                 <input type="time" class="form-control" id="hora" name="hora" required>
             </div>
             <div class="mb-3">
-                <label for="notas" class="form-label">Notas (opcional)</label>
-                <textarea class="form-control" id="notas" name="notas" rows="2"></textarea>
+                <label for="notas" class="form-label">Notas adicionales (opcional)</label>
+                <textarea class="form-control" id="notas" name="notas" rows="3" placeholder="Alguna indicación especial"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Reservar</button>
+            <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
             <a href="/" class="btn btn-secondary ms-2">Cancelar</a>
         </form>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}

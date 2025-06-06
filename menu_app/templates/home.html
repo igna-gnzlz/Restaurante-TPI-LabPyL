@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -18,7 +19,7 @@
                     Pedidos
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Ver lista de pedidos</a></li>
+                    <li><a class="dropdown-item" href="{% url 'mis_pedidos' %}">Ver lista de pedidos</a></li>
                     <li><a class="dropdown-item" href="{% url 'realizar_pedido' %}">Realizar pedido</a></li>
                 </ul>
             </div>
@@ -35,11 +36,36 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'realizar_reserva' %}">Realizar reserva</a></li>
-                    <li><a class="dropdown-item" href="#">Mi reserva</a></li>
+                    <li>
+                        <a 
+                            class="dropdown-item" 
+                            href="#" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalMiReserva"
+                        >
+                            Mi reserva
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
 
     </div>
 </div>
-{% endblock content %}
+
+<!-- Modal para "Mi reserva" -->
+<div class="modal fade" id="modalMiReserva" tabindex="-1" aria-labelledby="modalMiReservaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMiReservaLabel">Mi reserva</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="contenidoMiReserva">
+        Cargando...
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
