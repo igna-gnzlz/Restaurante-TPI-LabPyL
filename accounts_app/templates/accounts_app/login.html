@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-4">
+    <h4 class="mb-4 text-center">Iniciar Sesión</h4>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for err in form.non_field_errors %}
+            <div>{{ err }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">
+          {{ form.username.label }}:
+        </label>
+        {{ form.username }}
+        {% for err in form.username.errors %}
+          <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.password.id_for_label }}" class="form-label">
+          {{ form.password.label }}:
+        </label>
+        {{ form.password }}
+        {% for err in form.password.errors %}
+          <div class="text-danger small">{{ err }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Entrar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -48,6 +48,31 @@
                                 {% navbar_link 'menu' 'Menu' %}
                             </li>
                         </ul>
+
+                        <!-- Botones de Iniciar Sesión y Registrarse alineados a la derecha -->
+                        <div class="d-flex gap-2 ms-auto">
+                            {% if request.user.is_authenticated %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary btn-sm dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        {{ request.user.username }}
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <form method="post" action="{% url 'accounts_app:logout' %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">Cerrar sesión</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <a href="{% url 'accounts_app:login' %}" class="btn btn-outline-primary btn-sm">Iniciar Sesión</a>
+                                <a href="{% url 'accounts_app:register' %}" class="btn btn-primary btn-sm">Registrarse</a>
+                            {% endif %}
+                        </div>
                     </div>
             </div>
         </div>

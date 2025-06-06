@@ -28,13 +28,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Esto es por lo del User que hereda de AbstractUser en accounts_app/models.py
+
+AUTH_USER_MODEL = 'accounts_app.User'
 
 # Application definition
 
 INSTALLED_APPS = [
-    'menu_app',
-    'bookings_app',
     'accounts_app',
+    'bookings_app',
+    'menu_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +61,7 @@ ROOT_URLCONF = 'restaurante.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'menu_app/templates')],
+        'DIRS': [BASE_DIR / 'templates'],  # <- os.path.join(BASE_DIR, 'templates') usa strings, ahora usa objetos y es mas seguro
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
