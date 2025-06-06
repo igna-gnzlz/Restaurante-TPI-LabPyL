@@ -192,7 +192,7 @@ class Booking(models.Model):
 
 class Table(models.Model):
     capacity = models.IntegerField()
-    number = models.IntegerField()
+    number = models.IntegerField(null=True)
     description = models.TextField(blank=True)
     is_reserved = models.BooleanField(default=False)
     booking = models.ForeignKey('Booking', models.SET_NULL, null=True)

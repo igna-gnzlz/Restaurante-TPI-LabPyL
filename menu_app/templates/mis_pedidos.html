@@ -23,5 +23,8 @@
     {% else %}
         <p>No tenés pedidos realizados aún.</p>
     {% endif %}
+
+    <!-- Botón para volver al inicio -->
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-4">Volver al inicio</a>
 </div>
 {% endblock %}

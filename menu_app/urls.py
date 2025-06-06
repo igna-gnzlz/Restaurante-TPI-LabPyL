@@ -11,4 +11,5 @@ urlpatterns = [
     path("realizar-pedido/", views.realizar_pedido, name="realizar_pedido"),
     path("api/mi-reserva/", views.obtener_reserva_usuario, name="api_mi_reserva"),
     path("mis-pedidos/", views.mis_pedidos, name="mis_pedidos"),
+    path('mi-reserva/', views.mi_reserva, name='mi_reserva'),
 ]
