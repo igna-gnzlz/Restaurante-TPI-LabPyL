@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login
 class RegisterView(FormView):
     template_name = 'accounts_app/register.html'
     form_class = RegisterForm
-    success_url = reverse_lazy('accounts_app:login')  # o la url name que tengas para login
+    success_url = reverse_lazy('accounts_app:login')  # va hacia el login
 
     def form_valid(self, form):
         form.save()  # Guarda el usuario usando tu método save()
