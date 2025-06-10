@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mis Notificaciones</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Notificación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notif in user_notifications %}
+                <tr>
+                    <td>
+                        {% if notif.is_read %}
+                            {{ notif.notification.title }}
+                        {% else %}
+                            <strong>{{ notif.notification.title }}</strong>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'accounts_app:user_notification_detail' notif.pk %}" class="btn btn-primary btn-sm">Ver mensaje</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No tienes notificaciones.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
