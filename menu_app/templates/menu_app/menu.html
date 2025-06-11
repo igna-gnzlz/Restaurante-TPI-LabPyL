@@ -7,9 +7,13 @@
     <div class="row">
         {% for item in menu_items %}
             <div class="col-md-4 mb-4">
-                <a href="{% url 'product_detail' item.id %}" class="text-decoration-none text-dark">
+                <a href="{% url 'menu_app:product_detail' item.slug %}" class="text-decoration-none text-dark">
                     <div class="card">
-                        <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                        {% else %}
+                        <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
+                        {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">{{ item.description }}</p>

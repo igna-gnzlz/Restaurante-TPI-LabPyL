@@ -1,36 +1,332 @@
 [
-    {
-      "model": "menu_app.product",
-      "pk": 1,
-      "fields": {
-        "name": "Pizza Margherita",
-        "description": "Pizza clásica con tomate, mozzarella y albahaca.",
-        "price": 500.00,
-        "quantity": 5,
-        "image": "/static/images/pizza_margherita.jpg"
-      }
-    },
-    {
-      "model": "menu_app.product",
-      "pk": 2,
-      "fields": {
-        "name": "Ensalada César",
-        "description": "Ensalada fresca con pollo, lechuga, croutones y aderezo César.",
-        "price": 350.00,
-        "quantity": 10,
-        "image": "/static/images/ensalada_cesar.jpg"
-      }
-    },
-    {
-      "model": "menu_app.product",
-      "pk": 3,
-      "fields": {
-        "name": "Hamburguesa Clásica",
-        "description": "Hamburguesa con carne de res, lechuga, tomate y mayonesa.",
-        "price": 450.00,
-        "quantity": 1,
-        "image": "/static/images/hamburguesa.jpg"
-      }
+  {
+    "model": "menu_app.product",
+    "pk": 1,
+    "fields": {
+      "name": "Berenjenas a la Parmesana",
+      "description": "Berenjenas gratinadas con salsa de tomate, queso mozzarella y albahaca fresca",
+      "price": 12.5,
+      "quantity": 10,
+      "slug": "berenjenas-a-la-parmesana"
     }
-  ]
-  
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 2,
+    "fields": {
+      "name": "Curry de Verduras",
+      "description": "Mezcla de verduras frescas en salsa de curry con leche de coco",
+      "price": 11.8,
+      "quantity": 10,
+      "slug": "curry-de-verduras"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 3,
+    "fields": {
+      "name": "Ensalada César",
+      "description": "Lechuga romana, croutons, queso parmesano y aderezo césar tradicional",
+      "price": 9.9,
+      "quantity": 10,
+      "slug": "ensalada-cesar"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 4,
+    "fields": {
+      "name": "Ensalada Griega",
+      "description": "Tomate, pepino, cebolla roja, aceitunas kalamata y queso feta con vinagreta de limón",
+      "price": 10.5,
+      "quantity": 10,
+      "slug": "ensalada-griega"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 5,
+    "fields": {
+      "name": "Empanada de Carne",
+      "description": "Masa casera rellena de carne picada, huevo, aceitunas y especias",
+      "price": 4.5,
+      "quantity": 10,
+      "slug": "empanada-de-carne"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 6,
+    "fields": {
+      "name": "Empanada de Queso y Cebolla",
+      "description": "Masa hojaldrada rellena de queso fundido y cebolla caramelizada",
+      "price": 4.2,
+      "quantity": 10,
+      "slug": "empanada-de-queso-y-cebolla"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 7,
+    "fields": {
+      "name": "Pizza Margherita",
+      "description": "Masa fina con salsa de tomate, mozzarella fresca y albahaca",
+      "price": 14.0,
+      "quantity": 10,
+      "slug": "pizza-margherita"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 8,
+    "fields": {
+      "name": "Pizza Pepperoni",
+      "description": "Masa tradicional con doble porción de pepperoni y queso mozzarella",
+      "price": 15.5,
+      "quantity": 10,
+      "slug": "pizza-pepperoni"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 9,
+    "fields": {
+      "name": "Hamburguesa Clásica",
+      "description": "Carne 100% res, queso cheddar, lechuga, tomate y salsa especial",
+      "price": 10.9,
+      "quantity": 10,
+      "slug": "hamburguesa-clasica"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 10,
+    "fields": {
+      "name": "Hamburguesa Vegana",
+      "description": "Medallón de garbanzos y espinacas con aguacate y mayonesa de zanahoria",
+      "price": 12.0,
+      "quantity": 10,
+      "slug": "hamburguesa-vegana"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 11,
+    "fields": {
+      "name": "Ceviche Mixto",
+      "description": "Pescado blanco, camarones y pulpo marinados en limón con ají y cilantro",
+      "price": 16.5,
+      "quantity": 10,
+      "slug": "ceviche-mixto"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 12,
+    "fields": {
+      "name": "Paella de Mariscos",
+      "description": "Arroz bomba con mejillones, calamares, gambas y azafrán",
+      "price": 18.0,
+      "quantity": 10,
+      "slug": "paella-de-mariscos"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 13,
+    "fields": {
+      "name": "Bife de Chorizo",
+      "description": "Corte premium de 300g con chimichurri y papas rústicas",
+      "price": 22.0,
+      "quantity": 10,
+      "slug": "bife-de-chorizo"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 14,
+    "fields": {
+      "name": "Pechuga a la Mostaza",
+      "description": "Pechuga de pollo grillada con salsa de mostaza y miel",
+      "price": 14.5,
+      "quantity": 10,
+      "slug": "pechuga-a-la-mostaza"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 15,
+    "fields": {
+      "name": "Fettuccine Alfredo",
+      "description": "Pasta fresca con salsa de crema, parmesano y pimienta negra",
+      "price": 13.5,
+      "quantity": 10,
+      "slug": "fettuccine-alfredo"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 16,
+    "fields": {
+      "name": "Raviolis de Ricotta",
+      "description": "Rellenos de ricotta y espinacas con salsa de tomate fresco",
+      "price": 12.9,
+      "quantity": 10,
+      "slug": "raviolis-de-ricotta"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 17,
+    "fields": {
+      "name": "Puré de Papas Trufado",
+      "description": "Puré cremoso con aceite de trufa negra y perejil",
+      "price": 6.5,
+      "quantity": 10,
+      "slug": "pure-de-papas-trufado"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 18,
+    "fields": {
+      "name": "Verduras al Wok",
+      "description": "Mezcla de brócoli, zanahoria y pimientos salteados con ajo",
+      "price": 7.0,
+      "quantity": 10,
+      "slug": "verduras-al-wok"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 19,
+    "fields": {
+      "name": "Malbec Reserva",
+      "description": "Copa de vino Malbec de bodega premium (175ml)",
+      "price": 8.0,
+      "quantity": 10,
+      "slug": "malbec-reserva"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 20,
+    "fields": {
+      "name": "Cerveza Artesanal IPA",
+      "description": "Botella 500ml de cerveza lupulada con 6.5% de alcohol",
+      "price": 6.5,
+      "quantity": 10,
+      "slug": "cerveza-artesanal-ipa"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 21,
+    "fields": {
+      "name": "Jugo de Naranja Natural",
+      "description": "Exprimido al momento sin conservantes",
+      "price": 4.5,
+      "quantity": 10,
+      "slug": "jugo-de-naranja-natural"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 22,
+    "fields": {
+      "name": "Agua con Gas",
+      "description": "Botella 750ml de agua mineral con gas",
+      "price": 3.0,
+      "quantity": 10,
+      "slug": "agua-con-gas"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 23,
+    "fields": {
+      "name": "Volcán de Chocolate",
+      "description": "Postre caliente con centro líquido de chocolate y helado de vainilla",
+      "price": 7.5,
+      "quantity": 10,
+      "slug": "volcan-de-chocolate"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 24,
+    "fields": {
+      "name": "Tiramisú",
+      "description": "Clásico italiano con capas de bizcocho, café y mascarpone",
+      "price": 6.9,
+      "quantity": 10,
+      "slug": "tiramisu"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 25,
+    "fields": {
+      "name": "Café Especial",
+      "description": "Café de altura con notas de caramelo y nuez",
+      "price": 3.5,
+      "quantity": 10,
+      "slug": "cafe-especial"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 26,
+    "fields": {
+      "name": "Té de Frutos Rojos",
+      "description": "Infusión herbal con frutos del bosque",
+      "price": 3.0,
+      "quantity": 10,
+      "slug": "te-de-frutos-rojos"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 27,
+    "fields": {
+      "name": "Menú Ejecutivo",
+      "description": "Plato del día + postre + bebida (consultar opciones diarias)",
+      "price": 15.0,
+      "quantity": 10,
+      "slug": "menu-ejecutivo"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 28,
+    "fields": {
+      "name": "Menú Vegetariano del Día",
+      "description": "Selección de platos vegetarianos según temporada",
+      "price": 14.0,
+      "quantity": 10,
+      "slug": "menu-vegetariano-del-dia"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 29,
+    "fields": {
+      "name": "Nuggets con Papas",
+      "description": "Pollo empanizado con papas fritas y salsa kétchup",
+      "price": 8.5,
+      "quantity": 10,
+      "slug": "nuggets-con-papas"
+    }
+  },
+  {
+    "model": "menu_app.product",
+    "pk": 30,
+    "fields": {
+      "name": "Mini Hamburguesa",
+      "description": "Versión pequeña de nuestra hamburguesa clásica con jugo o gaseosa",
+      "price": 9.0,
+      "quantity": 10,
+      "slug": "mini-hamburguesa"
+    }
+  }
+]
