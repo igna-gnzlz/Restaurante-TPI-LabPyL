@@ -18,10 +18,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from menu_app.views import HomeView
+from menu_app.views import OrderDetailView
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("admin/", admin.site.urls),
     path("menu/", include(("menu_app.urls", "menu_app"), namespace="menu_app")),
-    path("accounts/", include("accounts_app.urls", namespace="accounts_app"))
+    path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
+    path('my-order/', OrderDetailView.as_view(), name='order_detail'),
 ]

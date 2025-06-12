@@ -110,7 +110,7 @@ class Order(models.Model):
     ]
     buyDate = models.DateField()
     code = models.CharField(max_length=15, unique=True)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     state = models.CharField(max_length=15, choices=STATE_CHOICES, default='P')
     user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE)
 
@@ -118,6 +118,11 @@ class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.product.price * self.quantity
+        super().save(*args, **kwargs)
 
 class Rating(models.Model):
     title = models.CharField(max_length=15)
