@@ -1,3 +1,5 @@
+from . import views
+
 from django.urls import path
 from accounts_app.views import UserRegisterView, UserLoginView
 from accounts_app.views import NotificationRecipientsView, UserNotificationsListView
@@ -15,5 +17,6 @@ urlpatterns = [
     path('my_notifications/',
     UserNotificationsListView.as_view(), name='user_notifications_list'),
     path('my_notifications/<int:pk>/',
-    UserNotificationDetailView.as_view(), name='user_notification_detail')
+    UserNotificationDetailView.as_view(), name='user_notification_detail'),
+    path('profile/', views.profile, name='profile'),
 ]

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Card de reserva actual -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Reserva actual</h4>
+            {% if proxima_reserva %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Fecha:</strong> {{ proxima_reserva.fecha }}</li>
+                    <li class="list-group-item"><strong>Estado:</strong>
+                        {% if proxima_reserva.approved == None %}Pendiente
+                        {% elif proxima_reserva.approved %}Aprobada
+                        {% else %}Rechazada
+                        {% endif %}
+                    </li>
+                    {% if proxima_reserva.notas %}
+                        <li class="list-group-item"><strong>Notas:</strong> {{ proxima_reserva.notas }}</li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    Sin reserva.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card de historial de reservas -->
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Historial de reservas</h4>
+            {% if reservas_pasadas %}
+                <ul class="list-group list-group-flush">
+                    {% for reserva in reservas_pasadas %}
+                        <li class="list-group-item">
+                            <strong>Fecha:</strong> {{ reserva.fecha }}<br>
+                            <strong>Estado:</strong>
+                            {% if reserva.approved == None %}Pendiente
+                            {% elif reserva.approved %}Aprobada
+                            {% else %}Rechazada
+                            {% endif %}
+                            {% if reserva.notas %}
+                                <br><strong>Notas:</strong> {{ reserva.notas }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="alert alert-secondary mb-0">
+                    -historial vacío-
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="/" class="btn btn-secondary mt-4">Volver al inicio</a>
+</div>
+{% endblock %}

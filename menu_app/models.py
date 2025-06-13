@@ -106,7 +106,7 @@ class Order(models.Model):
     code = models.CharField(max_length=15, unique=True)
     amount = models.FloatField()
     state = models.CharField(max_length=15, choices=STATE_CHOICES, default='P')
-    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders1111')
 
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
