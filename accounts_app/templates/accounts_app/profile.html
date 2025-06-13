@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Perfil de usuario</h5>
+            <p class="card-text">Aquí podrás ver y editar los datos de tu perfil.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Volver al inicio</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

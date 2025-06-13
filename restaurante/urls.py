@@ -25,5 +25,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("menu/", include(("menu_app.urls", "menu_app"), namespace="menu_app")),
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
+    path('bookings/', include('bookings_app.urls'))
     path('my-order/', OrderDetailView.as_view(), name='order_detail'),
 ]

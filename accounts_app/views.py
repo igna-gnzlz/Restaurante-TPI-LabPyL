@@ -11,6 +11,15 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def profile(request):
+    user = request.user
+    return render(request, 'accounts_app/profile.html', {'user': user})
+
 
 class UserRegisterView(FormView):
     template_name = 'accounts_app/register.html'

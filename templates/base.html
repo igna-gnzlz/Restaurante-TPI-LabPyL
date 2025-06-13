@@ -70,6 +70,15 @@
                                             <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">Notificaciones</a>
                                         </li>
                                         <li>
+                                            <a class="dropdown-item" href="{% url 'user_reservations_history' %}">Mis Reservas</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'user_orders_history' %}">Historial de pedidos</a>
+                                        </li>
+                                        <li>
+                                        <a class="dropdown-item" href="{% url 'accounts_app:profile' %}">Mi perfil</a>
+                                        </li>
+                                        <li>
                                             <form method="post" action="{% url 'accounts_app:logout' %}">
                                                 {% csrf_token %}
                                                 <button type="submit" class="dropdown-item">Cerrar Sesión</button>
