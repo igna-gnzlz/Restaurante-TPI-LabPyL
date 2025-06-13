@@ -1,10 +1,9 @@
 from django.urls import path, include
-from .views import HomeView, MenuListView, ProductDetailView, BookingListView
+from .views import MenuListView, ProductDetailView, AddToOrderView
 
 urlpatterns = [
-    path("", HomeView.as_view(), name="home"),
-    path("menu/", MenuListView.as_view(), name="menu"),
-    path("menu/<int:pk>/", ProductDetailView.as_view(), name="product_detail"),
+    path("", MenuListView.as_view(), name="menu"),
+    path("<slug:slug>/", ProductDetailView.as_view(), name="product_detail"),
+    path('add-to-order/<slug:slug>/', AddToOrderView.as_view(), name='add_to_order'),
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
-
 ]

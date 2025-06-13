@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Mi Pedido</h2>
+    {% for item in order.ordercontainsproduct_set.all %}
+    <div class="card mb-2">
+        <div class="card-body">
+            <h5>{{ item.product.name }}</h5>
+            <p>Cantidad: {{ item.quantity }}</p>
+            <p>Subtotal: ${{ item.subtotal }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        No hay productos en tu pedido. ¡Explora nuestro <a href="{% url 'menu_app:menu' %}">menú</a>!
+    </div>
+    {% endfor %}
+    <h4>Total: ${{ order.amount }}</h4>
+    <a href="{% url 'menu_app:menu' %}" class="btn btn-primary">Volver al menú</a>
+</div>
+{% endblock %}
