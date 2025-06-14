@@ -27,4 +27,5 @@ urlpatterns = [
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
     path('bookings/', include('bookings_app.urls')),
     path('my-order/', OrderDetailView.as_view(), name='order_detail'),
+    
 ]
