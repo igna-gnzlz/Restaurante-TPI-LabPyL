@@ -35,6 +35,7 @@ AUTH_USER_MODEL = 'accounts_app.User'
 # Esto es para que despues del login se vaya a home
 
 LOGIN_REDIRECT_URL = 'home'
+AUTH_USER_MODEL = 'accounts_app.User'
 
 # Application definition
 
