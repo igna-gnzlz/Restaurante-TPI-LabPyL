@@ -1,153 +1,2021 @@
 [
     {
-        "model": "accounts_app.notification",
+        "model": "auth.group",
         "pk": 1,
         "fields": {
-            "title": "Actualizaci¾n importante sobre tu cuenta",
-            "message": "Queremos informarte que hemos mejorado la seguridad de tu cuenta para proteger mejor tu información. Te recomendamos revisar tus datos y cambiar tu contraseña si aún no lo has hecho. ¡Gracias por confiar en nosotros!",
-            "created_at": "2025-06-10T04:25:45.233Z"
+            "name": "Administrador"
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 2,
+        "fields": {
+            "name": "Cajero"
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "Cliente"
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 1,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 1
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 2,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 3
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 3,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 4
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 4,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 7
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 5,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 8
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 6,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 11
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 7,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 12
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 8,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 13
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 9,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 14
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 10,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 15
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 11,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 16
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 12,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 17
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 13,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 18
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 14,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 19
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 15,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 20
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 16,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 21
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 17,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 22
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 18,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 23
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 19,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 24
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 20,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 26
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 21,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 27
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 22,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 28
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 23,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 31
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 24,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 32
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 25,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 33
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 26,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 34
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 27,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 35
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 28,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 36
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 29,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 38
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 30,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 39
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 31,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 40
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 32,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 41
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 33,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 42
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 34,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 43
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 35,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 44
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 36,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 47
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 37,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 48
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 40,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 32
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 41,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 38
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 42,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 40
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 43,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 44
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 44,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 46
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 45,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 48
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 46,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 20
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 47,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 22
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 48,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 23
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 49,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 24
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 50,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 26
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 51,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 27
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 52,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 28
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 53,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 30
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 54,
+        "fields": {
+            "group_id": 2,
+            "permission_id": 31
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 55,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 25
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 56,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 37
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 57,
+        "fields": {
+            "group_id": 1,
+            "permission_id": 30
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 58,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 32
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 59,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 4
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 60,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 5
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 61,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 6
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 62,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 7
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 63,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 8
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 64,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 36
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 65,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 10
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 66,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 37
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 67,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 12
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 68,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 40
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 69,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 44
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 70,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 16
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 71,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 48
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 72,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 20
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 73,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 21
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 74,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 24
+        }
+    },
+    {
+        "model": "auth.group_permissions",
+        "pk": 75,
+        "fields": {
+            "group_id": 3,
+            "permission_id": 28
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 1,
+        "fields": {
+            "app_label": "accounts_app",
+            "model": "notification"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 2,
+        "fields": {
+            "app_label": "accounts_app",
+            "model": "rating"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 3,
+        "fields": {
+            "app_label": "accounts_app",
+            "model": "userrecievesnotification"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 4,
+        "fields": {
+            "app_label": "accounts_app",
+            "model": "user"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 5,
+        "fields": {
+            "app_label": "bookings_app",
+            "model": "timeslot"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 6,
+        "fields": {
+            "app_label": "bookings_app",
+            "model": "booking"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 7,
+        "fields": {
+            "app_label": "bookings_app",
+            "model": "table"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 8,
+        "fields": {
+            "app_label": "bookings_app",
+            "model": "tablehastimeslot"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 9,
+        "fields": {
+            "app_label": "menu_app",
+            "model": "category"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 10,
+        "fields": {
+            "app_label": "menu_app",
+            "model": "order"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 11,
+        "fields": {
+            "app_label": "menu_app",
+            "model": "product"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 12,
+        "fields": {
+            "app_label": "menu_app",
+            "model": "ordercontainsproduct"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 13,
+        "fields": {
+            "app_label": "admin",
+            "model": "logentry"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 14,
+        "fields": {
+            "app_label": "auth",
+            "model": "permission"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 15,
+        "fields": {
+            "app_label": "auth",
+            "model": "group"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 16,
+        "fields": {
+            "app_label": "contenttypes",
+            "model": "contenttype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 17,
+        "fields": {
+            "app_label": "sessions",
+            "model": "session"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 18,
+        "fields": {
+            "app_label": "accounts_app",
+            "model": "usernotification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 1,
+        "fields": {
+            "content_type_id": 1,
+            "codename": "add_notification",
+            "name": "Can add notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 2,
+        "fields": {
+            "content_type_id": 1,
+            "codename": "change_notification",
+            "name": "Can change notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 3,
+        "fields": {
+            "content_type_id": 1,
+            "codename": "delete_notification",
+            "name": "Can delete notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 4,
+        "fields": {
+            "content_type_id": 1,
+            "codename": "view_notification",
+            "name": "Can view notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 5,
+        "fields": {
+            "content_type_id": 2,
+            "codename": "add_rating",
+            "name": "Can add rating"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 6,
+        "fields": {
+            "content_type_id": 2,
+            "codename": "change_rating",
+            "name": "Can change rating"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 7,
+        "fields": {
+            "content_type_id": 2,
+            "codename": "delete_rating",
+            "name": "Can delete rating"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 8,
+        "fields": {
+            "content_type_id": 2,
+            "codename": "view_rating",
+            "name": "Can view rating"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 9,
+        "fields": {
+            "content_type_id": 3,
+            "codename": "add_userrecievesnotification",
+            "name": "Can add user recieves notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 10,
+        "fields": {
+            "content_type_id": 3,
+            "codename": "change_userrecievesnotification",
+            "name": "Can change user recieves notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 11,
+        "fields": {
+            "content_type_id": 3,
+            "codename": "delete_userrecievesnotification",
+            "name": "Can delete user recieves notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 12,
+        "fields": {
+            "content_type_id": 3,
+            "codename": "view_userrecievesnotification",
+            "name": "Can view user recieves notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 13,
+        "fields": {
+            "content_type_id": 4,
+            "codename": "add_user",
+            "name": "Can add user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 14,
+        "fields": {
+            "content_type_id": 4,
+            "codename": "change_user",
+            "name": "Can change user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 15,
+        "fields": {
+            "content_type_id": 4,
+            "codename": "delete_user",
+            "name": "Can delete user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 16,
+        "fields": {
+            "content_type_id": 4,
+            "codename": "view_user",
+            "name": "Can view user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 17,
+        "fields": {
+            "content_type_id": 5,
+            "codename": "add_timeslot",
+            "name": "Can add time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 18,
+        "fields": {
+            "content_type_id": 5,
+            "codename": "change_timeslot",
+            "name": "Can change time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 19,
+        "fields": {
+            "content_type_id": 5,
+            "codename": "delete_timeslot",
+            "name": "Can delete time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 20,
+        "fields": {
+            "content_type_id": 5,
+            "codename": "view_timeslot",
+            "name": "Can view time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 21,
+        "fields": {
+            "content_type_id": 6,
+            "codename": "add_booking",
+            "name": "Can add booking"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 22,
+        "fields": {
+            "content_type_id": 6,
+            "codename": "change_booking",
+            "name": "Can change booking"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 23,
+        "fields": {
+            "content_type_id": 6,
+            "codename": "delete_booking",
+            "name": "Can delete booking"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 24,
+        "fields": {
+            "content_type_id": 6,
+            "codename": "view_booking",
+            "name": "Can view booking"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 25,
+        "fields": {
+            "content_type_id": 7,
+            "codename": "add_table",
+            "name": "Can add table"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 26,
+        "fields": {
+            "content_type_id": 7,
+            "codename": "change_table",
+            "name": "Can change table"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 27,
+        "fields": {
+            "content_type_id": 7,
+            "codename": "delete_table",
+            "name": "Can delete table"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 28,
+        "fields": {
+            "content_type_id": 7,
+            "codename": "view_table",
+            "name": "Can view table"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 29,
+        "fields": {
+            "content_type_id": 8,
+            "codename": "add_tablehastimeslot",
+            "name": "Can add table has time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 30,
+        "fields": {
+            "content_type_id": 8,
+            "codename": "change_tablehastimeslot",
+            "name": "Can change table has time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 31,
+        "fields": {
+            "content_type_id": 8,
+            "codename": "delete_tablehastimeslot",
+            "name": "Can delete table has time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 32,
+        "fields": {
+            "content_type_id": 8,
+            "codename": "view_tablehastimeslot",
+            "name": "Can view table has time slot"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 33,
+        "fields": {
+            "content_type_id": 9,
+            "codename": "add_category",
+            "name": "Can add category"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 34,
+        "fields": {
+            "content_type_id": 9,
+            "codename": "change_category",
+            "name": "Can change category"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 35,
+        "fields": {
+            "content_type_id": 9,
+            "codename": "delete_category",
+            "name": "Can delete category"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 36,
+        "fields": {
+            "content_type_id": 9,
+            "codename": "view_category",
+            "name": "Can view category"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 37,
+        "fields": {
+            "content_type_id": 10,
+            "codename": "add_order",
+            "name": "Can add order"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 38,
+        "fields": {
+            "content_type_id": 10,
+            "codename": "change_order",
+            "name": "Can change order"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 39,
+        "fields": {
+            "content_type_id": 10,
+            "codename": "delete_order",
+            "name": "Can delete order"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 40,
+        "fields": {
+            "content_type_id": 10,
+            "codename": "view_order",
+            "name": "Can view order"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 41,
+        "fields": {
+            "content_type_id": 11,
+            "codename": "add_product",
+            "name": "Can add product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 42,
+        "fields": {
+            "content_type_id": 11,
+            "codename": "change_product",
+            "name": "Can change product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 43,
+        "fields": {
+            "content_type_id": 11,
+            "codename": "delete_product",
+            "name": "Can delete product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 44,
+        "fields": {
+            "content_type_id": 11,
+            "codename": "view_product",
+            "name": "Can view product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 45,
+        "fields": {
+            "content_type_id": 12,
+            "codename": "add_ordercontainsproduct",
+            "name": "Can add order contains product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 46,
+        "fields": {
+            "content_type_id": 12,
+            "codename": "change_ordercontainsproduct",
+            "name": "Can change order contains product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 47,
+        "fields": {
+            "content_type_id": 12,
+            "codename": "delete_ordercontainsproduct",
+            "name": "Can delete order contains product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 48,
+        "fields": {
+            "content_type_id": 12,
+            "codename": "view_ordercontainsproduct",
+            "name": "Can view order contains product"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 49,
+        "fields": {
+            "content_type_id": 13,
+            "codename": "add_logentry",
+            "name": "Can add log entry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 50,
+        "fields": {
+            "content_type_id": 13,
+            "codename": "change_logentry",
+            "name": "Can change log entry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 51,
+        "fields": {
+            "content_type_id": 13,
+            "codename": "delete_logentry",
+            "name": "Can delete log entry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 52,
+        "fields": {
+            "content_type_id": 13,
+            "codename": "view_logentry",
+            "name": "Can view log entry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 53,
+        "fields": {
+            "content_type_id": 14,
+            "codename": "add_permission",
+            "name": "Can add permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 54,
+        "fields": {
+            "content_type_id": 14,
+            "codename": "change_permission",
+            "name": "Can change permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 55,
+        "fields": {
+            "content_type_id": 14,
+            "codename": "delete_permission",
+            "name": "Can delete permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 56,
+        "fields": {
+            "content_type_id": 14,
+            "codename": "view_permission",
+            "name": "Can view permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 57,
+        "fields": {
+            "content_type_id": 15,
+            "codename": "add_group",
+            "name": "Can add group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 58,
+        "fields": {
+            "content_type_id": 15,
+            "codename": "change_group",
+            "name": "Can change group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 59,
+        "fields": {
+            "content_type_id": 15,
+            "codename": "delete_group",
+            "name": "Can delete group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 60,
+        "fields": {
+            "content_type_id": 15,
+            "codename": "view_group",
+            "name": "Can view group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 61,
+        "fields": {
+            "content_type_id": 16,
+            "codename": "add_contenttype",
+            "name": "Can add content type"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 62,
+        "fields": {
+            "content_type_id": 16,
+            "codename": "change_contenttype",
+            "name": "Can change content type"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 63,
+        "fields": {
+            "content_type_id": 16,
+            "codename": "delete_contenttype",
+            "name": "Can delete content type"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 64,
+        "fields": {
+            "content_type_id": 16,
+            "codename": "view_contenttype",
+            "name": "Can view content type"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 65,
+        "fields": {
+            "content_type_id": 17,
+            "codename": "add_session",
+            "name": "Can add session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 66,
+        "fields": {
+            "content_type_id": 17,
+            "codename": "change_session",
+            "name": "Can change session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 67,
+        "fields": {
+            "content_type_id": 17,
+            "codename": "delete_session",
+            "name": "Can delete session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 68,
+        "fields": {
+            "content_type_id": 17,
+            "codename": "view_session",
+            "name": "Can view session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 69,
+        "fields": {
+            "content_type_id": 18,
+            "codename": "add_usernotification",
+            "name": "Can add user notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 70,
+        "fields": {
+            "content_type_id": 18,
+            "codename": "change_usernotification",
+            "name": "Can change user notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 71,
+        "fields": {
+            "content_type_id": 18,
+            "codename": "delete_usernotification",
+            "name": "Can delete user notification"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 72,
+        "fields": {
+            "content_type_id": 18,
+            "codename": "view_usernotification",
+            "name": "Can view user notification"
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 1,
         "fields": {
-            "last_login": "2025-06-10T09:11:36.500Z",
+            "password": "pbkdf2_sha256$1000000$oUWOyxWn5lxxXDeYifHyaC$E2kPADzqwben5RvhxGtWfFtLriEYvYU2UpoZpMaKeF8=",
+            "last_login": null,
             "is_superuser": false,
-            "first_name": "",
+            "first_name": "Fernando",
+            "email": "tusi.fer@gmail.com",
             "is_staff": true,
             "is_active": true,
-            "date_joined": "2025-06-06T20:23:11Z",
-            "name": "Fernando",
-            "last_name": "Tusi",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "tusi.fer.45",
-            "email": "tusi.fer@gmail.com",
-            "password": "pbkdf2_sha256$1000000$oUWOyxWn5lxxXDeYifHyaC$E2kPADzqwben5RvhxGtWfFtLriEYvYU2UpoZpMaKeF8=",
-            "groups": [
-                1
-            ],
-            "user_permissions": []
+            "name": "Fernando",
+            "last_name": "Tusi"
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 2,
         "fields": {
-            "last_login": "2025-06-09T18:14:03.649Z",
+            "password": "pbkdf2_sha256$1000000$M6B3rJ1NHuWHv41HhoIqmJ$/dLXTLkgbKhZZBldlN0TxTv3HNESRnDasb4grv3n+iA=",
+            "last_login": null,
             "is_superuser": true,
             "first_name": "",
+            "email": "admin@gmail.com",
             "is_staff": true,
             "is_active": true,
-            "date_joined": "2025-06-07T06:28:54.883Z",
-            "name": "",
-            "last_name": "",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "admin",
-            "email": "admin@gmail.com",
-            "password": "pbkdf2_sha256$1000000$M6B3rJ1NHuWHv41HhoIqmJ$/dLXTLkgbKhZZBldlN0TxTv3HNESRnDasb4grv3n+iA=",
-            "groups": [],
-            "user_permissions": []
+            "name": "",
+            "last_name": ""
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 3,
         "fields": {
-            "last_login": "2025-06-10T08:18:01.186Z",
+            "password": "pbkdf2_sha256$1000000$tAINHomtNMicRhZXueIMl8$2e55g5G0aEpftxITT9Kawt5XwbKR2S0057Ht2W+sfKg=",
+            "last_login": null,
             "is_superuser": false,
-            "first_name": "",
+            "first_name": "Pedro",
+            "email": "pepe.el.pollo@gmail.com",
             "is_staff": false,
             "is_active": true,
-            "date_joined": "2025-06-09T17:38:44Z",
-            "name": "Pedro",
-            "last_name": "Fernandez",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "elpepe777",
-            "email": "pepe.el.pollo@gmail.com",
-            "password": "pbkdf2_sha256$1000000$tAINHomtNMicRhZXueIMl8$2e55g5G0aEpftxITT9Kawt5XwbKR2S0057Ht2W+sfKg=",
-            "groups": [
-                3
-            ],
-            "user_permissions": []
+            "name": "Pedro",
+            "last_name": "Fernandez"
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 4,
         "fields": {
-            "last_login": "2025-06-10T01:22:37.732Z",
+            "password": "pbkdf2_sha256$1000000$2oSYu6OIJAI13HG69p6XgG$doL24zrvSNWSCZEb9gyp6w3GOaDdUFBY9xI1lPIiaqg=",
+            "last_login": null,
             "is_superuser": false,
-            "first_name": "",
+            "first_name": "Ignacio",
+            "email": "papu.igna999@gmail.com",
             "is_staff": true,
             "is_active": true,
-            "date_joined": "2025-06-09T18:19:55Z",
-            "name": "Ignacio",
-            "last_name": "Duberti",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "ignaprime0600",
-            "email": "papu.igna999@gmail.com",
-            "password": "pbkdf2_sha256$1000000$2oSYu6OIJAI13HG69p6XgG$doL24zrvSNWSCZEb9gyp6w3GOaDdUFBY9xI1lPIiaqg=",
-            "groups": [
-                2
-            ],
-            "user_permissions": []
+            "name": "Ignacio",
+            "last_name": "Duberti"
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 5,
         "fields": {
-            "last_login": "2025-06-10T04:00:51.213Z",
+            "password": "pbkdf2_sha256$1000000$ZQsnvdEdrNtkqjyOqEBwEo$/4t7Tq+D+2dDAo2FHVRx+rkbU++1C4+HOPseWugHeIc=",
+            "last_login": null,
             "is_superuser": false,
-            "first_name": "",
+            "first_name": "Lucas",
+            "email": "teamomessi.1812@gmail.com",
             "is_staff": true,
             "is_active": true,
-            "date_joined": "2025-06-09T18:28:16Z",
-            "name": "Lucas",
-            "last_name": "Messi",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "messilover2022",
-            "email": "teamomessi.1812@gmail.com",
-            "password": "pbkdf2_sha256$1000000$ZQsnvdEdrNtkqjyOqEBwEo$/4t7Tq+D+2dDAo2FHVRx+rkbU++1C4+HOPseWugHeIc=",
-            "groups": [
-                2
-            ],
-            "user_permissions": []
+            "name": "Lucas",
+            "last_name": "Messi"
         }
     },
     {
         "model": "accounts_app.user",
         "pk": 6,
         "fields": {
+            "password": "pbkdf2_sha256$1000000$MeP2dl5Zkoy4SBpCzkhE2p$uVbtyFvf5hUcLmcHIcGtjzVoWVE5kiKWx+AxssmSKC4=",
             "last_login": null,
             "is_superuser": false,
-            "first_name": "",
+            "first_name": "Tito",
+            "email": "titolewan09@gmail.com",
             "is_staff": false,
             "is_active": true,
-            "date_joined": "2025-06-10T04:12:03.812Z",
-            "name": "Tito",
-            "last_name": "Lewandowski",
+            "date_joined": "2023-01-01T00:00:00Z",
             "username": "tito09",
-            "email": "titolewan09@gmail.com",
-            "password": "pbkdf2_sha256$1000000$MeP2dl5Zkoy4SBpCzkhE2p$uVbtyFvf5hUcLmcHIcGtjzVoWVE5kiKWx+AxssmSKC4=",
-            "groups": [
-                3
-            ],
-            "user_permissions": []
+            "name": "Tito",
+            "last_name": "Lewandowski"
         }
     },
     {
-        "model": "accounts_app.usernotification",
+        "model": "accounts_app.user",
+        "pk": 7,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash1$fakesalt1=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Admin1",
+            "email": "admin@restaurante.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "admin1",
+            "name": "Administrador",
+            "last_name": "Sistema"
+        }
+    },
+    {
+        "model": "accounts_app.user",
+        "pk": 8,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash2$fakesalt2=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Cajero",
+            "email": "cajero1@restaurante.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "cajero1",
+            "name": "Carlos",
+            "last_name": "Gomez"
+        }
+    },
+    {
+        "model": "accounts_app.user",
+        "pk": 9,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash3$fakesalt3=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Cajero",
+            "email": "cajero2@restaurante.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "cajero2",
+            "name": "Laura",
+            "last_name": "Perez"
+        }
+    },
+    {
+        "model": "accounts_app.user",
+        "pk": 10,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash4$fakesalt4=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Cliente",
+            "email": "cliente1@restaurante.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "cliente1",
+            "name": "Juan",
+            "last_name": "Rodriguez"
+        }
+    },
+    {
+        "model": "accounts_app.user",
+        "pk": 11,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash5$fakesalt5=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Cliente",
+            "email": "cliente2@restaurante.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "cliente2",
+            "name": "Maria",
+            "last_name": "Gonzalez"
+        }
+    },
+    {
+        "model": "accounts_app.user",
+        "pk": 12,
+        "fields": {
+            "password": "pbkdf2_sha256$600000$fakehash6$fakesalt6=",
+            "last_login": null,
+            "is_superuser": false,
+            "first_name": "Cliente",
+            "email": "cliente3@restaurante.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2023-01-01T00:00:00Z",
+            "username": "cliente3",
+            "name": "Pedro",
+            "last_name": "Lopez"
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
         "pk": 1,
         "fields": {
-            "user": 3,
-            "notification": 1,
-            "is_read": true
+            "user_id": 3,
+            "group_id": 3
         }
     },
     {
-        "model": "accounts_app.usernotification",
+        "model": "accounts_app.user_groups",
         "pk": 2,
         "fields": {
-            "user": 6,
-            "notification": 1,
-            "is_read": false
+            "user_id": 1,
+            "group_id": 1
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 3,
+        "fields": {
+            "user_id": 4,
+            "group_id": 2
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 4,
+        "fields": {
+            "user_id": 5,
+            "group_id": 2
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 5,
+        "fields": {
+            "user_id": 6,
+            "group_id": 3
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 6,
+        "fields": {
+            "user_id": 7,
+            "group_id": 1
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 7,
+        "fields": {
+            "user_id": 8,
+            "group_id": 2
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 8,
+        "fields": {
+            "user_id": 9,
+            "group_id": 2
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 9,
+        "fields": {
+            "user_id": 10,
+            "group_id": 3
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 10,
+        "fields": {
+            "user_id": 11,
+            "group_id": 3
+        }
+    },
+    {
+        "model": "accounts_app.user_groups",
+        "pk": 11,
+        "fields": {
+            "user_id": 12,
+            "group_id": 3
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 1,
+        "fields": {
+            "name": "Berenjenas a la Parmesana",
+            "description": "Berenjenas gratinadas con salsa de tomate, queso mozzarella y albahaca fresca",
+            "price": 12.5,
+            "quantity": 10,
+            "slug": "berenjenas-a-la-parmesana"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 2,
+        "fields": {
+            "name": "Curry de Verduras",
+            "description": "Mezcla de verduras frescas en salsa de curry con leche de coco",
+            "price": 11.8,
+            "quantity": 10,
+            "slug": "curry-de-verduras"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 3,
+        "fields": {
+            "name": "Ensalada César",
+            "description": "Lechuga romana, croutons, queso parmesano y aderezo césar tradicional",
+            "price": 9.9,
+            "quantity": 10,
+            "slug": "ensalada-cesar"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 4,
+        "fields": {
+            "name": "Ensalada Griega",
+            "description": "Tomate, pepino, cebolla roja, aceitunas kalamata y queso feta con vinagreta de limón",
+            "price": 10.5,
+            "quantity": 10,
+            "slug": "ensalada-griega"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 5,
+        "fields": {
+            "name": "Empanada de Carne",
+            "description": "Masa casera rellena de carne picada, huevo, aceitunas y especias",
+            "price": 4.5,
+            "quantity": 10,
+            "slug": "empanada-de-carne"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 6,
+        "fields": {
+            "name": "Empanada de Queso y Cebolla",
+            "description": "Masa hojaldrada rellena de queso fundido y cebolla caramelizada",
+            "price": 4.2,
+            "quantity": 10,
+            "slug": "empanada-de-queso-y-cebolla"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 7,
+        "fields": {
+            "name": "Pizza Margherita",
+            "description": "Masa fina con salsa de tomate, mozzarella fresca y albahaca",
+            "price": 14.0,
+            "quantity": 10,
+            "slug": "pizza-margherita"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 8,
+        "fields": {
+            "name": "Pizza Pepperoni",
+            "description": "Masa tradicional con doble porción de pepperoni y queso mozzarella",
+            "price": 15.5,
+            "quantity": 10,
+            "slug": "pizza-pepperoni"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 9,
+        "fields": {
+            "name": "Hamburguesa Clásica",
+            "description": "Carne 100% res, queso cheddar, lechuga, tomate y salsa especial",
+            "price": 10.9,
+            "quantity": 10,
+            "slug": "hamburguesa-clasica"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 10,
+        "fields": {
+            "name": "Hamburguesa Vegana",
+            "description": "Medallón de garbanzos y espinacas con aguacate y mayonesa de zanahoria",
+            "price": 12.0,
+            "quantity": 10,
+            "slug": "hamburguesa-vegana"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 11,
+        "fields": {
+            "name": "Ceviche Mixto",
+            "description": "Pescado blanco, camarones y pulpo marinados en limón con ají y cilantro",
+            "price": 16.5,
+            "quantity": 10,
+            "slug": "ceviche-mixto"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 12,
+        "fields": {
+            "name": "Paella de Mariscos",
+            "description": "Arroz bomba con mejillones, calamares, gambas y azafrán",
+            "price": 18.0,
+            "quantity": 10,
+            "slug": "paella-de-mariscos"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 13,
+        "fields": {
+            "name": "Bife de Chorizo",
+            "description": "Corte premium de 300g con chimichurri y papas rústicas",
+            "price": 22.0,
+            "quantity": 10,
+            "slug": "bife-de-chorizo"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 14,
+        "fields": {
+            "name": "Pechuga a la Mostaza",
+            "description": "Pechuga de pollo grillada con salsa de mostaza y miel",
+            "price": 14.5,
+            "quantity": 10,
+            "slug": "pechuga-a-la-mostaza"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 15,
+        "fields": {
+            "name": "Fettuccine Alfredo",
+            "description": "Pasta fresca con salsa de crema, parmesano y pimienta negra",
+            "price": 13.5,
+            "quantity": 10,
+            "slug": "fettuccine-alfredo"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 16,
+        "fields": {
+            "name": "Raviolis de Ricotta",
+            "description": "Rellenos de ricotta y espinacas con salsa de tomate fresco",
+            "price": 12.9,
+            "quantity": 10,
+            "slug": "raviolis-de-ricotta"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 17,
+        "fields": {
+            "name": "Puré de Papas Trufado",
+            "description": "Puré cremoso con aceite de trufa negra y perejil",
+            "price": 6.5,
+            "quantity": 10,
+            "slug": "pure-de-papas-trufado"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 18,
+        "fields": {
+            "name": "Verduras al Wok",
+            "description": "Mezcla de brócoli, zanahoria y pimientos salteados con ajo",
+            "price": 7.0,
+            "quantity": 10,
+            "slug": "verduras-al-wok"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 19,
+        "fields": {
+            "name": "Malbec Reserva",
+            "description": "Copa de vino Malbec de bodega premium (175ml)",
+            "price": 8.0,
+            "quantity": 10,
+            "slug": "malbec-reserva"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 20,
+        "fields": {
+            "name": "Cerveza Artesanal IPA",
+            "description": "Botella 500ml de cerveza lupulada con 6.5% de alcohol",
+            "price": 6.5,
+            "quantity": 10,
+            "slug": "cerveza-artesanal-ipa"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 21,
+        "fields": {
+            "name": "Jugo de Naranja Natural",
+            "description": "Exprimido al momento sin conservantes",
+            "price": 4.5,
+            "quantity": 10,
+            "slug": "jugo-de-naranja-natural"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 22,
+        "fields": {
+            "name": "Agua con Gas",
+            "description": "Botella 750ml de agua mineral con gas",
+            "price": 3.0,
+            "quantity": 10,
+            "slug": "agua-con-gas"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 23,
+        "fields": {
+            "name": "Volcán de Chocolate",
+            "description": "Postre caliente con centro líquido de chocolate y helado de vainilla",
+            "price": 7.5,
+            "quantity": 10,
+            "slug": "volcan-de-chocolate"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 24,
+        "fields": {
+            "name": "Tiramisú",
+            "description": "Clásico italiano con capas de bizcocho, café y mascarpone",
+            "price": 6.9,
+            "quantity": 10,
+            "slug": "tiramisu"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 25,
+        "fields": {
+            "name": "Café Especial",
+            "description": "Café de altura con notas de caramelo y nuez",
+            "price": 3.5,
+            "quantity": 10,
+            "slug": "cafe-especial"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 26,
+        "fields": {
+            "name": "Té de Frutos Rojos",
+            "description": "Infusión herbal con frutos del bosque",
+            "price": 3.0,
+            "quantity": 10,
+            "slug": "te-de-frutos-rojos"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 27,
+        "fields": {
+            "name": "Menú Ejecutivo",
+            "description": "Plato del día + postre + bebida (consultar opciones diarias)",
+            "price": 15.0,
+            "quantity": 10,
+            "slug": "menu-ejecutivo"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 28,
+        "fields": {
+            "name": "Menú Vegetariano del Día",
+            "description": "Selección de platos vegetarianos según temporada",
+            "price": 14.0,
+            "quantity": 10,
+            "slug": "menu-vegetariano-del-dia"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 29,
+        "fields": {
+            "name": "Nuggets con Papas",
+            "description": "Pollo empanizado con papas fritas y salsa kétchup",
+            "price": 8.5,
+            "quantity": 10,
+            "slug": "nuggets-con-papas"
+        }
+    },
+    {
+        "model": "menu_app.product",
+        "pk": 30,
+        "fields": {
+            "name": "Mini Hamburguesa",
+            "description": "Versión pequeña de nuestra hamburguesa clásica con jugo o gaseosa",
+            "price": 9.0,
+            "quantity": 10,
+            "slug": "mini-hamburguesa"
         }
     }
 ]
