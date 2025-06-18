@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView
-
+from accounts_app.views import UserNotificationDeleteView  # o la vista que vayas a usar
+from accounts_app.views import UserNotificationDeleteAllView
 from accounts_app.views import (
     UserRegisterView,
     UserLoginView,
@@ -22,4 +23,7 @@ urlpatterns = [
     path('my_notifications/<int:pk>/', UserNotificationDetailView.as_view(), name='user_notification_detail'),
     path('profile/', ProfileView.as_view(), name='profile'),  # Usamos la vista basada en clase
     path('profile/edit-username/', EditUsernameView.as_view(), name='edit_username'),
+     path('my_notifications/delete/<int:pk>/',UserNotificationDeleteView.as_view(),name='user_notification_delete'),
+      path('my_notifications/delete_all/',UserNotificationDeleteAllView.as_view(),name='user_notification_delete_all'
+    ),
 ]

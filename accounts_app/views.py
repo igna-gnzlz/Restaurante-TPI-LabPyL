@@ -11,14 +11,29 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 import re
-
-
 from accounts_app.forms import UserRegisterForm, UserLoginForm
 from accounts_app.models import Notification, UserNotification
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import get_user_model
 user = get_user_model()
 
+from django.views.generic.edit import DeleteView
+from django.urls import reverse_lazy
+from .models import UserNotification  # Ajusta el modelo según tu caso
+from django.views import View
+from django.shortcuts import redirect
+from .models import UserNotification
+
+
+class UserNotificationDeleteAllView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        UserNotification.objects.filter(user=request.user).delete()
+        return redirect('accounts_app:user_notifications_list')
+
+class UserNotificationDeleteView(DeleteView):
+    model = UserNotification
+    success_url = reverse_lazy('accounts_app:user_notifications_list')
+    template_name = 'accounts_app/user_notification_confirm_delete.html'
 
 class EditUsernameForm(forms.ModelForm):
     class Meta:
