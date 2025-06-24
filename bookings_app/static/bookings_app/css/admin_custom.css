@@ -1,0 +1,4 @@
+/* Oculta la opción 'Todas' de todos los filtros laterales */
+#changelist-filter li:first-child {
+    display: none;
+}

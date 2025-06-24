@@ -1,14 +1,10 @@
 from django.views.generic import FormView, ListView, DetailView
-from django.urls import reverse_lazy
 from django.contrib import messages
 from accounts_app.forms import UserRegisterForm, UserLoginForm
 from accounts_app.models import Notification, UserNotification
-
 from django.contrib.auth.views import LoginView
-
-from django.contrib.auth.models import Group
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 
 

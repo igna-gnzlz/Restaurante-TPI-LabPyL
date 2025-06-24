@@ -1,10 +1,7 @@
 from django import forms
-from django.contrib.auth import authenticate
-from accounts_app.models import User, Notification, UserNotification
+from accounts_app.models import User, Notification
 import re
 from django.contrib.auth.models import Group
-
-from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
 
@@ -180,7 +177,7 @@ class UserAdminRegisterForm(forms.ModelForm, UserValidationMixin):
 
 class NotificationForm(forms.ModelForm):
     recipients = forms.ModelMultipleChoiceField(
-        queryset=User.objects.none(),  # lo seteo en __init__
+        queryset=User.objects.none(),  # lo seteoh en __init__
         required=False,
         widget=forms.CheckboxSelectMultiple,
         label="Usuarios destinatarios (Clientes)"

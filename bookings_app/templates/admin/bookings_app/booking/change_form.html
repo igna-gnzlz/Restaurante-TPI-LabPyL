@@ -1,0 +1,15 @@
+{% extends "admin/change_form.html" %}
+
+{% block submit_buttons_bottom %}
+    <div class="submit-row">
+        <a href="{{ changelist_url }}" class="button cancel-link">Salir</a>
+        {% if mostrar_acciones %}
+            <button type="submit" name="_accept" class="button" style="background-color:#28a745; color:white;">Aceptar</button>
+            <button type="submit" name="_reject" class="button" style="background-color:#fd7e14; color:white;">Rechazar</button>
+        {% endif %}
+
+        {% if has_delete_permission %}
+            <a href="{{ delete_url }}" class="button deletelink">Eliminar</a>
+        {% endif %}
+    </div>
+{% endblock %}

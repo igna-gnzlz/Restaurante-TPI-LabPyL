@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Card de Proxima Reserva / Reserva Actual -->
+    <div id="proxima-reserva-container">
+        {% include 'bookings_app/includes/get_next_reservation_card.html' %}
+    </div>
+
+    <!-- Card Reservas Futuras -->
+    <div id="reservas-futuras-container">
+        {% include 'bookings_app/includes/get_future_reservations_card.html' %}
+    </div>
+
+    <!-- Card Reservas Pendientes -->
+    <div id="reservas-pendientes-container">
+        {% include 'bookings_app/includes/get_pending_reservations_card.html' %}
+    </div>
+
+    <!-- Card Historial de Reservas -->
+    <div class="card mb-4 sombra-gris">
+        <div class="card-body">
+            <h4 class="card-title text-center">Historial de Reservas</h4>
+            <div class="row">
+                <!-- Aprobadas -->
+                <div class="col-md-6">
+                    <div class="card mb-3 ">
+                        <div class="card-body">
+                            <div id="historial-aprobadas-container">
+                                {% include 'bookings_app/includes/get_history_reservations_aprobadas_card.html' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rechazadas -->
+                <div class="col-md-6">
+                    <div class="card mb-3 ">
+                        <div class="card-body">
+                            <div id="historial-rechazadas-container">
+                                {% include 'bookings_app/includes/get_history_reservations_rechazadas_card.html' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <a href="/" class="btn btn-secondary mt-4 mb-3">Volver al inicio</a>
+
+    <!-- Clase Modal de Ver Detalles -->
+    <div class="modal fade" id="detalleReservaModal" tabindex="-1" aria-labelledby="detalleReservaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleReservaModalLabel">Detalles de la Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                    <div class="modal-body">
+                        <p><strong>Código:</strong> <span id="modal-code"></span></p>
+                        <p><strong>Fecha de Reserva:</strong> <span id="modal-date"></span></p>
+                        <p><strong>Fecha de Emisión:</strong> <span id="modal-issue_date"></span></p>
+                        <p id="approval-date-container" class="d-none">
+                            <strong>Fecha de Aprobación:</strong> <span id="modal-approval_date"></span>
+                        </p>
+                        <p><strong>Franja Horaria:</strong> <span id="modal-time_slot"></span></p>
+                        <p><strong>Observaciones:</strong> <span id="modal-observations"></span></p>
+                        <p><strong>Mesas:</strong> <span id="modal-tables"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clase Modal de Eliminar -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que querés eliminar esta reserva?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<style>
+.sombra-verde {
+    box-shadow: 0 0 15px rgba(0, 128, 0, 0.4);
+}
+
+.borde-verde {
+    border: 1px solid #198754;
+}
+
+.fondo-verde {
+    background-color: #d4edda !important; 
+}
+
+.sombra-violeta {
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.35);
+}
+
+.borde-violeta {
+    border: 1px solid #8a2be2;
+}
+
+.fondo-violeta {
+    background-color: #e6e0f8 !important; 
+}
+
+
+.sombra-celeste {
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.35);
+}
+
+.borde-celeste {
+    border: 1px solid #0d6efd;
+}
+
+.fondo-celeste {
+    background-color: #d1ecf1 !important;
+}
+
+.sombra-gris {
+    box-shadow: 0 0 15px rgba(128, 128, 128, 0.35); 
+}
+
+.borde-gris {
+    border: 1px solid #6c757d;
+}
+
+.fondo-gris {
+    background-color: #f8f9fa !important; 
+}
+
+.fondo-error-rojo {
+    background-color: #f8d7da !important;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+</style>
+
+<script>
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    let deleteBookingId = null;
+
+    // Guardar id de reserva a eliminar
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        deleteBookingId = button.getAttribute('data-id');
+    });
+
+    // Confirmar eliminación
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        if (deleteBookingId) {
+            fetch("{% url 'bookings_app:delete_booking' 0 %}".replace('0', deleteBookingId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la solicitud');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+
+                    // Cerramos modal
+                    var modalInstance = bootstrap.Modal.getInstance(confirmDeleteModal);
+                    modalInstance.hide();
+
+                    // Actualizar Próxima Reserva
+                    fetch("{% url 'bookings_app:get_next_reservation' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('proxima-reserva-container').innerHTML = data.card_html;
+                    });
+
+                    // Actualizar Reservas Futuras
+                    fetch("{% url 'bookings_app:get_future_reservations' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('reservas-futuras-container').innerHTML = data.card_html;
+                    });
+
+                    // Actualizar Reservas Pendientes
+                    fetch("{% url 'bookings_app:get_pending_reservations' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('reservas-pendientes-container').innerHTML = data.card_html;
+                    });
+
+                    // Actualizar Historial Aprobadas
+                    fetch("{% url 'bookings_app:get_history_aprobadas' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('historial-aprobadas-container').innerHTML = data.card_html;
+                    });
+
+                    // Actualizar Historial Rechazadas
+                    fetch("{% url 'bookings_app:get_history_rechazadas' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('historial-rechazadas-container').innerHTML = data.card_html;
+                    });
+
+                } else {
+                    alert('No se pudo eliminar la reserva.');
+                }
+            })
+            .catch(error => {
+                alert('Error al intentar eliminar la reserva.');
+                console.error(error);
+            });
+        }
+    });
+
+    function actualizarProximaReserva() {
+        fetch("{% url 'bookings_app:get_next_reservation' %}")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('proxima-reserva-container').innerHTML = data.card_html;
+        });
+    }
+
+    // Llamar cada minuto (60000 ms)
+    setInterval(actualizarProximaReserva, 60000);
+
+    // Opcional: llamada inicial
+    actualizarProximaReserva();
+
+
+    // Modal de detalles reserva
+    var detalleReservaModal = document.getElementById('detalleReservaModal')
+    detalleReservaModal.addEventListener('show.bs.modal', function (event) {
+        // Botón que abrió el modal
+        var button = event.relatedTarget 
+
+        // Extraer info de atributos data-*
+        var code = button.getAttribute('data-code')
+        var date = button.getAttribute('data-date')
+        var issue_date = button.getAttribute('data-issue_date')
+        var time_slot = button.getAttribute('data-time_slot')
+        var observations = button.getAttribute('data-observations')
+        var tables = button.getAttribute('data-tables')
+
+        // Actualizar el contenido del modal
+        detalleReservaModal.querySelector('#modal-code').textContent = code
+        detalleReservaModal.querySelector('#modal-date').textContent = date
+        detalleReservaModal.querySelector('#modal-issue_date').textContent = issue_date
+        detalleReservaModal.querySelector('#modal-time_slot').textContent = time_slot
+        detalleReservaModal.querySelector('#modal-observations').textContent = observations
+        detalleReservaModal.querySelector('#modal-tables').textContent = tables
+
+        // Mostrar u ocultar fecha de aprobación
+        var approvalDateContainer = detalleReservaModal.querySelector('#approval-date-container')
+        if (approval_date && approval_date.trim() !== "") {
+            approvalDateContainer.classList.remove('d-none')
+            detalleReservaModal.querySelector('#modal-approval_date').textContent = approval_date
+        } else {
+            approvalDateContainer.classList.add('d-none')
+            detalleReservaModal.querySelector('#modal-approval_date').textContent = ""
+        }
+        })
+
+</script>
+
+{% endblock %}

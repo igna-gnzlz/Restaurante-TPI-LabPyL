@@ -51,10 +51,9 @@
                                 {% navbar_link 'menu' 'Menu' %}
                             </li>
                         </ul>
-
-                        <!-- Botones de Iniciar Sesión y Registrarse alineados a la derecha -->
                         <div class="d-flex gap-2 ms-auto">
                             {% if request.user.is_authenticated %}
+                                <a href="{% url 'bookings_app:make_reservation' %}" class="btn btn-primary btn-sm">Reservar</a>
                                 <div class="dropdown">
                                     <button class="btn btn-outline-primary btn-sm dropdown-toggle"
                                         type="button"
@@ -63,6 +62,9 @@
                                         {{ request.user.username }}
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'bookings_app:my_reservation' %}">Mis Reservas</a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">Notificaciones</a>
                                         </li>
