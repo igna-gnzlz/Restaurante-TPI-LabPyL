@@ -1417,7 +1417,7 @@
         "model": "accounts_app.user",
         "pk": 2,
         "fields": {
-            "password": "pbkdf2_sha256$1000000$M6B3rJ1NHuWHv41HhoIqmJ$/dLXTLkgbKhZZBldlN0TxTv3HNESRnDasb4grv3n+iA=",
+            "password": "pbkdf2_sha256$1000000$UkfG2CrjhGsQwYDDD1AY5m$OmCzC2Pgn0h36hNQTznKnkOxRDZxur552z8flJ7DC38=",
             "last_login": null,
             "is_superuser": true,
             "first_name": "",
@@ -1425,7 +1425,7 @@
             "is_staff": true,
             "is_active": true,
             "date_joined": "2023-01-01T00:00:00Z",
-            "username": "admin",
+            "username": "superuser1",
             "name": "",
             "last_name": ""
         }
@@ -1502,7 +1502,7 @@
         "model": "accounts_app.user",
         "pk": 7,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash1$fakesalt1=",
+            "password": "pbkdf2_sha256$1000000$4mRsbqRYKmNjzJCESqU61P$bEaBixWStjwFYrjQ92KHIoBQB96DJk9/ICvshYJx0ik=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Admin1",
@@ -1510,7 +1510,7 @@
             "is_staff": true,
             "is_active": true,
             "date_joined": "2023-01-01T00:00:00Z",
-            "username": "admin1",
+            "username": "administrador",
             "name": "Administrador",
             "last_name": "Sistema"
         }
@@ -1519,7 +1519,7 @@
         "model": "accounts_app.user",
         "pk": 8,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash2$fakesalt2=",
+            "password": "pbkdf2_sha256$1000000$fXLULep8GW9oUpOaJ9HnTj$BpOFTSVWtLKQ3Vw+MTE93udklWVi9+6NLabkEJOR4CM=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Cajero",
@@ -1536,7 +1536,7 @@
         "model": "accounts_app.user",
         "pk": 9,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash3$fakesalt3=",
+            "password": "pbkdf2_sha256$1000000$29V6qDoQwiqI3sAAlRsFZm$IH7FWj+wi9zXRp8ThFzQgz1SmCnGk+BU/fBCW9hYRII=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Cajero",
@@ -1553,7 +1553,7 @@
         "model": "accounts_app.user",
         "pk": 10,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash4$fakesalt4=",
+            "password": "pbkdf2_sha256$1000000$QPLdEYUfgopMnyCfgenrqu$Il9baOeV1jKvHKaizkVbJQgnV1O/if422H5I/91ez3o=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Cliente",
@@ -1570,7 +1570,7 @@
         "model": "accounts_app.user",
         "pk": 11,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash5$fakesalt5=",
+            "password": "pbkdf2_sha256$1000000$RXRK3DGsJXwFYw2VLR9c8o$AL5yG8/i131fbTSmsePQlAj2C54/sajhX9KsemM8oi0=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Cliente",
@@ -1587,7 +1587,7 @@
         "model": "accounts_app.user",
         "pk": 12,
         "fields": {
-            "password": "pbkdf2_sha256$600000$fakehash6$fakesalt6=",
+            "password": "pbkdf2_sha256$1000000$tV8OMLYGqAVTGAguWTUiy8$r0skz4IkdneCy3Vhe4GoMgYDIqQ2pEwZBbCzCU+zgGk=",
             "last_login": null,
             "is_superuser": false,
             "first_name": "Cliente",
@@ -1689,333 +1689,291 @@
         }
     },
     {
+        "model": "menu_app.category",
+        "pk": 1,
+        "fields": {
+            "name": "Entradas",
+            "description": "Platos ligeros servidos al comienzo de la comida.",
+            "isActive": true
+        }
+    },
+    {
+        "model": "menu_app.category",
+        "pk": 2,
+        "fields": {
+            "name": "Platos principales",
+            "description": "Platos fuertes que constituyen el eje central del menú.",
+            "isActive": true
+        }
+    },
+    {
+        "model": "menu_app.category",
+        "pk": 3,
+        "fields": {
+            "name": "Acompañamientos",
+            "description": "Guarniciones o complementos para acompañar los platos principales.",
+            "isActive": true
+        }
+    },
+    {
+        "model": "menu_app.category",
+        "pk": 4,
+        "fields": {
+            "name": "Postres",
+            "description": "Opciones dulces servidas al finalizar la comida.",
+            "isActive": true
+        }
+    },
+    {
+        "model": "menu_app.category",
+        "pk": 5,
+        "fields": {
+            "name": "Bebidas sin alcohol",
+            "description": "Refrescos, jugos, aguas y otras bebidas no alcohólicas.",
+            "isActive": true
+        }
+    },
+    {
+        "model": "menu_app.category",
+        "pk": 6,
+        "fields": {
+            "name": "Bebidas con alcohol",
+            "description": "Vinos, cervezas, cócteles y otras bebidas alcohólicas.",
+            "isActive": true
+        }
+    },
+    {
         "model": "menu_app.product",
         "pk": 1,
         "fields": {
-            "name": "Berenjenas a la Parmesana",
-            "description": "Berenjenas gratinadas con salsa de tomate, queso mozzarella y albahaca fresca",
-            "price": 12.5,
+            "name": "Agua sin Gas",
+            "description": "Botella de 750ml de agua mineral sin gas",
+            "price": 1000.0,
             "quantity": 10,
-            "slug": "berenjenas-a-la-parmesana"
+            "image": "/static/images/agua_sin_gas.jpg",
+            "slug": "agua-sin-gas",
+            "category": 5
         }
     },
     {
         "model": "menu_app.product",
         "pk": 2,
         "fields": {
-            "name": "Curry de Verduras",
-            "description": "Mezcla de verduras frescas en salsa de curry con leche de coco",
-            "price": 11.8,
+            "name": "Café con Leche",
+            "description": "Café con Leche. Delicioso",
+            "price": 3500.0,
             "quantity": 10,
-            "slug": "curry-de-verduras"
+            "image": "/static/images/cafe_con_leche.jpg",
+            "slug": "cafe-con-leche",
+            "category": 5
         }
     },
     {
         "model": "menu_app.product",
         "pk": 3,
         "fields": {
-            "name": "Ensalada César",
-            "description": "Lechuga romana, croutons, queso parmesano y aderezo césar tradicional",
-            "price": 9.9,
+            "name": "Milanesa a la Napolitana",
+            "description": "Milanesa de ternera con jamón, queso muzzarella y salsa de tomate, acompañada de guarnición a elección",
+            "price": 15000.0,
             "quantity": 10,
-            "slug": "ensalada-cesar"
+            "image": "/static/images/mila_napo.jpg",
+            "slug": "milanesa-napolitana",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 4,
         "fields": {
-            "name": "Ensalada Griega",
-            "description": "Tomate, pepino, cebolla roja, aceitunas kalamata y queso feta con vinagreta de limón",
-            "price": 10.5,
+            "name": "Milanesa a Caballo",
+            "description": "Milanesa de ternera coronada con huevo frito, acompañada de guarnición a elección",
+            "price": 15000.0,
             "quantity": 10,
-            "slug": "ensalada-griega"
+            "image": "/static/images/milanesa_caballo.jpg",
+            "slug": "milanesa-caballo",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 5,
         "fields": {
-            "name": "Empanada de Carne",
-            "description": "Masa casera rellena de carne picada, huevo, aceitunas y especias",
-            "price": 4.5,
+            "name": "Puré de Papas Cremoso",
+            "description": "Preparado con papas seleccionadas, manteca y leche fresca. ¡El acompañamiento perfecto para tus milanesas!",
+            "price": 5000.0,
             "quantity": 10,
-            "slug": "empanada-de-carne"
+            "image": "/static/images/pure_papas.jpg",
+            "slug": "pure-papas",
+            "category": 3
         }
     },
     {
         "model": "menu_app.product",
         "pk": 6,
         "fields": {
-            "name": "Empanada de Queso y Cebolla",
-            "description": "Masa hojaldrada rellena de queso fundido y cebolla caramelizada",
-            "price": 4.2,
+            "name": "Bife de Chorizo",
+            "description": "Corte premium de 300g con chimichurri",
+            "price": 21000.0,
             "quantity": 10,
-            "slug": "empanada-de-queso-y-cebolla"
+            "image": "/static/images/bife_chorizo.jpg",
+            "slug": "bife-chorizo",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 7,
         "fields": {
-            "name": "Pizza Margherita",
-            "description": "Masa fina con salsa de tomate, mozzarella fresca y albahaca",
-            "price": 14.0,
+            "name": "Asado de Tira",
+            "description": "Costillar argentino cortado transversalmente",
+            "price": 22000.0,
             "quantity": 10,
-            "slug": "pizza-margherita"
+            "image": "/static/images/asado_tira.jpg",
+            "slug": "asado-tira",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 8,
         "fields": {
-            "name": "Pizza Pepperoni",
-            "description": "Masa tradicional con doble porción de pepperoni y queso mozzarella",
-            "price": 15.5,
+            "name": "Hamburguesa Criolla",
+            "description": "Carne 100% res con queso, lechuga, tomate y salsa criolla",
+            "price": 13000.0,
             "quantity": 10,
-            "slug": "pizza-pepperoni"
+            "image": "/static/images/hamburguesa_criolla.jpg",
+            "slug": "hamburguesa-criolla",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 9,
         "fields": {
-            "name": "Hamburguesa Clásica",
-            "description": "Carne 100% res, queso cheddar, lechuga, tomate y salsa especial",
-            "price": 10.9,
+            "name": "Ñoquis del 29",
+            "description": "Ñoquis caseros con salsa fileto (tradición de los días 29)",
+            "price": 11000.0,
             "quantity": 10,
-            "slug": "hamburguesa-clasica"
+            "image": "/static/images/nioquis.jpg",
+            "slug": "nioquis-29",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 10,
         "fields": {
-            "name": "Hamburguesa Vegana",
-            "description": "Medallón de garbanzos y espinacas con aguacate y mayonesa de zanahoria",
-            "price": 12.0,
+            "name": "Sorrentinos de Jamón y Queso",
+            "description": "Pasta rellena con jamón natural y muzzarella",
+            "price": 12000.0,
             "quantity": 10,
-            "slug": "hamburguesa-vegana"
+            "image": "/static/images/sorrentinos.jpg",
+            "slug": "sorrentinos-jamon-queso",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 11,
         "fields": {
-            "name": "Ceviche Mixto",
-            "description": "Pescado blanco, camarones y pulpo marinados en limón con ají y cilantro",
-            "price": 16.5,
+            "name": "Empanadas Salteñas (3 unidades)",
+            "description": "Empanadas de carne cortada a cuchillo con papa y comino. Se sirven 3 unidades",
+            "price": 4500.0,
             "quantity": 10,
-            "slug": "ceviche-mixto"
+            "image": "/static/images/empanadas_saltenas.jpg",
+            "slug": "empanadas-saltenas",
+            "category": 1
         }
     },
     {
         "model": "menu_app.product",
         "pk": 12,
         "fields": {
-            "name": "Paella de Mariscos",
-            "description": "Arroz bomba con mejillones, calamares, gambas y azafrán",
-            "price": 18.0,
+            "name": "Merluza a la Romana",
+            "description": "Filete de merluza rebozado con limón",
+            "price": 16000.0,
             "quantity": 10,
-            "slug": "paella-de-mariscos"
+            "image": "/static/images/merluza_romana.jpg",
+            "slug": "merluza-romana",
+            "category": 2
         }
     },
     {
         "model": "menu_app.product",
         "pk": 13,
         "fields": {
-            "name": "Bife de Chorizo",
-            "description": "Corte premium de 300g con chimichurri y papas rústicas",
-            "price": 22.0,
+            "name": "Provoleta",
+            "description": "Queso provolone grillado con orégano y ají molido",
+            "price": 10000.0,
             "quantity": 10,
-            "slug": "bife-de-chorizo"
+            "image": "/static/images/provoleta.jpg",
+            "slug": "provoleta",
+            "category": 1
         }
     },
     {
         "model": "menu_app.product",
         "pk": 14,
         "fields": {
-            "name": "Pechuga a la Mostaza",
-            "description": "Pechuga de pollo grillada con salsa de mostaza y miel",
-            "price": 14.5,
+            "name": "Papas Fritas Provenzal",
+            "description": "Papas fritas con ajo y perejil fresco",
+            "price": 7000.0,
             "quantity": 10,
-            "slug": "pechuga-a-la-mostaza"
+            "image": "/static/images/papas_provenzal.jpg",
+            "slug": "papas-provenzal",
+            "category": 3
         }
     },
     {
         "model": "menu_app.product",
         "pk": 15,
         "fields": {
-            "name": "Fettuccine Alfredo",
-            "description": "Pasta fresca con salsa de crema, parmesano y pimienta negra",
-            "price": 13.5,
+            "name": "Malbec Reserve",
+            "description": "Vino tinto malbec de Mendoza (copa 250ml)",
+            "price": 9000.0,
             "quantity": 10,
-            "slug": "fettuccine-alfredo"
+            "image": "/static/images/malbec.jpg",
+            "slug": "malbec-reserve",
+            "category": 6
         }
     },
     {
         "model": "menu_app.product",
         "pk": 16,
         "fields": {
-            "name": "Raviolis de Ricotta",
-            "description": "Rellenos de ricotta y espinacas con salsa de tomate fresco",
-            "price": 12.9,
+            "name": "Torrontés",
+            "description": "Vino blanco torrontés de Salta (copa 250ml)",
+            "price": 8500.0,
             "quantity": 10,
-            "slug": "raviolis-de-ricotta"
+            "image": "/static/images/torrontes.jpg",
+            "slug": "torrontes-salta",
+            "category": 6
         }
     },
     {
         "model": "menu_app.product",
         "pk": 17,
         "fields": {
-            "name": "Puré de Papas Trufado",
-            "description": "Puré cremoso con aceite de trufa negra y perejil",
-            "price": 6.5,
+            "name": "Flan con Dulce de Leche",
+            "description": "Flan casero con dulce de leche y crema",
+            "price": 8000.0,
             "quantity": 10,
-            "slug": "pure-de-papas-trufado"
+            "image": "/static/images/flan_dulce_leche.jpg",
+            "slug": "flan-dulce-leche",
+            "category": 4
         }
     },
     {
         "model": "menu_app.product",
         "pk": 18,
         "fields": {
-            "name": "Verduras al Wok",
-            "description": "Mezcla de brócoli, zanahoria y pimientos salteados con ajo",
-            "price": 7.0,
+            "name": "Agua Saborizada Pomelo",
+            "description": "Botella de 750ml de agua saborizada natural",
+            "price": 2500.0,
             "quantity": 10,
-            "slug": "verduras-al-wok"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 19,
-        "fields": {
-            "name": "Malbec Reserva",
-            "description": "Copa de vino Malbec de bodega premium (175ml)",
-            "price": 8.0,
-            "quantity": 10,
-            "slug": "malbec-reserva"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 20,
-        "fields": {
-            "name": "Cerveza Artesanal IPA",
-            "description": "Botella 500ml de cerveza lupulada con 6.5% de alcohol",
-            "price": 6.5,
-            "quantity": 10,
-            "slug": "cerveza-artesanal-ipa"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 21,
-        "fields": {
-            "name": "Jugo de Naranja Natural",
-            "description": "Exprimido al momento sin conservantes",
-            "price": 4.5,
-            "quantity": 10,
-            "slug": "jugo-de-naranja-natural"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 22,
-        "fields": {
-            "name": "Agua con Gas",
-            "description": "Botella 750ml de agua mineral con gas",
-            "price": 3.0,
-            "quantity": 10,
-            "slug": "agua-con-gas"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 23,
-        "fields": {
-            "name": "Volcán de Chocolate",
-            "description": "Postre caliente con centro líquido de chocolate y helado de vainilla",
-            "price": 7.5,
-            "quantity": 10,
-            "slug": "volcan-de-chocolate"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 24,
-        "fields": {
-            "name": "Tiramisú",
-            "description": "Clásico italiano con capas de bizcocho, café y mascarpone",
-            "price": 6.9,
-            "quantity": 10,
-            "slug": "tiramisu"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 25,
-        "fields": {
-            "name": "Café Especial",
-            "description": "Café de altura con notas de caramelo y nuez",
-            "price": 3.5,
-            "quantity": 10,
-            "slug": "cafe-especial"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 26,
-        "fields": {
-            "name": "Té de Frutos Rojos",
-            "description": "Infusión herbal con frutos del bosque",
-            "price": 3.0,
-            "quantity": 10,
-            "slug": "te-de-frutos-rojos"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 27,
-        "fields": {
-            "name": "Menú Ejecutivo",
-            "description": "Plato del día + postre + bebida (consultar opciones diarias)",
-            "price": 15.0,
-            "quantity": 10,
-            "slug": "menu-ejecutivo"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 28,
-        "fields": {
-            "name": "Menú Vegetariano del Día",
-            "description": "Selección de platos vegetarianos según temporada",
-            "price": 14.0,
-            "quantity": 10,
-            "slug": "menu-vegetariano-del-dia"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 29,
-        "fields": {
-            "name": "Nuggets con Papas",
-            "description": "Pollo empanizado con papas fritas y salsa kétchup",
-            "price": 8.5,
-            "quantity": 10,
-            "slug": "nuggets-con-papas"
-        }
-    },
-    {
-        "model": "menu_app.product",
-        "pk": 30,
-        "fields": {
-            "name": "Mini Hamburguesa",
-            "description": "Versión pequeña de nuestra hamburguesa clásica con jugo o gaseosa",
-            "price": 9.0,
-            "quantity": 10,
-            "slug": "mini-hamburguesa"
+            "image": "/static/images/agua_pomelo.jpg",
+            "slug": "agua-pomelo",
+            "category": 5
         }
     }
 ]
