@@ -50,9 +50,6 @@
                             <li class="nav-item">
                                 {% navbar_link 'menu_app:menu' 'Menu' %}
                             </li>
-                            <li class="nav-item">
-                                {% navbar_link 'order_detail' 'Mi Pedido' %}
-                            </li>
                         </ul>
                         <div class="d-flex gap-2 ms-auto">
                             {% if request.user.is_authenticated %}
@@ -71,13 +68,7 @@
                                         <li>
                                             <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">Notificaciones</a>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'user_reservations_history' %}">Mis Reservas</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'user_orders_history' %}">Historial de pedidos</a>
-                                        </li>
-                                        <li>
+                                        
                                         <a class="dropdown-item" href="{% url 'accounts_app:profile' %}">Mi perfil</a>
                                         </li>
                                         <li>
