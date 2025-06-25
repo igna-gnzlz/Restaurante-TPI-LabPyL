@@ -217,3 +217,26 @@ class NotificationForm(forms.ModelForm):
             raise forms.ValidationError('Debe seleccionar al menos un destinatario o marcar "Enviar a todos".')
 
         return cleaned_data
+
+
+class EditUsernameForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username']
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username', '').strip()
+        # Validación de caracteres permitidos
+        if not re.fullmatch(r'[A-Za-z0-9.]+', username):
+            raise forms.ValidationError("El nombre de usuario solo puede contener letras, números y puntos.")
+        
+        max_length = self.fields['username'].max_length
+        if len(username) > max_length:
+            raise forms.ValidationError(f"El nombre de usuario no puede superar los {max_length} caracteres.")
+
+        # Permitir que el usuario mantenga su mismo username sin error
+        # self.instance es el usuario actual
+        if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Este nombre de usuario ya está registrado.")
+        
+        return username
