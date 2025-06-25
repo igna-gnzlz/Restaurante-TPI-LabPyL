@@ -1,11 +1,84 @@
-from django.views.generic import TemplateView, ListView, DetailView
-from .models import Product
-from bookings_app.models import Booking
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from .models import Product, Order, OrderContainsProduct
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.timezone import now
+import uuid
+
+from .forms import AddOneForm, RemoveOneForm, DeleteItemForm, CancelOrderForm
+
+class AddOneView(LoginRequiredMixin, View):
+    def post(self, request):
+        form = AddOneForm(request.POST)
+        if form.is_valid():
+            item_id = form.cleaned_data['item_id']
+            item = get_object_or_404(
+                OrderContainsProduct,
+                id=item_id,
+                order__user=request.user,
+                order__state='P'
+            )
+            item.quantity += 1
+            item.subtotal = item.quantity * item.product.price
+            item.save()
+            order = item.order
+            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
+            order.save()
+        return redirect('menu_app:order_detail')
+
+class RemoveOneView(LoginRequiredMixin, View):
+    def post(self, request):
+        form = RemoveOneForm(request.POST)
+        if form.is_valid():
+            item_id = form.cleaned_data['item_id']
+            item = get_object_or_404(
+                OrderContainsProduct,
+                id=item_id,
+                order__user=request.user,
+                order__state='P'
+            )
+            order = item.order
+            if item.quantity > 1:
+                item.quantity -= 1
+                item.subtotal = item.quantity * item.product.price
+                item.save()
+            else:
+                item.delete()
+            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
+            order.save()
+        return redirect('menu_app:order_detail')
+
+class DeleteItemView(LoginRequiredMixin, View):
+    def post(self, request):
+        form = DeleteItemForm(request.POST)
+        if form.is_valid():
+            item_id = form.cleaned_data['item_id']
+            item = get_object_or_404(
+                OrderContainsProduct,
+                id=item_id,
+                order__user=request.user,
+                order__state='P'
+            )
+            order = item.order
+            item.delete()
+            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
+            order.save()
+        return redirect('menu_app:order_detail')
+
+class CancelOrderView(LoginRequiredMixin, FormView):
+    template_name = 'menu_app/cancel_order.html'
+    form_class = CancelOrderForm  # <--- sin paréntesis ni argumentos
+
+    def form_valid(self, form):
+        order_id = form.cleaned_data['order_id']
+        order = get_object_or_404(Order, id=order_id, user=self.request.user, state='P')
+        order.delete()
+        return redirect('menu_app:menu')
 
 
 class HomeView(TemplateView):
     template_name = "home.html"
-
 
 class MenuListView(ListView):
     model = Product
@@ -15,26 +88,49 @@ class MenuListView(ListView):
     def get_queryset(self):
         return Product.objects.all().order_by("name")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-
 class ProductDetailView(DetailView):
     model = Product
     template_name = "menu_app/product_detail.html"
     context_object_name = "product"
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
 
-class BookingListView(ListView):
-    model = Booking
-    template_name = "menu_app/booking_list.html"
-    context_object_name = "bookings"
+class AddToOrderView(LoginRequiredMixin, View):
+    def post(self, request, slug):
+        product = get_object_or_404(Product, slug=slug)
+        order, created = Order.objects.get_or_create(
+            user=request.user,
+            state='P',
+            defaults={
+                'buyDate': now().date(),
+                'code': uuid.uuid4().hex[:15],
+                'amount': 0.0,
+            }
+        )
+        ocp, created_ocp = OrderContainsProduct.objects.get_or_create(
+            order=order,
+            product=product,
+            defaults={
+                'subtotal': product.price,
+                'quantity': 1
+            }
+        )
+        if not created_ocp:
+            ocp.quantity += 1
+            ocp.subtotal = ocp.quantity * product.price
+            ocp.save()
+        order.amount = sum(item.subtotal for item in order.ordercontainsproduct_set.all())
+        order.save()
+        return redirect("menu_app:order_detail")
 
-    def get_queryset(self):
-        return Booking.objects.order_by("approval_date","date")
-    
+class OrderDetailView(LoginRequiredMixin, TemplateView):
+    template_name = 'menu_app/my_order.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['booking'] = Booking.objects.order_by("approval_date","date")
-   
+        order = Order.objects.filter(
+            user=self.request.user,
+            state='P'
+        ).prefetch_related('ordercontainsproduct_set__product').first()
+        context['order'] = order
         return context

@@ -1,5 +1,5 @@
 from django.db import models
-from accounts_app.models import User
+from django.utils.text import slugify
 
 class Product(models.Model):
     name = models.CharField(max_length=20,default="")
@@ -9,9 +9,15 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     @classmethod
     def validate(cls, name, description, price):
@@ -104,11 +110,67 @@ class Order(models.Model):
     ]
     buyDate = models.DateField()
     code = models.CharField(max_length=15, unique=True)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     state = models.CharField(max_length=15, choices=STATE_CHOICES, default='P')
-    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders1111')
 
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.product.price * self.quantity
+        super().save(*args, **kwargs)
+
+class Rating(models.Model):
+    title = models.CharField(max_length=15)
+    text = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey('menu_app.Product', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+    
+    @classmethod
+    def validate(cls, title, text, rating):
+        errors = {}
+
+        if title == "":
+            errors["title"] = "Por favor ingrese un título"
+
+        if text == "":
+            errors["text"] = "Por favor ingrese un comentario"
+
+        if rating < 1 or rating > 5:
+            errors["rating"] = "Por favor ingrese una calificación entre 1 y 5"
+
+        return errors
+    
+    @classmethod
+    def new(cls, title, text, rating, product, user):
+        errors = Rating.validate(title, text, rating)
+
+        if len(errors.keys()) > 0:
+            return False, errors
+
+        Rating.objects.create(
+            title=title,
+            text=text,
+            rating=rating,
+            product=product,
+            user=user
+        )
+
+        return True, None
+    
+    def update(self, title, text, rating):
+        self.title = title or self.title
+        self.text = text or self.text
+        if rating is not None:
+            self.rating = rating
+
+        self.save()
