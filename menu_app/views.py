@@ -1,3 +1,4 @@
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from .models import Product, Order, OrderContainsProduct
 from django.shortcuts import get_object_or_404, redirect
@@ -49,22 +50,24 @@ class RemoveOneView(LoginRequiredMixin, View):
             order.save()
         return redirect('menu_app:order_detail')
 
-class DeleteItemView(LoginRequiredMixin, View):
-    def post(self, request):
-        form = DeleteItemForm(request.POST)
-        if form.is_valid():
-            item_id = form.cleaned_data['item_id']
-            item = get_object_or_404(
-                OrderContainsProduct,
-                id=item_id,
-                order__user=request.user,
-                order__state='P'
-            )
-            order = item.order
-            item.delete()
-            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
-            order.save()
-        return redirect('menu_app:order_detail')
+class DeleteItemView(LoginRequiredMixin, FormView):
+    form_class = DeleteItemForm
+    success_url = reverse_lazy('menu_app:order_detail')
+    action = 'delete_item'
+    template_name = 'menu_app/delete_item.html'
+    def form_valid(self, form):
+        item_id = form.cleaned_data['item_id']
+        item = get_object_or_404(
+            OrderContainsProduct,
+            id=item_id,
+            order__user=self.request.user,
+            order__state='P'
+        )
+        order = item.order
+        item.delete()
+        order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
+        order.save()
+        return super().form_valid(form)
 
 class CancelOrderView(LoginRequiredMixin, FormView):
     template_name = 'menu_app/cancel_order.html'
