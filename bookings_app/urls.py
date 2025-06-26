@@ -1,12 +1,17 @@
-from django.contrib import admin
-from django.urls import include, path
-from django.views.generic import TemplateView
-from . import views
-from .views import UserOrdersHistoryView
+from django.urls import path
+from bookings_app.views import BookingListView, DeleteBookingView, MakeReservationView
+from bookings_app.views import GetNextReservationView, GetFutureReservationsView, GetPendingReservationsView
+from bookings_app.views import GetHistoryAprobadasView, GetHistoryRechazadasView
+
+app_name = 'bookings_app'
 
 urlpatterns = [
-    # Reservations urls
-    path('mis-reservas/', views.BookingListView.as_view(), name='user_reservations_history'),
-     path('historial/', UserOrdersHistoryView.as_view(), name='user_orders_history'),
-
+    path('my_reservation/', BookingListView.as_view(), name='my_reservation'),
+    path('make_reservation', MakeReservationView.as_view(), name='make_reservation'),
+    path('delete_booking/<int:pk>/', DeleteBookingView.as_view(), name='delete_booking'),
+    path('get_next_reservation/', GetNextReservationView.as_view(), name='get_next_reservation'),
+    path('get_future_reservations/', GetFutureReservationsView.as_view(), name='get_future_reservations'),
+    path('get_pending_reservations/', GetPendingReservationsView.as_view(), name='get_pending_reservations'),
+    path('get_history_aprobadas/', GetHistoryAprobadasView.as_view(), name='get_history_aprobadas'),
+    path('get_history_rechazadas/', GetHistoryRechazadasView.as_view(), name='get_history_rechazadas')
 ]

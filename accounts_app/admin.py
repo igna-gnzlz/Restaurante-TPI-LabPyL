@@ -2,9 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from accounts_app.forms import UserAdminRegisterForm, NotificationForm
 from accounts_app.models import User, Notification, UserNotification
-
 from django.contrib.auth.models import Group
-
 from django.urls import reverse
 from django.utils.html import format_html
 
