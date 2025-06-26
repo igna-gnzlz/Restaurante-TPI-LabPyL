@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView, ListView, DetailView, FormView
-from .models import Product, Order, OrderContainsProduct
+from .models import Product, Order, OrderContainsProduct, Category
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.timezone import now
 import uuid
-
 from .forms import AddOneForm, RemoveOneForm, DeleteItemForm, CancelOrderForm
+
 
 class AddOneView(LoginRequiredMixin, View):
     def post(self, request):
@@ -81,13 +81,26 @@ class HomeView(TemplateView):
     template_name = "home.html"
 
 class MenuListView(ListView):
-    model = Product
-    template_name = "menu_app/menu.html"
-    context_object_name = "menu_items"
-
+    model = Category
+    template_name = 'menu_app/menu.html'
+    context_object_name = 'categories'
+    
     def get_queryset(self):
-        return Product.objects.all().order_by("name")
-
+        return Category.objects.filter(isActive=True).order_by('id')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = self.get_queryset()
+        categorized_items = {}
+        
+        for category in categories:
+            products = Product.objects.filter(category=category)
+            if products.exists():
+                categorized_items[category] = products
+                
+        context['categorized_items'] = categorized_items
+        return context
+    
 class ProductDetailView(DetailView):
     model = Product
     template_name = "menu_app/product_detail.html"
