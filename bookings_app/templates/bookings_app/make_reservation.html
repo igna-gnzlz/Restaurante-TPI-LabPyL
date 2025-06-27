@@ -50,11 +50,12 @@
                             <div class="calendar-cell"></div>
                             {% else %}
                             <div class="calendar-cell">
-                                <button type="button"
-                                    class="btn btn-sm {% if dia == current_day %}btn-primary{% elif today.month == current_month and dia < today.day %}btn-secondary disabled{% else %}btn-outline-primary{% endif %}"
-                                    onclick="selectDay({{ dia }})">
-                                    {{ dia }}
-                                </button>
+                             <button type="button"
+                                class="btn btn-sm {% if dia == current_day %}btn-primary{% elif today.month == current_month and dia < today.day %}btn-secondary disabled{% else %}btn-outline-primary{% endif %}"
+                                onclick="selectDay('{{ dia }}')">
+                                {{ dia }}
+                            </button>
+
                             </div>
                             {% endif %}
                             {% endfor %}

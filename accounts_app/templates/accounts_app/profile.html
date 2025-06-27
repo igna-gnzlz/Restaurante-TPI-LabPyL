@@ -9,7 +9,6 @@
             <h3>Perfil de: {{ user.username }}</h3>
         </div>
         <div class="card-body d-flex gap-4 align-items-center">
-            <!-- Foto de perfil -->
             {% if user.profile.image.url %}
                 <img src="{{ user.profile.image.url }}" alt="Foto de perfil" class="rounded" style="width: 120px; height: 120px; object-fit: cover;">
             {% else %}
@@ -18,9 +17,7 @@
                 </div>
             {% endif %}
 
-            <!-- Datos del usuario -->
             <div class="flex-grow-1">
-                <!-- Nombre de usuario con botón editar -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <strong>Nombre de usuario:</strong> {{ user.username }}
@@ -30,19 +27,26 @@
                     </a>
                 </div>
 
-                <!-- Apellido -->
                 <p><strong>Apellido:</strong> {{ user.last_name }}</p>
-
-                <!-- Nombre completo -->
                 <p><strong>Nombre:</strong> {{ user.name }}</p>
-
-                <!-- Email -->
                 <p><strong>Email:</strong> {{ user.email }}</p>
             </div>
         </div>
-        <div class="card-footer text-end">
-            <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+    </div>
+
+    <div class="card mx-auto mt-4" style="max-width: 600px;">
+        <div class="card-header">
+            <h3>Opciones</h3>
         </div>
+        <div class="card-body d-flex justify-content-around">
+            <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary">Mis reservas</a>
+            <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary">Notificaciones</a>
+            <a href="{% url 'menu_app:my_orders' %}" class="btn btn-outline-primary">Historial de órdenes</a>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-primary">Volver al menú</a>
     </div>
 </div>
 {% endblock %}
