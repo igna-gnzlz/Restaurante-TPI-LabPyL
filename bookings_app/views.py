@@ -41,7 +41,7 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
         ).order_by('date', 'time_slot__start_time').first()
 
         card_title = "Próxima Reserva"
-        
+        reservas_futuras = Booking.objects.none() 
         if proxima_reserva:
             if proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time:
                 card_title = "Reserva Actual"

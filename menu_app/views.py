@@ -79,7 +79,6 @@ class CancelOrderView(LoginRequiredMixin, FormView):
         order.delete()
         return redirect('menu_app:menu')
 
-
 class HomeView(TemplateView):
     template_name = "home.html"
 
@@ -137,3 +136,17 @@ class OrderDetailView(LoginRequiredMixin, TemplateView):
         ).prefetch_related('ordercontainsproduct_set__product').first()
         context['order'] = order
         return context
+
+class MyOrdersListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'menu_app/my_orders.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        # Solo pedidos completados (ajusta el estado si usas otro)
+        return Order.objects.filter(user=self.request.user, state='C').order_by('-buyDate')
+
+class ClearOrdersHistoryView(LoginRequiredMixin, View):
+    def post(self, request):
+        Order.objects.filter(user=request.user, state='C').delete()
+        return redirect('menu_app:my_orders')

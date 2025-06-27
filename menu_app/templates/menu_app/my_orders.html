@@ -2,29 +2,41 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Mis Pedidos</h1>
-
-    <!-- Aquí mostrarás la lista de pedidos del usuario -->
-    {% if pedidos %}
-        <div class="row">
-            {% for pedido in pedidos %}
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Pedido #{{ pedido.id }}</h5>
-                            <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
-                            <p><strong>Estado:</strong> {{ pedido.estado }}</p>
-                            <!-- Agregá más campos que quieras mostrar -->
+    <div class="card mb-4 sombra-gris">
+        <div class="card-body">
+            <h4 class="card-title text-center">Historial de Pedidos</h4>
+            {% if orders %}
+                <div class="row">
+                    {% for pedido in orders %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pedido #{{ pedido.id }}</h5>
+                                    <p><strong>Fecha:</strong> {{ pedido.buyDate }}</p>
+                                    <p><strong>Monto:</strong> ${{ pedido.amount }}</p>
+                                    <!-- Agrega más campos si lo deseas -->
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+                <form method="post" action="{% url 'menu_app:clear_orders_history' %}" class="mt-3 text-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Limpiar historial</button>
+                </form>
+            {% else %}
+                <p class="text-muted text-center">No tenés pedidos realizados aún.</p>
+            {% endif %}
         </div>
-    {% else %}
-        <p>No tenés pedidos realizados aún.</p>
-    {% endif %}
-
-    <!-- Botón para volver al inicio -->
-    <a href="{% url 'home' %}" class="btn btn-secondary mt-4">Volver al inicio</a>
+    </div>
+    <div class="text-center">
+        <a href="{% url 'home' %}" class="btn btn-secondary mt-4 mb-3">Volver al inicio</a>
+    </div>
 </div>
+
+<style>
+.sombra-gris {
+    box-shadow: 0 0 15px rgba(128, 128, 128, 0.35); 
+}
+</style>
 {% endblock %}
