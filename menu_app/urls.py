@@ -19,7 +19,6 @@ urlpatterns = [
     path("<slug:slug>/", ProductDetailView.as_view(), name="product_detail"),
     path('add-to-order/<slug:slug>/', AddToOrderView.as_view(), name='add_to_order'),
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
-
     path('add_one/', AddOneView.as_view(), name='add_one'),
     path('remove_one/', RemoveOneView.as_view(), name='remove_one'),
     path('delete_item/', DeleteItemView.as_view(), name='delete_item'),
