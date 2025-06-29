@@ -1,6 +1,5 @@
 from django.urls import path, include
 from .views import (
-    OrderDetailView,
     MenuListView,
     ProductDetailView,
     AddToOrderView,
@@ -8,7 +7,6 @@ from .views import (
     RemoveOneView,
     DeleteItemView,
     CancelOrderView,
-    
 )
 
 app_name = 'menu_app'
