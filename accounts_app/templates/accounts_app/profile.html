@@ -41,12 +41,12 @@
         <div class="card-body d-flex justify-content-around">
             <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary">Mis reservas</a>
             <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary">Notificaciones</a>
-            <a href="{% url 'menu_app:my_orders' %}" class="btn btn-outline-primary">Historial de órdenes</a>
+            <a href="{% url 'my_orders' %}" class="btn btn-outline-primary">Historial de órdenes</a>
         </div>
     </div>
 
     <div class="text-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-primary">Volver al menú</a>
+        <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
     </div>
 </div>
 {% endblock %}

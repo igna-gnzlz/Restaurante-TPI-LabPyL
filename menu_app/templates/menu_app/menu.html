@@ -43,12 +43,19 @@
                     <span class="card-text mb-3"><strong>${{ item.price }}</strong></span>
                     <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
                         style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
+                    {% if user.is_authenticated %}
                     <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary mt-auto btn-click-animate btn-isolated">
                             Agregar a pedido
                         </button>
                     </form>
+                    {% else %}
+                    <a href="{% url 'accounts_app:login' %}?next={% url 'my_orders' %}"
+                        class="btn btn-outline-secondary mt-auto btn-click-animate btn-isolated">
+                        Iniciar sesión para pedir
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -57,5 +64,8 @@
     {% empty %}
     <p class="text-center">No hay productos disponibles.</p>
     {% endfor %}
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+    </div>
 </div>
 {% endblock %}
