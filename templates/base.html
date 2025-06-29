@@ -56,6 +56,7 @@
                         </ul>
                         <div class="d-flex gap-2 ms-auto">
                             {% if request.user.is_authenticated %}
+                                   <a href="{% url 'menu_app:order_detail' %}" class="btn btn-primary btn-sm">Hacer pedido</a>
                                 <a href="{% url 'bookings_app:make_reservation' %}" class="btn btn-primary btn-sm">Reservar</a>
                                 <div class="dropdown">
                                     <button class="btn btn-outline-primary btn-sm dropdown-toggle"
@@ -65,13 +66,6 @@
                                         {{ request.user.username }}
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'bookings_app:my_reservation' %}">Mis Reservas</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">Notificaciones</a>
-                                        </li>
-                                        
                                         <a class="dropdown-item" href="{% url 'accounts_app:profile' %}">Mi perfil</a>
                                         </li>
                                         <li>
