@@ -1,30 +1,91 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
-    <h1>Mis Pedidos</h1>
+<div class="container">
+    <h2>Reservas Aprobadas Próximas</h2>
 
-    <!-- Aquí mostrarás la lista de pedidos del usuario -->
-    {% if pedidos %}
-        <div class="row">
-            {% for pedido in pedidos %}
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Pedido #{{ pedido.id }}</h5>
-                            <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
-                            <p><strong>Estado:</strong> {{ pedido.estado }}</p>
-                            <!-- Agregá más campos que quieras mostrar -->
+    {% if reservas_proximas %}
+    <div class="row">
+        {% for reserva in reservas_proximas %}
+        <div class="col-md-4 mb-3">
+            <form method="get" action=".">
+                <input type="hidden" name="booking" value="{{ reserva.id }}">
+                <button type="submit" class="card w-100 btn text-start reserva-btn 
+                {% if reserva_seleccionada and reserva.id == reserva_seleccionada.id %}
+                    btn-success border-success
+                {% else %}
+                    btn-outline-primary
+                {% endif %}">
+                    <div class="card-body">
+                        <h5 class="card-title">Código: {{ reserva.code }}</h5>
+                        <p class="card-text">Fecha: {{ reserva.date }}</p>
+                        <p class="card-text">Franja Horaria: {{ reserva.time_slot }}</p>
                         </div>
-                    </div>
+                </button>
+                </form>
                 </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+                </div>
     {% else %}
-        <p>No tenés pedidos realizados aún.</p>
+    <div class="alert alert-danger">
+        No puedes realizar pedidos porque no tienes reservas aprobadas.
+    </div>
     {% endif %}
 
-    <!-- Botón para volver al inicio -->
-    <a href="{% url 'home' %}" class="btn btn-secondary mt-4">Volver al inicio</a>
+    {% if reserva_seleccionada %}
+    <hr>
+    <div class="alert alert-warning">Los productos del menú se agregarán al pedido de la reserva seleccionada:
+        {{ reserva_seleccionada.code }}.</div>
+    <hr>
+    <h3>Pedido temporal de la reserva: {{ reserva_seleccionada.code }}</h3>
+    
+    {% if carrito_reserva %}
+    <ul class="list-group">
+        {% for item in carrito_reserva %}
+        <li class="list-group-item d-flex justify-content-between">
+            {{ item.product.name }} x {{ item.quantity }}
+            <span>${{ item.subtotal }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <h4 class="mt-3">Total: ${{ total_carrito }}</h4>
+    {% else %}
+    <div class="alert alert-warning">Todavía no hay productos en el carrito.</div>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-danger mt-4">
+        Por favor, antes de agregar un producto al pedido o ver el historial de pedidos, seleccione primero su reserva
+        aprobada próxima asociada, y luego intente nuevamente.
+    </div>
+    {% endif %}
 </div>
+<style>
+    .reserva-btn {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .reserva-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .reserva-btn.btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+    }
+
+    .reserva-btn.btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    .reserva-btn.btn-success::before {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+</style>
 {% endblock %}

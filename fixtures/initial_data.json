@@ -1673,6 +1673,111 @@
         }
     },
     {
+        "model": "bookings_app.table",
+        "pk": 1,
+        "fields": {
+            "number": "1",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.table",
+        "pk": 2,
+        "fields": {
+            "number": "2",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.table",
+        "pk": 3,
+        "fields": {
+            "number": "3",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.table",
+        "pk": 4,
+        "fields": {
+            "number": "4",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.table",
+        "pk": 5,
+        "fields": {
+            "number": "5",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.table",
+        "pk": 6,
+        "fields": {
+            "number": "6",
+            "capacity": 2,
+            "description": "Mesa para 2 personas"
+        }
+    },
+    {
+        "model": "bookings_app.timeslot",
+        "pk": 1,
+        "fields": {
+            "name": "Mañana",
+            "start_time": "08:00:00",
+            "end_time": "12:00:00",
+            "tables": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        }
+    },
+    {
+        "model": "bookings_app.timeslot",
+        "pk": 2,
+        "fields": {
+            "name": "Tarde",
+            "start_time": "13:00:00",
+            "end_time": "17:00:00",
+            "tables": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        }
+    },
+    {
+        "model": "bookings_app.timeslot",
+        "pk": 3,
+        "fields": {
+            "name": "Noche",
+            "start_time": "18:00:00",
+            "end_time": "22:00:00",
+            "tables": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        }
+    },
+    {
         "model": "menu_app.category",
         "pk": 1,
         "fields": {
@@ -1735,7 +1840,6 @@
             "price": 1000.0,
             "quantity": 10,
             "image": "/static/images/agua_sin_gas.jpg",
-            "slug": "agua-sin-gas",
             "category": 5
         }
     },
@@ -1748,7 +1852,6 @@
             "price": 3500.0,
             "quantity": 10,
             "image": "/static/images/cafe_con_leche.jpg",
-            "slug": "cafe-con-leche",
             "category": 5
         }
     },
@@ -1761,7 +1864,6 @@
             "price": 15000.0,
             "quantity": 10,
             "image": "/static/images/mila_napo.jpg",
-            "slug": "milanesa-napolitana",
             "category": 2
         }
     },
@@ -1774,7 +1876,6 @@
             "price": 15000.0,
             "quantity": 10,
             "image": "/static/images/milanesa_caballo.jpg",
-            "slug": "milanesa-caballo",
             "category": 2
         }
     },
@@ -1787,7 +1888,6 @@
             "price": 5000.0,
             "quantity": 10,
             "image": "/static/images/pure_papas.jpg",
-            "slug": "pure-papas",
             "category": 3
         }
     },
@@ -1800,7 +1900,6 @@
             "price": 21000.0,
             "quantity": 10,
             "image": "/static/images/bife_chorizo.jpg",
-            "slug": "bife-chorizo",
             "category": 2
         }
     },
@@ -1813,7 +1912,6 @@
             "price": 22000.0,
             "quantity": 10,
             "image": "/static/images/asado_tira.jpg",
-            "slug": "asado-tira",
             "category": 2
         }
     },
@@ -1826,7 +1924,6 @@
             "price": 13000.0,
             "quantity": 10,
             "image": "/static/images/hamburguesa_criolla.jpg",
-            "slug": "hamburguesa-criolla",
             "category": 2
         }
     },
@@ -1839,7 +1936,6 @@
             "price": 11000.0,
             "quantity": 10,
             "image": "/static/images/nioquis.jpg",
-            "slug": "nioquis-29",
             "category": 2
         }
     },
@@ -1852,7 +1948,6 @@
             "price": 12000.0,
             "quantity": 10,
             "image": "/static/images/sorrentinos.jpg",
-            "slug": "sorrentinos-jamon-queso",
             "category": 2
         }
     },
@@ -1865,7 +1960,6 @@
             "price": 4500.0,
             "quantity": 10,
             "image": "/static/images/empanadas_saltenas.jpg",
-            "slug": "empanadas-saltenas",
             "category": 1
         }
     },
@@ -1878,7 +1972,6 @@
             "price": 16000.0,
             "quantity": 10,
             "image": "/static/images/merluza_romana.jpg",
-            "slug": "merluza-romana",
             "category": 2
         }
     },
@@ -1891,7 +1984,6 @@
             "price": 10000.0,
             "quantity": 10,
             "image": "/static/images/provoleta.jpg",
-            "slug": "provoleta",
             "category": 1
         }
     },
@@ -1904,7 +1996,6 @@
             "price": 7000.0,
             "quantity": 10,
             "image": "/static/images/papas_provenzal.jpg",
-            "slug": "papas-provenzal",
             "category": 3
         }
     },
@@ -1917,7 +2008,6 @@
             "price": 9000.0,
             "quantity": 10,
             "image": "/static/images/malbec.jpg",
-            "slug": "malbec-reserve",
             "category": 6
         }
     },
@@ -1930,7 +2020,6 @@
             "price": 8500.0,
             "quantity": 10,
             "image": "/static/images/torrontes.jpg",
-            "slug": "torrontes-salta",
             "category": 6
         }
     },
@@ -1943,7 +2032,6 @@
             "price": 8000.0,
             "quantity": 10,
             "image": "/static/images/flan_dulce_leche.jpg",
-            "slug": "flan-dulce-leche",
             "category": 4
         }
     },
@@ -1956,7 +2044,6 @@
             "price": 2500.0,
             "quantity": 10,
             "image": "/static/images/agua_pomelo.jpg",
-            "slug": "agua-pomelo",
             "category": 5
         }
     }

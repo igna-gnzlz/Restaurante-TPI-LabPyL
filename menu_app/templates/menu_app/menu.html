@@ -41,12 +41,14 @@
                     <h5 class="card-title">{{ item.name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
                     <span class="card-text mb-3"><strong>${{ item.price }}</strong></span>
-                    <a href="{% url 'menu_app:product_detail' item.slug %}" class="stretched-link"
+                    <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
                         style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
-                    <button onclick="addToOrder('{{ item.slug }}')"
-                        class="btn btn-primary mt-auto btn-click-animate btn-isolated">
-                        Agregar a mi pedido
-                    </button>
+                    <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary mt-auto btn-click-animate btn-isolated">
+                            Agregar a pedido
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -56,24 +58,4 @@
     <p class="text-center">No hay productos disponibles.</p>
     {% endfor %}
 </div>
-
-<script>
-    function addToOrder(slug) {
-        fetch(`/menu/add-to-order/${slug}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = 'menu/my-order/';
-                } else {
-                    alert("Error al agregar el producto");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-</script>
 {% endblock %}

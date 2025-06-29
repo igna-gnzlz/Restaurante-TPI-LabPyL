@@ -20,7 +20,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'category', 'price', 'quantity']
     list_filter = ['category']
     search_fields = ['name', 'description']
-    prepopulated_fields = {'slug': ('name',)}  # Auto-genera el slug basado en el nombre
     
     # Campos adicionales para mejor organización
     fields = ['name', 'slug', 'description', 'price', 'quantity', 'category', 'image']
