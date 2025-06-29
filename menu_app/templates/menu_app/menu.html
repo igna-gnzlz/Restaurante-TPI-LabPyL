@@ -3,6 +3,12 @@
 
 {% block content %}
 <style>
+    .card-img-top {
+        object-fit: cover;
+        height: 200px;
+        width: 100%;
+    }
+
     .btn-click-animate:hover {
         transform: scale(0.98);
     }
@@ -11,7 +17,6 @@
         transform: scale(0.96);
     }
 
-    /* Evita que el botón herede el link de la card */
     .btn-isolated {
         position: relative;
         z-index: 2;
@@ -19,9 +24,12 @@
 </style>
 
 <div class="container my-5">
-    <h1 class="text-center mb-4">Menú</h1>
-    <div class="row">
-        {% for item in menu_items %}
+    <h1 class="text-center mb-5">Menú</h1>
+
+    {% for category, items in categorized_items.items %}
+    <h3 class="mb-4">{{ category.name }}</h3>
+    <div class="row mb-5">
+        {% for item in items %}
         <div class="col-md-4 mb-4">
             <div class="card h-100 position-relative">
                 {% if item.image %}
@@ -33,41 +41,21 @@
                     <h5 class="card-title">{{ item.name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
                     <span class="card-text mb-3"><strong>${{ item.price }}</strong></span>
-                    <!-- El link al product abarca toda la card, excepto el botón -->
-                    <a href="{% url 'menu_app:product_detail' item.slug %}" class="stretched-link"
+                    <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
                         style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
-                    <!-- Botón aislado del link de la card -->
-                    <button onclick="addToOrder('{{ item.slug }}')" class="btn btn-primary mt-auto btn-click-animate btn-isolated">
-                        Agregar a mi pedido
-                    </button>
-                    
-                    </div>
-                    </div>
-        </div>
-        {% empty %}
-        <div class="col-md-4 mb-4">
-            <h5 class="text-center">No hay productos disponibles</h5>
+                    <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary mt-auto btn-click-animate btn-isolated">
+                            Agregar a pedido
+                        </button>
+                    </form>
+                </div>
             </div>
+        </div>
         {% endfor %}
     </div>
+    {% empty %}
+    <p class="text-center">No hay productos disponibles.</p>
+    {% endfor %}
 </div>
-<script>
-    function addToOrder(slug) {
-        fetch(`/menu/add-to-order/${slug}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/my-order/';
-                } else {
-                    alert("Error al agregar el producto");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-</script>
 {% endblock %}

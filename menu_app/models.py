@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.text import slugify
 
 class Product(models.Model):
     name = models.CharField(max_length=20,default="")
@@ -9,16 +8,10 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
-    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.name
     
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
     @classmethod
     def validate(cls, name, description, price):
         errors = {}
@@ -103,6 +96,8 @@ class Category(models.Model):
 
 class Order(models.Model):
     STATE_CHOICES = [
+        ('I','Iniciado por cliente'),
+        ('T','Terminado por cliente'),
         ('P','Preparación'),
         ('E','Enviado'),
         ('R','Recibido'),
@@ -111,8 +106,9 @@ class Order(models.Model):
     buyDate = models.DateField()
     code = models.CharField(max_length=15, unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='P')
-    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders1111')
+    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='I')
+    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders')
+    booking = models.ForeignKey('bookings_app.Booking', on_delete=models.CASCADE, null=True, blank=True)
 
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
