@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.text import slugify
 
 class Product(models.Model):
     name = models.CharField(max_length=20,default="")
@@ -9,16 +8,10 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
-    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.name
     
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
     @classmethod
     def validate(cls, name, description, price):
         errors = {}
@@ -103,20 +96,45 @@ class Category(models.Model):
 
 class Order(models.Model):
     STATE_CHOICES = [
+        ('S','Solicitado por cliente'),
         ('P','Preparación'),
         ('E','Enviado'),
         ('R','Recibido'),
         ('C','Cancelado')
     ]
     buyDate = models.DateField()
-    code = models.CharField(max_length=15, unique=True)
+    code = models.CharField(max_length=15, unique=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='P')
-    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders1111')
+    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='S')
+    user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders')
+    booking = models.ForeignKey('bookings_app.Booking', on_delete=models.CASCADE, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self._generate_unique_code()
+        super().save(*args, **kwargs)
+    
+    def _generate_unique_code(self):
+        """Genera un código único con reintentos para evitar colisiones"""
+        max_attempts = 10
+        for _ in range(max_attempts):
+            code = self.generate_order_code()
+            if not Order.objects.filter(code=code).exists():
+                return code
+        raise ValueError("No se pudo generar un código único después de 10 intentos")
+    
+    def generate_order_code(self):
+        import uuid
+        """Genera un código corto y único basado en UUID"""
+        short_uuid = str(uuid.uuid4()).replace('-', '')[:8].upper()
+        return f'PDD-{short_uuid}'
+
+    def __str__(self):
+        return f"Pedido {self.code} - {self.user.username}"
 
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=1)
 

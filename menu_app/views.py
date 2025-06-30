@@ -1,139 +1,216 @@
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, DetailView, FormView
-from .models import Product, Order, OrderContainsProduct
-from django.shortcuts import get_object_or_404, redirect
-from django.views import View
+from django.views.generic import TemplateView, ListView, DetailView
+from .models import Product, Order, OrderContainsProduct, Category
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.timezone import now
-import uuid
-
-from .forms import AddOneForm, RemoveOneForm, DeleteItemForm, CancelOrderForm
-
-class AddOneView(LoginRequiredMixin, View):
-    def post(self, request):
-        form = AddOneForm(request.POST)
-        if form.is_valid():
-            item_id = form.cleaned_data['item_id']
-            item = get_object_or_404(
-                OrderContainsProduct,
-                id=item_id,
-                order__user=request.user,
-                order__state='P'
-            )
-            item.quantity += 1
-            item.subtotal = item.quantity * item.product.price
-            item.save()
-            order = item.order
-            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
-            order.save()
-        return redirect('menu_app:order_detail')
-
-class RemoveOneView(LoginRequiredMixin, View):
-    def post(self, request):
-        form = RemoveOneForm(request.POST)
-        if form.is_valid():
-            item_id = form.cleaned_data['item_id']
-            item = get_object_or_404(
-                OrderContainsProduct,
-                id=item_id,
-                order__user=request.user,
-                order__state='P'
-            )
-            order = item.order
-            if item.quantity > 1:
-                item.quantity -= 1
-                item.subtotal = item.quantity * item.product.price
-                item.save()
-            else:
-                item.delete()
-            order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
-            order.save()
-        return redirect('menu_app:order_detail')
-
-class DeleteItemView(LoginRequiredMixin, FormView):
-    form_class = DeleteItemForm
-    success_url = reverse_lazy('menu_app:order_detail')
-    action = 'delete_item'
-    template_name = 'menu_app/delete_item.html'
-    def form_valid(self, form):
-        item_id = form.cleaned_data['item_id']
-        item = get_object_or_404(
-            OrderContainsProduct,
-            id=item_id,
-            order__user=self.request.user,
-            order__state='P'
-        )
-        order = item.order
-        item.delete()
-        order.amount = sum(i.subtotal for i in order.ordercontainsproduct_set.all())
-        order.save()
-        return super().form_valid(form)
-
-class CancelOrderView(LoginRequiredMixin, FormView):
-    template_name = 'menu_app/cancel_order.html'
-    form_class = CancelOrderForm  # <--- sin paréntesis ni argumentos
-
-    def form_valid(self, form):
-        order_id = form.cleaned_data['order_id']
-        order = get_object_or_404(Order, id=order_id, user=self.request.user, state='P')
-        order.delete()
-        return redirect('menu_app:menu')
+from bookings_app.models import Booking
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.views import View
 
 
 class HomeView(TemplateView):
     template_name = "home.html"
 
 class MenuListView(ListView):
-    model = Product
-    template_name = "menu_app/menu.html"
-    context_object_name = "menu_items"
-
+    model = Category
+    template_name = 'menu_app/menu.html'
+    context_object_name = 'categories'
+    
     def get_queryset(self):
-        return Product.objects.all().order_by("name")
-
+        return Category.objects.filter(isActive=True).order_by('id')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = self.get_queryset()
+        categorized_items = {}
+        
+        for category in categories:
+            products = Product.objects.filter(category=category)
+            if products.exists():
+                categorized_items[category] = products
+                
+        context['categorized_items'] = categorized_items
+        return context
+    
 class ProductDetailView(DetailView):
     model = Product
     template_name = "menu_app/product_detail.html"
     context_object_name = "product"
-    slug_field = 'slug'
-    slug_url_kwarg = 'slug'
+
+class MakeOrderView(LoginRequiredMixin, View):
+    template_name = 'menu_app/make_order.html'
+
+    def get(self, request):
+        from menu_app.utils.cart import get_cart_items_and_total
+        from django.db.models import Q
+        from django.utils import timezone
+
+        local_now = timezone.localtime()
+        hoy = local_now.date()
+        ahora = local_now.time()
+
+        reservas_usuario = Booking.objects.filter(user=self.request.user).select_related('time_slot')
+
+        reservas_proximas = Booking.objects.none()  # vacío por defecto
+        reservas_proximas = reservas_usuario.filter(
+            approved=True,
+            approval_date__isnull=False
+        ).filter(
+            Q(date__gt=hoy) |
+            Q(date=hoy, time_slot__start_time__gt=ahora)
+        ).order_by('date', 'time_slot__start_time')
+
+        reserva_seleccionada = None
+        pedidos_reserva = []
+
+        reserva_id = request.GET.get('booking')
+        if reserva_id:
+            reserva_seleccionada = get_object_or_404(reservas_proximas, id=reserva_id)
+            pedidos_reserva = Order.objects.filter(user=request.user, booking=reserva_seleccionada)
+            request.session['booking_selected_id'] = reserva_seleccionada.id
+        else:
+            booking_selected_id_session = request.session.get('booking_selected_id')
+            if booking_selected_id_session:
+                reserva_seleccionada = get_object_or_404(reservas_proximas, id=booking_selected_id_session)
+                pedidos_reserva = Order.objects.filter(user=request.user, booking=reserva_seleccionada)
+
+        carrito_reserva = []
+        total_carrito = 0.00
+        if reserva_seleccionada:
+            carrito_reserva, total_carrito = get_cart_items_and_total(request.session, reserva_seleccionada.id)
+
+        context = {
+            'reservas_proximas': reservas_proximas,
+            'reserva_seleccionada': reserva_seleccionada,
+            'pedidos_reserva': pedidos_reserva,
+            'carrito_reserva': carrito_reserva,
+            'total_carrito': total_carrito
+        }
+
+        return render(request, self.template_name, context)
+
 
 class AddToOrderView(LoginRequiredMixin, View):
-    def post(self, request, slug):
-        product = get_object_or_404(Product, slug=slug)
-        order, created = Order.objects.get_or_create(
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        if not booking_selected_id:
+            messages.warning(request, "Seleccione primero una reserva.")
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+
+        booking_key = str(booking_selected_id)
+        product_key = str(product.id)
+
+         # Obtener cantidad actual del producto en el carrito (si existe)
+        prod_quantity_cart = cart.get(booking_key, {}).get(product_key, {}).get('quantity', 0)
+
+        # Verificar stock
+        if product.quantity <= prod_quantity_cart:
+            messages.warning(request, f"No hay stock suficiente para agregar más unidades de '{product.name}'.")
+            return redirect('menu_app:menu')
+
+        if booking_key not in cart:
+            cart[booking_key] = {}
+
+        if product_key in cart[booking_key]:
+            cart[booking_key][product_key]['quantity'] += 1
+        else:
+            cart[booking_key][product_key] = {'quantity': 1}
+
+        request.session['cart'] = cart  # Guardar cambios en la sesión
+        request.session.modified = True
+
+        messages.success(request, f'Se agregó "{product.name}" al pedido.')
+        return redirect('menu_app:menu')
+
+
+class DecrementFromCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        product_key = str(product.id)
+
+        if booking_key in cart and product_key in cart[booking_key]:
+            cart[booking_key][product_key]['quantity'] -= 1
+
+            # Eliminar si la cantidad es 0 o menos
+            if cart[booking_key][product_key]['quantity'] <= 0:
+                del cart[booking_key][product_key]
+
+            # Si ya no hay productos en la reserva, quitar la reserva del carrito
+            if not cart[booking_key]:
+                del cart[booking_key]
+
+            request.session['cart'] = cart
+            request.session.modified = True
+
+            messages.success(request, f"Se quitó una unidad de '{product.name}' del carrito.")
+
+        return redirect('make_order')
+
+
+class ConfirmOrderView(LoginRequiredMixin, View):
+    def post(self, request):
+        from django.utils.timezone import now
+
+        booking_selected_id = request.session.get('booking_selected_id')
+        if not booking_selected_id:
+            messages.warning(request, "Debe seleccionar una reserva para confirmar un pedido.")
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_selected_cart = cart.get(str(booking_selected_id), {})
+
+        if not booking_selected_cart:
+            messages.warning(request, "El carrito está vacío.")
+            return redirect('make_order')
+
+        # Crear la orden
+        booking_obj = get_object_or_404(Booking, id=booking_selected_id)
+        order = Order.objects.create(
             user=request.user,
-            state='P',
-            defaults={
-                'buyDate': now().date(),
-                'code': uuid.uuid4().hex[:15],
-                'amount': 0.0,
-            }
+            booking=booking_obj,
+            buyDate=now().date(),
+            amount=0.00,  # se inicializa en 0, se calculará después
+            state='S'
+            # El código se generará automáticamente en el método save de Order
         )
-        ocp, created_ocp = OrderContainsProduct.objects.get_or_create(
-            order=order,
-            product=product,
-            defaults={
-                'subtotal': product.price,
-                'quantity': 1
-            }
-        )
-        if not created_ocp:
-            ocp.quantity += 1
-            ocp.subtotal = ocp.quantity * product.price
-            ocp.save()
-        order.amount = sum(item.subtotal for item in order.ordercontainsproduct_set.all())
+
+        total = 0
+        for product_id, data in booking_selected_cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            quantity = data['quantity']
+
+            order_product = OrderContainsProduct.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                # El subtotal se calculará automáticamente en el método save de OrderContainsProduct
+            )
+
+            # Decrementar stock
+            product.quantity -= quantity
+            product.save()
+
+            # Refresco desde la BD para asegurar que el subtotal se calcule correctamente
+            order_product.refresh_from_db()
+            # Sumar subtotales de productos al total de la orden
+            total += order_product.subtotal
+
+        order.amount = total
         order.save()
-        return redirect("menu_app:order_detail")
 
-class OrderDetailView(LoginRequiredMixin, TemplateView):
-    template_name = 'menu_app/my_order.html'
+        # Vaciar carrito de esa reserva
+        cart.pop(str(booking_selected_id))
+        # Actualizar la sesión
+        request.session['cart'] = cart
+        request.session.modified = True
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        order = Order.objects.filter(
-            user=self.request.user,
-            state='P'
-        ).prefetch_related('ordercontainsproduct_set__product').first()
-        context['order'] = order
-        return context
+        messages.success(request, f'Pedido confirmado. Código: {order.code}')
+        return redirect('make_order')

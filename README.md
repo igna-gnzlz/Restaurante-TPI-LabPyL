@@ -44,7 +44,7 @@ python manage.py migrate
 ```
 ## Llenar base de datos con fixture
 ```bash
-python manage.py loaddata products.json
+python manage.py loaddata fixtures/initial_data.json
 ```
 ## Correr app
 ```bash
