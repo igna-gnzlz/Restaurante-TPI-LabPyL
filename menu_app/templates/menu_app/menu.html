@@ -17,13 +17,24 @@
         transform: scale(0.96);
     }
 
-    .btn-isolated {
+    .product-card-isolated {
         position: relative;
         z-index: 2;
     }
 </style>
 
 <div class="container my-5">
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <h1 class="text-center mb-5">Menú</h1>
 
     {% for category, items in categorized_items.items %}
@@ -40,21 +51,28 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ item.name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
+                    <p class="card-text">Stock: {{ item.quantity }}</p>
                     <span class="card-text mb-3"><strong>${{ item.price }}</strong></span>
                     <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
                         style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
-                    {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary mt-auto btn-click-animate btn-isolated">
-                            Agregar a pedido
+                    {% if item.quantity > 0 %}
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary mt-auto btn-click-animate product-card-isolated">
+                                Agregar a pedido
+                            </button>
+                        </form>
+                        {% else %}
+                        <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+                            class="btn btn-outline-secondary mt-auto btn-click-animate product-card-isolated">
+                            Iniciar sesión para pedir
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <button class="btn btn-secondary mt-auto btn-click-animate product-card-isolated" disabled>
+                            Sin stock
                         </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'accounts_app:login' %}?next={% url 'my_orders' %}"
-                        class="btn btn-outline-secondary mt-auto btn-click-animate btn-isolated">
-                        Iniciar sesión para pedir
-                    </a>
                     {% endif %}
                 </div>
             </div>

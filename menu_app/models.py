@@ -96,23 +96,45 @@ class Category(models.Model):
 
 class Order(models.Model):
     STATE_CHOICES = [
-        ('I','Iniciado por cliente'),
-        ('T','Terminado por cliente'),
+        ('S','Solicitado por cliente'),
         ('P','Preparación'),
         ('E','Enviado'),
         ('R','Recibido'),
         ('C','Cancelado')
     ]
     buyDate = models.DateField()
-    code = models.CharField(max_length=15, unique=True)
+    code = models.CharField(max_length=15, unique=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='I')
+    state = models.CharField(max_length=15, choices=STATE_CHOICES, default='S')
     user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders')
     booking = models.ForeignKey('bookings_app.Booking', on_delete=models.CASCADE, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = self._generate_unique_code()
+        super().save(*args, **kwargs)
+    
+    def _generate_unique_code(self):
+        """Genera un código único con reintentos para evitar colisiones"""
+        max_attempts = 10
+        for _ in range(max_attempts):
+            code = self.generate_order_code()
+            if not Order.objects.filter(code=code).exists():
+                return code
+        raise ValueError("No se pudo generar un código único después de 10 intentos")
+    
+    def generate_order_code(self):
+        import uuid
+        """Genera un código corto y único basado en UUID"""
+        short_uuid = str(uuid.uuid4()).replace('-', '')[:8].upper()
+        return f'PDD-{short_uuid}'
+
+    def __str__(self):
+        return f"Pedido {self.code} - {self.user.username}"
+
 class OrderContainsProduct(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.PositiveIntegerField(default=1)
 
