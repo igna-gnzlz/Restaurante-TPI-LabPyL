@@ -4,7 +4,6 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.timezone import now
 
 
 class TableAdminForm(forms.ModelForm):

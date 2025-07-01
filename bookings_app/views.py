@@ -333,6 +333,7 @@ class MakeReservationView(ClienteRequiredMixin, FormView):
                 approval_date__isnull=True
             )
 
+            # No se puede hacer la reserva si hay una pediente
             if reservas_pendientes.exists():
                 messages.error(
                     self.request,
