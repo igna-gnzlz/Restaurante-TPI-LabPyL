@@ -56,8 +56,8 @@
                         </ul>
                         <div class="d-flex gap-2 ms-auto">
                             {% if request.user.is_authenticated %}
-                                   <a href="{% url 'make_order' %}" class="btn btn-primary btn-sm">Pedir</a>
                                 <a href="{% url 'bookings_app:make_reservation' %}" class="btn btn-primary btn-sm">Reservar</a>
+                                <a href="{% url 'make_order' %}" class="btn btn-primary btn-sm">Pedir</a>
                                 <div class="dropdown">
                                     <button class="btn btn-outline-primary btn-sm dropdown-toggle"
                                         type="button"

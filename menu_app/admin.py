@@ -1,7 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category
-#from models_copy import Booking, User
-
+from .models import Product, Category, Order
 
 class MenuAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "price", "quantity")
@@ -14,6 +12,9 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ['isActive']
     search_fields = ['name']
 
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -22,7 +23,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name', 'description']
     
     # Campos adicionales para mejor organización
-    fields = ['name', 'slug', 'description', 'price', 'quantity', 'category', 'image']
+    fields = ['name', 'description', 'price', 'quantity', 'category', 'image']
     
     # Mostrar imagen en el admin
     readonly_fields = ['image_preview']

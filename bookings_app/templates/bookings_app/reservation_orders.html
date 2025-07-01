@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Pedidos para la Reserva {{ reserva.code }}</h4>
+        </div>
+    </div>
+
+    {% if pedidos %}
+    {% for pedido in pedidos %}
+    <div class="card mb-3 ">
+        <div class="card-body">
+            <h5 class="card-title">Pedido {{ pedido.code }}</h5>
+            <p><strong>Estado:</strong> {{ pedido.get_state_display }}</p>
+            <p><strong>Fecha de Compra:</strong> {{ pedido.buyDate }}</p>
+            <p><strong>Monto Total:</strong> ${{ pedido.amount }}</p>
+            
+            {% if pedido.state == 'S' %}
+            <form method="post" action="{% url 'bookings_app:cancel_order' pedido.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+            </form>
+            {% else %}
+            <form method="post" action="{% url 'bookings_app:delete_order' pedido.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+            {% endif %}
+
+            <h6 class="mt-3">Productos:</h6>
+            <ul class="list-group">
+                {% for item in pedido.items %}
+                <li class="list-group-item d-flex justify-content-between">
+                    {{ item.product.name }} x {{ item.quantity }}
+                    <span>${{ item.subtotal }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-info">No hay pedidos para esta reserva.</div>
+    {% endif %}
+
+    <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-secondary mt-4 mb-3">Volver</a>
+</div>
+{% endblock %}
