@@ -14,14 +14,32 @@
         <div class="col-md-6">
             <h2 class="mb-3">{{ product.name }}</h2>
             <p>{{ product.description }}</p>
-            <h4 class="text-primary">${{ product.price }}</h4>
+            <p class="card-text">Stock: {{ product.quantity }}</p>
+            <h4 class="text">${{ product.price }}</h4>
 
             {% if product.quantity > 0 %}
-                <span class="badge bg-success">Disponible</span>
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'menu_app:add_to_order' product.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary mt-auto btn-click-animate product-card-isolated">
+                    Agregar a pedido
+                </button>
+            </form>
             {% else %}
-                <span class="badge bg-secondary">No disponible</span>
+            <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+                class="btn btn-outline-secondary mt-auto btn-click-animate product-card-isolated">
+                Iniciar sesión para pedir
+            </a>
+            {% endif %}
+            {% else %}
+            <button class="btn btn-secondary mt-auto btn-click-animate product-card-isolated" disabled>
+                Sin stock
+            </button>
             {% endif %}
         </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'menu_app:menu' %}#producto-{{ product.id }}" class="btn btn-primary">Volver al menú</a>
     </div>
 </div>
 {% endblock %}

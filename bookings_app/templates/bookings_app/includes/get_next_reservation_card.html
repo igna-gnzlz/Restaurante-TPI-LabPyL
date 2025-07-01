@@ -28,10 +28,18 @@
                         Sin mesas asignadas
                     {% endfor %}
                 </p>
+                <p><strong>Cantidad de Pedidos:</strong> {{ cantidad_pedidos_proxima_reserva }}</p>
                 <p><strong>Observaciones:</strong> {{ proxima_reserva.observations|default:"-" }}</p>
                 <p><strong>Fecha de Aprobación:</strong> {{ proxima_reserva.approval_date|default:"-" }}</p>
                 <p><strong>Fecha de Emisión:</strong> {{ proxima_reserva.issue_date }}</p>
 
+                {% if cantidad_pedidos_proxima_reserva > 0 %}
+                <div class="mb-2">
+                    <a href="{% url 'bookings_app:reservation_orders' proxima_reserva.pk %}" class="btn btn-light btn-sm sombra-verde">
+                        Ver Pedidos
+                    </a>
+                </div>                
+                {% endif %}
                 {% if not es_reserva_actual %}
                 <div>
                     <button 

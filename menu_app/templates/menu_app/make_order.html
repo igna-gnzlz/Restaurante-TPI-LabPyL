@@ -18,7 +18,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Código: {{ reserva.code }}</h5>
                         <p class="card-text">Fecha: {{ reserva.date }}</p>
-                        <p class="card-text">Franja Horaria: {{ reserva.time_slot }}</p>
+                        <p class="card-text">Franja Horaria: {{ reserva.time_slot }} ({{ reserva.time_slot.start_time }} - {{ reserva.time_slot.end_time }})</p>
                         </div>
                 </button>
                 </form>
@@ -27,7 +27,7 @@
                 </div>
     {% else %}
     <div class="alert alert-danger">
-        No puedes realizar pedidos porque no tienes reservas aprobadas.
+        No puedes realizar pedidos porque no tienes reservas aprobadas próximas.
     </div>
     {% endif %}
 
@@ -90,8 +90,7 @@
 
     {% else %}
     <div class="alert alert-danger mt-4">
-        Por favor, antes de agregar un producto al pedido o ver el historial de pedidos, seleccione primero su reserva
-        aprobada próxima asociada, y luego intente nuevamente.
+        Para agregar un producto al pedido, primero seleccione una reserva aprobada próxima y luego intente nuevamente.
     </div>
     {% endif %}
     <div class="text-center mt-4">
