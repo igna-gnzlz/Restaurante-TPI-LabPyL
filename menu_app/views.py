@@ -1,5 +1,7 @@
-from django.views.generic import TemplateView, ListView, DetailView
-from .models import Product, Order, OrderContainsProduct, Category
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating
+from menu_app.forms import RatingForm
+from accounts_app.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from bookings_app.models import Booking
@@ -8,8 +10,33 @@ from django.contrib import messages
 from django.views import View
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
+
+class MakeRatingView(FormView):
+    form_class = RatingForm
+    template_name = 'menu_app/rating_form.html'
+    success_url = reverse_lazy('menu_app:menu')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.product = get_object_or_404(Product, pk=kwargs.get('product_id'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context
+
+    def form_valid(self, form):
+        rating = form.save(commit=False)
+        rating.user = self.request.user if self.request.user.is_authenticated else None
+        rating.product = self.product
+        rating.save()
+        messages.success(self.request, "¡Comentario creado con éxito!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Por favor corrija los errores en el formulario.")
+        return super().form_invalid(form)
+
 
 class MenuListView(ListView):
     model = Category
@@ -27,10 +54,19 @@ class MenuListView(ListView):
         for category in categories:
             products = Product.objects.filter(category=category)
             if products.exists():
+                for product in products:
+                    product.rating_form = RatingForm()
+                    product.comments = product.rating_set.select_related('user').order_by('-created_at')
                 categorized_items[category] = products
                 
         context['categorized_items'] = categorized_items
+        context['rating_form'] = RatingForm()
         return context
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
+
     
 class ProductDetailView(DetailView):
     model = Product
