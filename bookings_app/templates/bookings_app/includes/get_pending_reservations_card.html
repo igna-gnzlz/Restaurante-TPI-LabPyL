@@ -1,10 +1,10 @@
-    <!-- Card Reservas Pendientes -->
-    
-    <div class="card mb-4 sombra-celeste">
-        <div class="card-body">
-            <h4 class="card-title">Reservas Pendientes</h4>
-            {% if reservas_pendientes %}
-                {% for reserva in reservas_pendientes %}
+<!-- Card Reservas Pendientes -->
+
+<div class="card mb-4 sombra-celeste">
+    <div class="card-body">
+        <h4 class="card-title">Reserva Pendiente</h4>
+        {% if reservas_pendientes%}
+            {% for reserva in reservas_pendientes %}
                     <div class="border rounded p-3 mb-3 d-flex justify-content-between align-items-center fondo-celeste">
                         <div>
                             <p class="mb-0"><strong>Código:</strong> {{ reserva.code }}</p>
@@ -39,8 +39,8 @@
                         </div>
                     </div>
                 {% endfor %}
-            {% else %}
-                <div class="alert alert-secondary mb-0 fondo-celeste">- Sin reservas -</div>
-            {% endif %}
-        </div>
+        {% else %}
+            <div class="alert alert-secondary mb-0 fondo-celeste">- Sin reserva -</div>
+        {% endif %}
     </div>
+</div>

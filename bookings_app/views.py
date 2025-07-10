@@ -1,6 +1,5 @@
 from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.mixins import ClienteRequiredMixin
-from bookings_app.managers import BookingQuerySet, BookingManager
 from menu_app.models import Order, OrderContainsProduct
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -32,15 +31,14 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
         reservas_usuario = Booking.objects.del_usuario(user).select_related('time_slot')
 
         proxima_reserva = reservas_usuario.proxima()
-
-        card_title = "Reserva Actual"
+        
         local_now = timezone.localtime()
         hoy = local_now.date()
         ahora = local_now.time()
 
-        if not proxima_reserva:
-            card_title = "Próxima Reserva"
-        elif not (proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time):
+        if proxima_reserva and (proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time):
+            card_title = "Reserva Actual"
+        else:
             card_title = "Próxima Reserva"
 
         reservas_futuras = reservas_usuario.futuras()
@@ -56,7 +54,7 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
         reservas_futuras = reservas_futuras.con_cantidad_pedidos()
         reservas_historial_aprobadas = reservas_historial_aprobadas.con_cantidad_pedidos()
 
-        cantidad_pedidos_proxima_reserva = proxima_reserva.cantidad_pedidos() if proxima_reserva else 0
+        cantidad_pedidos_proxima_reserva = proxima_reserva.get_cantidad_pedidos() if proxima_reserva else 0
 
         context.update({
             'proxima_reserva': proxima_reserva,
@@ -75,92 +73,47 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
         return Booking.objects.del_usuario(self.request.user)
 
 
-class DeleteBookingView(ClienteRequiredMixin, View):
-    def post(self, request, *args, **kwargs):
-        booking_id = kwargs.get('pk')
-        booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-        booking.delete()
-        return JsonResponse({'success': True})
-
-
 class GetNextReservationView(LoginRequiredMixin, ClienteRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        local_now = timezone.localtime()
-        hoy = local_now.date()
-        ahora = local_now.time()
+        reservas_usuario = Booking.objects.del_usuario(request.user).aprobadas()
+        proxima_reserva = Booking.objects.proxima(reservas_usuario)
 
-        reservas_usuario = Booking.objects.filter(
-            user=request.user,
-            approved=True,
-            approval_date__isnull=False
-        )
-
-        proxima_reserva = reservas_usuario.filter(
-            Q(date__gt=hoy) |
-            Q(date=hoy, time_slot__end_time__gte=ahora)
-        ).order_by('date', 'time_slot__start_time').first()
-
-        es_reserva_actual = False
-        if proxima_reserva:
-            if proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time:
-                es_reserva_actual = True
-        
-        cantidad_pedidos = 0
-        if proxima_reserva:
-            cantidad_pedidos = Order.objects.filter(booking=proxima_reserva).count()
+        cantidad_pedidos = proxima_reserva.get_cantidad_pedidos() if proxima_reserva else 0
+        es_reserva_actual = proxima_reserva.es_reserva_actual if proxima_reserva else False
 
         card_html = render_to_string('bookings_app/includes/get_next_reservation_card.html', {
             'proxima_reserva': proxima_reserva,
             'cantidad_pedidos_proxima_reserva': cantidad_pedidos,
             'es_reserva_actual': es_reserva_actual
         }, request=request)
-        
+
         return JsonResponse({'card_html': card_html})
 
 
 class GetFutureReservationsView(LoginRequiredMixin, ClienteRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        local_now = timezone.localtime()
-        hoy = local_now.date()
-        ahora = local_now.time()
-
-        reservas_usuario = Booking.objects.filter(
-            user=request.user,
-            approved=True,
-            approval_date__isnull=False
-        )
-
-        proxima_reserva = reservas_usuario.filter(
-            Q(date__gt=hoy) | Q(date=hoy, time_slot__start_time__gte=ahora)
-        ).order_by('date', 'time_slot__start_time').first()
-
-        reservas_futuras = reservas_usuario.filter(
-            Q(date__gt=hoy) | Q(date=hoy, time_slot__start_time__gte=ahora)
-        )
+        reservas_usuario = Booking.objects.del_usuario(request.user).aprobadas()
+        proxima_reserva = Booking.objects.proxima(reservas_usuario)
+        reservas_futuras = reservas_usuario.futuras()
 
         if proxima_reserva:
             reservas_futuras = reservas_futuras.exclude(id=proxima_reserva.id)
+        
+        reservas_futuras = reservas_futuras.con_cantidad_pedidos()
 
-        reservas_futuras = reservas_futuras.order_by('date', 'time_slot__start_time')
-
-        # Calulo y agrego la cantidad de pedidos a cada reserva futura
-        for reserva in reservas_futuras:
-            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
-
-        card_html = render_to_string('bookings_app/includes/get_future_reservations_card.html', {
-            'reservas_futuras': reservas_futuras
-        }, request=request)
+        card_html = render_to_string(
+            'bookings_app/includes/get_future_reservations_card.html',
+            {'reservas_futuras': reservas_futuras},
+            request=request
+        )
 
         return JsonResponse({'card_html': card_html})
 
 
+
 class GetPendingReservationsView(LoginRequiredMixin, ClienteRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        reservas_pendientes = Booking.objects.filter(
-            user=request.user,
-            approved=True,
-            approval_date__isnull=True
-        ).order_by('date', 'time_slot__start_time')
+        reservas_pendientes = Booking.objects.del_usuario(request.user).pendientes()
 
         card_html = render_to_string('bookings_app/includes/get_pending_reservations_card.html', {
             'reservas_pendientes': reservas_pendientes
@@ -171,21 +124,7 @@ class GetPendingReservationsView(LoginRequiredMixin, ClienteRequiredMixin, View)
 
 class GetHistoryAprobadasView(LoginRequiredMixin, ClienteRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        local_now = timezone.localtime()
-        hoy = local_now.date()
-        ahora = local_now.time()
-
-        reservas_aprobadas = Booking.objects.filter(
-            user=request.user,
-            approved=True,
-            approval_date__isnull=False
-        ).filter(
-            Q(date__lt=hoy) | Q(date=hoy, time_slot__end_time__lte=ahora)
-        ).order_by('-date', '-time_slot__start_time')
-
-        # Calulo y agrego la cantidad de pedidos a cada reserva aprobada en el historial
-        for reserva in reservas_aprobadas:
-            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
+        reservas_aprobadas = Booking.objects.del_usuario(request.user).historial_aprobadas().con_cantidad_pedidos()
 
         card_html = render_to_string('bookings_app/includes/get_history_reservations_aprobadas_card.html', {
             'reservas_historial_aprobadas': reservas_aprobadas
@@ -196,16 +135,21 @@ class GetHistoryAprobadasView(LoginRequiredMixin, ClienteRequiredMixin, View):
 
 class GetHistoryRechazadasView(LoginRequiredMixin, ClienteRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        reservas_rechazadas = Booking.objects.filter(
-            user=request.user,
-            approved=False
-        ).order_by('-date', '-time_slot__start_time')
+        reservas_rechazadas = Booking.objects.del_usuario(request.user).rechazadas()
 
         card_html = render_to_string('bookings_app/includes/get_history_reservations_rechazadas_card.html', {
             'reservas_historial_rechazadas': reservas_rechazadas
         }, request=request)
 
         return JsonResponse({'card_html': card_html})
+
+
+class DeleteBookingView(ClienteRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        booking_id = kwargs.get('pk')
+        booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+        booking.delete()
+        return JsonResponse({'success': True})
 
 
 class ReservationOrdersView(LoginRequiredMixin, DetailView):
@@ -254,6 +198,8 @@ class DeleteOrderView(View):
 
         #messages.success(request, f'El pedido fue eliminado correctamente.')
         return redirect('bookings_app:reservation_orders', booking_pk)
+
+
 
 
 class MakeReservationView(ClienteRequiredMixin, FormView):

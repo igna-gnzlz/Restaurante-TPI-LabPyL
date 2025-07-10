@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 from bookings_app.managers import BookingManager
-from menu_app.models import Order
 
 
 class Booking(models.Model):
@@ -18,14 +18,21 @@ class Booking(models.Model):
 
     objects = BookingManager()
 
-    def cantidad_pedidos(self):
-        # Si ya está annotado no hace consulta extra, sino consulta.
-        if hasattr(self, 'cantidad_pedidos'):
-            return self.cantidad_pedidos
-        return Order.objects.filter(booking=self).count()
-    
     def __str__(self):
         return 'Codigo de Reserva: '+self.code
+    
+    def get_cantidad_pedidos(self):
+        # Si ya está anotado no hace consulta extra, sino consulta.
+        if hasattr(self, 'cantidad_pedidos'):
+            return self.cantidad_pedidos
+        return self.orders.count()
+    
+    @property
+    def es_reserva_actual(self):
+        local_now = timezone.localtime()
+        hoy = local_now.date()
+        ahora = local_now.time()
+        return self.date == hoy and self.time_slot.start_time <= ahora <= self.time_slot.end_time
 
 
 class Table(models.Model):
