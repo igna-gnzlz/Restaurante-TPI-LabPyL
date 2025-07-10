@@ -107,7 +107,7 @@ class Order(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     state = models.CharField(max_length=15, choices=STATE_CHOICES, default='S')
     user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE, related_name='menu_orders')
-    booking = models.ForeignKey('bookings_app.Booking', on_delete=models.CASCADE, null=True, blank=True)
+    booking = models.ForeignKey('bookings_app.Booking', on_delete=models.CASCADE, null=True, blank=True, related_name='orders')
 
     def save(self, *args, **kwargs):
         if not self.code:
