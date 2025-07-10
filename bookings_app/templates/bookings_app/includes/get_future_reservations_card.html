@@ -10,16 +10,23 @@
                             <p class="mb-0"><strong>Código:</strong> {{ reserva.code }}</p>
                             <p class="mb-0"><strong>Fecha de Reserva:</strong> {{ reserva.date }}</p>
                             <p class="mb-0"><strong>Fecha de Emisión:</strong> {{ reserva.issue_date }}</p>
+                            <p class="mb-0"><strong>Cantidad de pedidos:</strong> {{ reserva.cantidad_pedidos }}</p>
                         </div>
                         <div>
+                            {% if reserva.cantidad_pedidos > 0 %}
+                            <a href="{% url 'bookings_app:reservation_orders' reserva.pk %}" class="btn btn-light btn-sm violeta-celeste sombra-violeta">
+                                Ver Pedidos
+                            </a>
+                            {% endif %}
                             <button 
                                 type="button" 
-                                class="btn btn-light btn-sm violeta-celeste"
+                                class="btn btn-light btn-sm violeta-celeste sombra-violeta"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#detalleReservaModal"
                                 data-code="{{ reserva.code }}"
                                 data-date="{{ reserva.date }}"
                                 data-issue_date="{{ reserva.issue_date }}"
+                                data-pedidos="{{ reserva.cantidad_pedidos }}"
                                 data-approval_date="{{ reserva.approval_date|default:'' }}"
                                 data-time_slot="{{ reserva.time_slot.name }} ({{ reserva.time_slot.start_time }} - {{ reserva.time_slot.end_time }})"
                                 data-observations="{{ reserva.observations|default:"-" }}"

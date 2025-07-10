@@ -16,7 +16,7 @@
 
     <!-- Card de Proxima Reserva / Reserva Actual -->
     <div id="proxima-reserva-container">
-        {% include 'bookings_app/includes/get_next_reservation_card.html' %}
+        {% include 'bookings_app/includes/get_next_reservation_card.html' with proxima_reserva=proxima_reserva cantidad_pedidos_proxima_reserva=cantidad_pedidos_proxima_reserva%}
     </div>
 
     <!-- Card Reservas Futuras -->
@@ -77,6 +77,7 @@
                         <p id="approval-date-container" class="d-none">
                             <strong>Fecha de Aprobación:</strong> <span id="modal-approval_date"></span>
                         </p>
+                        <p><strong>Cantidad de pedidos:</strong> <span id="modal-cantidad-pedidos"></span></p>
                         <p><strong>Franja Horaria:</strong> <span id="modal-time_slot"></span></p>
                         <p><strong>Observaciones:</strong> <span id="modal-observations"></span></p>
                         <p><strong>Mesas:</strong> <span id="modal-tables"></span></p>
@@ -132,7 +133,6 @@
 .fondo-violeta {
     background-color: #e6e0f8 !important; 
 }
-
 
 .sombra-celeste {
     box-shadow: 0 0 15px rgba(0, 123, 255, 0.35);
@@ -285,6 +285,7 @@
         var code = button.getAttribute('data-code')
         var date = button.getAttribute('data-date')
         var issue_date = button.getAttribute('data-issue_date')
+        var pedidos = button.getAttribute('data-pedidos');
         var time_slot = button.getAttribute('data-time_slot')
         var observations = button.getAttribute('data-observations')
         var tables = button.getAttribute('data-tables')
@@ -293,6 +294,7 @@
         detalleReservaModal.querySelector('#modal-code').textContent = code
         detalleReservaModal.querySelector('#modal-date').textContent = date
         detalleReservaModal.querySelector('#modal-issue_date').textContent = issue_date
+        detalleReservaModal.querySelector('#modal-cantidad-pedidos').textContent = pedidos;
         detalleReservaModal.querySelector('#modal-time_slot').textContent = time_slot
         detalleReservaModal.querySelector('#modal-observations').textContent = observations
         detalleReservaModal.querySelector('#modal-tables').textContent = tables

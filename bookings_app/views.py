@@ -1,21 +1,21 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from bookings_app.mixins import ClienteRequiredMixin
-from django.views.generic import ListView, FormView
 from bookings_app.models import Booking, TimeSlot, Table
-from django.utils import timezone
-from django.contrib import messages
-from bookings_app.forms import MakeReservationForm
-import calendar
-from datetime import date
-from django.db.models import Q
-from django.urls import reverse_lazy
-from django.utils.crypto import get_random_string
-from django.shortcuts import redirect
-
-from django.views import View
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from bookings_app.mixins import ClienteRequiredMixin
 from django.template.loader import render_to_string
+from django.views.generic import ListView, FormView
+from bookings_app.forms import MakeReservationForm
+from django.utils.crypto import get_random_string
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.contrib import messages
+from django.utils import timezone
+from menu_app.models import Order
+from django.db.models import Q
+from django.views import View
+from datetime import date
+import calendar
 
 
 class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
@@ -42,7 +42,7 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
 
         card_title = "Próxima Reserva"
         
-        reservas_futuras = Booking.objects.none()  # vacío por defecto
+        reservas_futuras = Booking.objects.none()  # me da vacio si no hay reservas
 
         if proxima_reserva:
             if proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time:
@@ -90,6 +90,19 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
             Q(date=hoy, time_slot__start_time__lt=ahora)
         ).order_by('-date', '-time_slot__start_time')
 
+        # Cantidad de pedidos de la próxima reserva
+        cantidad_pedidos_proxima_reserva = 0
+        if proxima_reserva:
+            cantidad_pedidos_proxima_reserva = Order.objects.filter(booking=proxima_reserva).count()
+
+        # Calulo y agrego la cantidad de pedidos a cada reserva futura
+        for reserva in reservas_futuras:
+            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
+
+        # Calulo y agrego la cantidad de pedidos a cada reserva aprobada en el historial
+        for reserva in reservas_historial_aprobadas:
+            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
+
         context.update({
             'proxima_reserva': proxima_reserva,
             'card_title': card_title,
@@ -97,7 +110,8 @@ class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
             'reservas_pendientes': reservas_pendientes,
             'reservas_historial_aprobadas': reservas_historial_aprobadas,
             'reservas_historial_rechazadas': reservas_historial_rechazadas,
-            'reservas_sin_confirmar': reservas_sin_confirmar
+            'reservas_sin_confirmar': reservas_sin_confirmar,
+            'cantidad_pedidos_proxima_reserva': cantidad_pedidos_proxima_reserva,
         })
 
         return context
@@ -113,14 +127,6 @@ class DeleteBookingView(ClienteRequiredMixin, View):
         booking = get_object_or_404(Booking, id=booking_id, user=request.user)
         booking.delete()
         return JsonResponse({'success': True})
-
-
-
-
-
-
-
-
 
 
 class MakeReservationView(ClienteRequiredMixin, FormView):
@@ -409,8 +415,13 @@ class GetNextReservationView(LoginRequiredMixin, ClienteRequiredMixin, View):
             if proxima_reserva.date == hoy and proxima_reserva.time_slot.start_time <= ahora <= proxima_reserva.time_slot.end_time:
                 es_reserva_actual = True
         
+        cantidad_pedidos = 0
+        if proxima_reserva:
+            cantidad_pedidos = Order.objects.filter(booking=proxima_reserva).count()
+
         card_html = render_to_string('bookings_app/includes/get_next_reservation_card.html', {
             'proxima_reserva': proxima_reserva,
+            'cantidad_pedidos_proxima_reserva': cantidad_pedidos,
             'es_reserva_actual': es_reserva_actual
         }, request=request)
         
@@ -441,6 +452,10 @@ class GetFutureReservationsView(LoginRequiredMixin, ClienteRequiredMixin, View):
             reservas_futuras = reservas_futuras.exclude(id=proxima_reserva.id)
 
         reservas_futuras = reservas_futuras.order_by('date', 'time_slot__start_time')
+
+        # Calulo y agrego la cantidad de pedidos a cada reserva futura
+        for reserva in reservas_futuras:
+            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
 
         card_html = render_to_string('bookings_app/includes/get_future_reservations_card.html', {
             'reservas_futuras': reservas_futuras
@@ -478,6 +493,10 @@ class GetHistoryAprobadasView(LoginRequiredMixin, ClienteRequiredMixin, View):
             Q(date__lt=hoy) | Q(date=hoy, time_slot__end_time__lte=ahora)
         ).order_by('-date', '-time_slot__start_time')
 
+        # Calulo y agrego la cantidad de pedidos a cada reserva aprobada en el historial
+        for reserva in reservas_aprobadas:
+            reserva.cantidad_pedidos = Order.objects.filter(booking=reserva).count()
+
         card_html = render_to_string('bookings_app/includes/get_history_reservations_aprobadas_card.html', {
             'reservas_historial_aprobadas': reservas_aprobadas
         }, request=request)
@@ -497,3 +516,56 @@ class GetHistoryRechazadasView(LoginRequiredMixin, ClienteRequiredMixin, View):
         }, request=request)
 
         return JsonResponse({'card_html': card_html})
+
+
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404
+from bookings_app.models import Booking
+from menu_app.models import Order, OrderContainsProduct
+
+class ReservationOrdersView(LoginRequiredMixin, DetailView):
+    model = Booking
+    template_name = 'bookings_app/reservation_orders.html'
+    context_object_name = 'reserva'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        reserva = self.get_object()
+
+        pedidos = Order.objects.filter(booking=reserva).order_by('buyDate')
+
+        # Enlazar productos
+        for pedido in pedidos:
+            pedido.items = OrderContainsProduct.objects.filter(order=pedido).select_related('product')
+
+        context['pedidos'] = pedidos
+        return context
+    
+
+class CancelOrderView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+
+        if order.state != 'S':
+            #messages.error(request, 'Solo se pueden cancelar pedidos en estado "Solicitado".')
+            return redirect('bookings_app:reservation_orders', order.booking.pk)
+
+        order.state = 'C'
+        order.save()
+        #messages.success(request, f'El pedido {order.code} fue cancelado correctamente.')
+        return redirect('bookings_app:reservation_orders', order.booking.pk)
+
+
+class DeleteOrderView(View):
+    def post(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+
+        if order.state == 'S':
+            #messages.error(request, 'Los pedidos en estado "Solicitado" no pueden ser eliminados. Cancelalos primero.')
+            return redirect('bookings_app:reservation_orders', order.booking.pk)
+
+        booking_pk = order.booking.pk
+        order.delete()
+
+        #messages.success(request, f'El pedido fue eliminado correctamente.')
+        return redirect('bookings_app:reservation_orders', booking_pk)

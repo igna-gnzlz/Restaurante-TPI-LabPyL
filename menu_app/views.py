@@ -1,15 +1,42 @@
-from django.views.generic import TemplateView, ListView, DetailView
-from .models import Product, Order, OrderContainsProduct, Category
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating
+from menu_app.forms import RatingForm
+from accounts_app.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from bookings_app.models import Booking
-from django.urls import reverse_lazy
 from django.contrib import messages
+from django.urls import reverse, reverse_lazy
 from django.views import View
 
 
-class HomeView(TemplateView):
-    template_name = "home.html"
+
+class MakeRatingView(FormView):
+    form_class = RatingForm
+    template_name = 'menu_app/rating_form.html'
+    success_url = reverse_lazy('menu_app:menu')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.product = get_object_or_404(Product, pk=kwargs.get('product_id'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = self.product
+        return context
+
+    def form_valid(self, form):
+        rating = form.save(commit=False)
+        rating.user = self.request.user if self.request.user.is_authenticated else None
+        rating.product = self.product
+        rating.save()
+        messages.success(self.request, "¡Comentario creado con éxito!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Por favor corrija los errores en el formulario.")
+        return super().form_invalid(form)
+
 
 class MenuListView(ListView):
     model = Category
@@ -27,10 +54,19 @@ class MenuListView(ListView):
         for category in categories:
             products = Product.objects.filter(category=category)
             if products.exists():
+                for product in products:
+                    product.rating_form = RatingForm()
+                    product.comments = product.rating_set.select_related('user').order_by('-created_at')
                 categorized_items[category] = products
                 
         context['categorized_items'] = categorized_items
+        context['rating_form'] = RatingForm()
         return context
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
+
     
 class ProductDetailView(DetailView):
     model = Product
@@ -50,29 +86,32 @@ class MakeOrderView(LoginRequiredMixin, View):
         ahora = local_now.time()
 
         reservas_usuario = Booking.objects.filter(user=self.request.user).select_related('time_slot')
-
         reservas_proximas = Booking.objects.none()  # vacío por defecto
+
+        # Todas las reservas futuras o actuales (aprobadas y con fecha de aprobación)
         reservas_proximas = reservas_usuario.filter(
             approved=True,
             approval_date__isnull=False
         ).filter(
             Q(date__gt=hoy) |
-            Q(date=hoy, time_slot__start_time__gt=ahora)
+            Q(date=hoy, time_slot__end_time__gte=ahora)
         ).order_by('date', 'time_slot__start_time')
 
         reserva_seleccionada = None
-        pedidos_reserva = []
 
         reserva_id = request.GET.get('booking')
         if reserva_id:
             reserva_seleccionada = get_object_or_404(reservas_proximas, id=reserva_id)
-            pedidos_reserva = Order.objects.filter(user=request.user, booking=reserva_seleccionada)
             request.session['booking_selected_id'] = reserva_seleccionada.id
         else:
             booking_selected_id_session = request.session.get('booking_selected_id')
             if booking_selected_id_session:
-                reserva_seleccionada = get_object_or_404(reservas_proximas, id=booking_selected_id_session)
-                pedidos_reserva = Order.objects.filter(user=request.user, booking=reserva_seleccionada)
+                try:
+                    reserva_seleccionada = reservas_proximas.get(id=booking_selected_id_session)
+                except Booking.DoesNotExist:
+                    reserva_seleccionada = None
+                    request.session.pop('booking_selected_id', None)  # limpia sesión si la reserva ya no existe
+
 
         carrito_reserva = []
         total_carrito = 0.00
@@ -82,7 +121,6 @@ class MakeOrderView(LoginRequiredMixin, View):
         context = {
             'reservas_proximas': reservas_proximas,
             'reserva_seleccionada': reserva_seleccionada,
-            'pedidos_reserva': pedidos_reserva,
             'carrito_reserva': carrito_reserva,
             'total_carrito': total_carrito
         }
@@ -96,7 +134,7 @@ class AddToOrderView(LoginRequiredMixin, View):
         booking_selected_id = request.session.get('booking_selected_id')
 
         if not booking_selected_id:
-            messages.warning(request, "Seleccione primero una reserva.")
+            #messages.warning(request, "Seleccione primero una reserva.")
             return redirect('make_order')
 
         cart = request.session.get('cart', {})
@@ -123,8 +161,9 @@ class AddToOrderView(LoginRequiredMixin, View):
         request.session['cart'] = cart  # Guardar cambios en la sesión
         request.session.modified = True
 
-        messages.success(request, f'Se agregó "{product.name}" al pedido.')
-        return redirect('menu_app:menu')
+        #messages.success(request, f'Se agregó "{product.name}" al pedido.')
+        return redirect(f"{reverse('menu_app:menu')}#producto-{product.id}")
+        
 
 
 class DecrementFromCartView(LoginRequiredMixin, View):
@@ -213,4 +252,4 @@ class ConfirmOrderView(LoginRequiredMixin, View):
         request.session.modified = True
 
         messages.success(request, f'Pedido confirmado. Código: {order.code}')
-        return redirect('make_order')
+        return redirect('bookings_app:my_reservation')
