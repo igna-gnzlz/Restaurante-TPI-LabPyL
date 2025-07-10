@@ -1,5 +1,8 @@
 from django.db import models
-from django.conf import settings 
+from django.conf import settings
+
+from bookings_app.managers import BookingManager
+from menu_app.models import Order
 
 
 class Booking(models.Model):
@@ -13,6 +16,14 @@ class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE) # Usa el User definido en settings.py
     issue_date = models.DateField(auto_now_add=True)
 
+    objects = BookingManager()
+
+    def cantidad_pedidos(self):
+        # Si ya está annotado no hace consulta extra, sino consulta.
+        if hasattr(self, 'cantidad_pedidos'):
+            return self.cantidad_pedidos
+        return Order.objects.filter(booking=self).count()
+    
     def __str__(self):
         return 'Codigo de Reserva: '+self.code
 
