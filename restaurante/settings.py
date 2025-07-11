@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts_app',
     'bookings_app',
     'menu_app',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Panel de Administración",
+    "site_header": "Restaurante TPI",
+    "site_brand": "Restaurante TPI",
+    "welcome_sign": "Bienvenido al Panel de Administración",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
