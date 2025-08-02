@@ -18,7 +18,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Código: {{ reserva.code }}</h5>
                         <p class="card-text">Fecha: {{ reserva.date }}</p>
-                        <p class="card-text">Franja Horaria: {{ reserva.time_slot }} ( {{ reserva.time_slot.start_time|time:"H:i" }} hs. - {{ reserva.time_slot.end_time|time:"H:i" }} hs.)</p>
+                        <p class="card-text">Franja Horaria: {{ reserva.time_slot }} ( {{ reserva.time_slot.get_label_horas }} )</p>
                         </div>
                 </button>
                 </form>

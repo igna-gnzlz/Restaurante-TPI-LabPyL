@@ -20,7 +20,7 @@
                     {% else %}Rechazada
                     {% endif %}
                 </p>
-                <p><strong>Franja Horaria:</strong> {{ proxima_reserva.time_slot.name }} ({{ proxima_reserva.time_slot.start_time }} - {{ proxima_reserva.time_slot.end_time }})</p>
+                <p><strong>Franja Horaria:</strong> {{ proxima_reserva.time_slot.name }} ( {{ proxima_reserva.time_slot.get_label_horas }} )</p>
                 <p><strong>Mesas:</strong>
                     {% for mesa in proxima_reserva.tables.all %}
                         {{ mesa.number }}{% if not forloop.last %}, {% endif %}

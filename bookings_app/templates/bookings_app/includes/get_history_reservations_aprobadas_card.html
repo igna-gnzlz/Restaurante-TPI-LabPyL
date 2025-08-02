@@ -24,8 +24,7 @@
                     data-date="{{ reserva.date }}"
                     data-issue_date="{{ reserva.issue_date }}"
                     data-pedidos="{{ reserva.cantidad_pedidos|default:0 }}"
-                    data-approval_date="{{ reserva.approval_date|default:'' }}"
-                    data-time_slot="{{ reserva.time_slot.name }} ({{ reserva.time_slot.start_time }} - {{ reserva.time_slot.end_time }})"
+                    data-time_slot="{{ reserva.time_slot.name }} ( {{ reserva.time_slot.get_label_horas }} )"
                     data-observations="{{ reserva.observations|default:"-" }}"
                     data-tables="{% for mesa in reserva.tables.all %}{{ mesa.number }}{% if not forloop.last %}, {% endif %}{% endfor %}">
                     Ver Detalles

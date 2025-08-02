@@ -99,5 +99,5 @@ class TimeSlot(models.Model):
         ahora = timezone.localtime().time()
         return self.start_time > ahora
 
-    def get_label(self):
-        return f"{self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')}"
+    def get_label_horas(self):
+        return f"{self.start_time.strftime('%H:%M')} hs. - {self.end_time.strftime('%H:%M')} hs."
