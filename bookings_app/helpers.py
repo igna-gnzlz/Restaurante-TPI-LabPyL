@@ -1,4 +1,5 @@
 from bookings_app.utils import DateTimeUtils
+from bookings_app.models import Booking
 
 import calendar
 from datetime import date
@@ -70,4 +71,7 @@ class BookingHelpers:
 
     @staticmethod
     def generar_codigo_reserva():
-        return get_random_string(8).upper()
+        while True:
+            codigo = get_random_string(length=9, allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+            if not Booking.objects.filter(code=codigo).exists():
+                return codigo

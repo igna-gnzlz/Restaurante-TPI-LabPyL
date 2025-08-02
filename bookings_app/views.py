@@ -14,11 +14,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.contrib import messages
-from django.utils import timezone
-from django.db.models import Q
 from django.views import View
-from datetime import date
-import calendar
 
 
 class BookingListView(LoginRequiredMixin, ClienteRequiredMixin, ListView):
@@ -272,15 +268,19 @@ class MakeReservationView(ClienteRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
+        # Verifico que no tenga reservas pendientes
         if Booking.objects.del_usuario(self.request.user).pendientes().exists():
             messages.error(self.request, "Operación Denegada: Tiene una reserva pendiente.")
             return self.form_invalid(form)
-
+        
+        # Obtengo los datos seleccionados
         selected_date = BookingHelpers.get_selected_date_from_request(self.request)
         mesas_seleccionadas = form.cleaned_data["tables"]
         time_slot = form.cleaned_data["time_slot"]
-        new_code = get_random_string(8).upper()
+        # Genero código único para reserva
+        new_code = BookingHelpers.generar_codigo_reserva()
 
+        # Creo la reserva y le asigno sus mesas
         reserva = Booking.objects.create(
             approved=True,
             approval_date=None,
