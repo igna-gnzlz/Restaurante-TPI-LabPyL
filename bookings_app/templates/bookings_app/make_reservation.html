@@ -38,7 +38,7 @@
                     <select id="id_time_slot" name="time_slot" class="form-select" onchange="updateTimeSlot()">
                         {% for slot in time_slots %}
                         <option value="{{ slot.id }}" {% if slot.id == selected_time_slot.id %}selected{% endif %}>
-                            {{ slot.name }} — {{ slot.start_time|time:"g:i a" }} a {{ slot.end_time|time:"g:i a" }}
+                            {{ slot.name }} — {{ slot.start_time|time:"H:i" }} hs. - {{ slot.end_time|time:"H:i" }} hs.
                         </option>
                         {% endfor %}
                     </select>
