@@ -291,6 +291,6 @@ class MakeReservationView(ClienteRequiredMixin, FormView):
             user=self.request.user
         )
         reserva.tables.set(mesas_seleccionadas)
-
-        messages.success(self.request, f"Reserva realizada con éxito. Código: {new_code}")
+        
+        messages.success(self.request, f"Reserva solicitada con éxito. Código: {new_code}")
         return super().form_valid(form)

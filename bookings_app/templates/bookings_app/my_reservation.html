@@ -2,6 +2,15 @@
 
 {% block content %}
 <div class="container mt-4">
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Card de Proxima Reserva / Reserva Actual -->
     <div id="proxima-reserva-container">
