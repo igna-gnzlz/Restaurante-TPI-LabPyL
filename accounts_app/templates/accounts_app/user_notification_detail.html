@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificación{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ user_notification.notification.title }}</h2>
+    <p>{{ user_notification.notification.message }}</p>
+    <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4">Realizar Reserva</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row">
+            <!-- Filtros a la izquierda -->
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="monthSelect" class="form-label">Mes</label>
+                    <select id="monthSelect" name="month" class="form-select" onchange="updateMonth()">
+                        {% for mes in months %}
+                        <option value="{{ mes.numero }}" {% if mes.numero == current_month %}selected{% endif %}>
+                            {{ mes.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_time_slot" class="form-label">Horarios</label>
+                    <select id="id_time_slot" name="time_slot" class="form-select" onchange="updateTimeSlot()">
+                        {% for slot in time_slots %}
+                        <option value="{{ slot.id }}" {% if slot.id == selected_time_slot.id %}selected{% endif %}>
+                            {{ slot.name }} — {{ slot.get_label_horas }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Calendario a la derecha -->
+            <div class="col-md-8">
+                <div class="calendar-container">
+                    <div class="calendar-table">
+                        <div class="d-flex text-center fw-bold border-bottom pb-2">
+                            {% for dia in weekdays %}
+                            <div class="calendar-cell small text-uppercase">{{ dia }}</div>
+                            {% endfor %}
+                        </div>
+                        {% for week in month_days %}
+                        <div class="d-flex">
+                            {% for dia in week %}
+                            {% if dia == 0 %}
+                            <div class="calendar-cell"></div>
+                            {% else %}
+                            <div class="calendar-cell">
+                                <button type="button"
+                                    class="btn btn-sm 
+                                    {% if dia == current_day %}
+                                        btn-primary
+                                    {% elif today.month == current_month and dia < today.day %}
+                                        btn-secondary disabled
+                                    {% else %}
+                                        btn-outline-primary
+                                    {% endif %}" onclick="selectDay({{ dia }})">
+                                    {{ dia }}
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mesas disponibles -->
+        <div class="mt-4 text-center">
+            <h5>{{ availability_title }}</h5>
+            {% if availability_subtitle %}
+                <p>{{ availability_subtitle }}</p>
+            {% endif %}
+            {% if show_tables %}
+                {{ form.tables }}
+            {% endif %}
+        </div>
+
+        <!-- Observaciones -->
+        <div class="mt-4">
+            <label for="{{ form.observations.id_for_label }}" class="form-label">Observaciones</label>
+            {{ form.observations }}
+        </div>
+
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'home' %}" class="btn btn-secondary btn-lg w-45">Volver a Inicio</a>
+            <button type="submit" class="btn btn-success btn-lg w-45">Confirmar Reserva</button>
+        </div>
+
+    </form>
+    
+</div>
+
+<style>
+.calendar-container {
+    max-width: 100%;
+}
+
+.calendar-table {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-cell {
+    flex: 1;
+    text-align: center;
+    padding: 2px;
+    min-width: 28px;
+}
+
+.calendar-cell button {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+    padding: 0;
+}
+
+.w-45 {
+    width: 45%;
+}
+
+.fondo-error-rojo {
+    background-color: #f8d7da !important;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+</style>
+
+<script>
+    // Al cargar la página, forzar day y month si no están en la URL
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // Enero = 0
+        const currentDay = now.getDate();
+
+        const urlMonth = params.get("month");
+        const urlDay = params.get("day");
+
+        // Si no hay month o day, forzamos al mes y día actual en la URL
+        if (!urlMonth || !urlDay) {
+            params.set("month", currentMonth);
+            params.set("day", currentDay);
+            // Mantener el time_slot si existe, si no no se toca
+            window.location.search = params.toString();
+        }
+    })();
+
+    function updateMonth() {
+        const monthSelect = document.getElementById("monthSelect");
+        const selectedMonth = parseInt(monthSelect.value);
+
+        const params = new URLSearchParams(window.location.search);
+        const prevMonth = params.get("month");
+        const prevDay = params.get("day");
+
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentDay = now.getDate();
+
+        // Actualizamos el mes seleccionado
+        params.set("month", selectedMonth);
+
+        if (selectedMonth === currentMonth) {
+            // Si volvemos al mes actual, chequear prevDay para ajustar day
+            if (prevDay && parseInt(prevDay) >= currentDay) {
+                // Mantener prevDay si es igual o mayor al día actual
+                params.set("day", prevDay);
+            } else {
+                // Caso contrario, forzar el día actual
+                params.set("day", currentDay);
+            }
+        } else {
+            // Mes distinto al actual
+            if (prevDay) {
+                params.set("day", prevDay);
+            } else {
+                params.set("day", 1);
+            }
+        }
+
+        window.location.search = params.toString();
+    }
+
+    function updateTimeSlot() {
+        const timeSlotSelect = document.getElementById("id_time_slot");
+        const selectedTimeSlot = timeSlotSelect.value;
+
+        const params = new URLSearchParams(window.location.search);
+
+        // Solo actualizamos el time_slot, sin modificar ni day ni month
+        params.set("time_slot", selectedTimeSlot);
+
+        window.location.search = params.toString();
+    }
+
+    function selectDay(dia) {
+        const params = new URLSearchParams(window.location.search);
+        params.set("day", dia);
+        window.location.search = params.toString();
+    }
+</script>
+{% endblock %}

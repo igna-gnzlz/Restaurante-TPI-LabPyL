@@ -25,8 +25,9 @@ python -m venv venv
 ```bash
 python.exe -m pip install --upgrade pip
 ```
-## Instalar dependencias
+## Instalar dependencias desde el repo clonado
 ```bash
+cd Restaurante-TPI-LabPyL
 pip install -r requirements.txt
 ```
 ## Instalar navegadores para correr tests E2E
@@ -43,9 +44,13 @@ python manage.py migrate
 ```
 ## Llenar base de datos con fixture
 ```bash
-python manage.py loaddata products.json
+python manage.py loaddata fixtures/initial_data.json
 ```
 ## Correr app
 ```bash
 python manage.py runserver
+```
+## Correr tests
+```bash
+python manage.py test
 ```

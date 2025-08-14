@@ -1,0 +1,51 @@
+<!-- Card Reservas Futuras -->
+
+<div class="card mb-4 sombra-violeta">
+        <div class="card-body">
+            <h4 class="card-title">Reservas Futuras</h4>
+            {% if reservas_futuras %}
+                {% for reserva in reservas_futuras %}
+                    <div class="border rounded p-3 mb-3 d-flex justify-content-between align-items-center fondo-violeta" data-card-id="futuras-{{ reserva.id }}">
+                        <div>
+                            <p class="mb-0"><strong>Código:</strong> {{ reserva.code }}</p>
+                            <p class="mb-0"><strong>Fecha de Reserva:</strong> {{ reserva.date }}</p>
+                            <p class="mb-0"><strong>Fecha de Emisión:</strong> {{ reserva.issue_date }}</p>
+                            <p class="mb-0"><strong>Cantidad de pedidos:</strong> {{ reserva.cantidad_pedidos }}</p>
+                        </div>
+                        <div>
+                            {% if reserva.cantidad_pedidos > 0 %}
+                            <a href="{% url 'bookings_app:reservation_orders' reserva.pk %}" class="btn btn-light btn-sm violeta-celeste sombra-violeta">
+                                Ver Pedidos
+                            </a>
+                            {% endif %}
+                            <button 
+                                type="button" 
+                                class="btn btn-light btn-sm violeta-celeste sombra-violeta"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#detalleReservaModal"
+                                data-code="{{ reserva.code }}"
+                                data-date="{{ reserva.date }}"
+                                data-issue_date="{{ reserva.issue_date }}"
+                                data-pedidos="{{ reserva.cantidad_pedidos }}"
+                                data-time_slot="{{ reserva.time_slot.name }} ( {{ reserva.time_slot.get_label_horas }} )"
+                                data-observations="{{ reserva.observations|default:"-" }}"
+                                data-tables="{% for mesa in reserva.tables.all %}{{ mesa.number }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                            >
+                                Ver Detalles
+                            </button>
+                            <button 
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal"
+                                data-id="{{ reserva.id }}">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-secondary mb-0 fondo-violeta">- Sin reservas -</div>
+            {% endif %}
+        </div>
+    </div>

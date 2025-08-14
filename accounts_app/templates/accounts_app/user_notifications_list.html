@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Mis notificaciones</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Notificación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notif in user_notifications %}
+                        <tr>
+                            <td>
+                                {{ notif.notification.title }}
+                            </td>
+                            <td>
+                                <a href="{% url 'accounts_app:user_notification_detail' notif.pk %}" class="btn btn-primary btn-sm">Ver mensaje</a>
+                                <form action="{% url 'accounts_app:user_notification_delete' notif.pk %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">&times;</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2">No tienes notificaciones.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <form action="{% url 'accounts_app:user_notification_delete_all' %}" method="post" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar todas las notificaciones</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

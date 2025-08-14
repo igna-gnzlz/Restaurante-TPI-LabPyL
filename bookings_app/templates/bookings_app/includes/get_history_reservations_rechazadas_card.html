@@ -1,0 +1,39 @@
+<!-- Rechazadas -->
+
+<h5>Rechazadas</h5>
+{% if reservas_historial_rechazadas %}
+    {% for reserva in reservas_historial_rechazadas %}
+        <div class="border rounded p-3 mb-3 d-flex justify-content-between align-items-center fondo-gris" data-card-id="rechazadas-{{ reserva.id }}">
+            <div>
+                <p class="mb-0"><strong>Código:</strong> {{ reserva.code }}</p>
+                <p class="mb-0"><strong>Fecha de Reserva:</strong> {{ reserva.date }}</p>
+            </div>
+            <div>
+                <button 
+                    type="button" 
+                    class="btn btn-light btn-sm sombra-gris"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#detalleReservaModal"
+                    data-code="{{ reserva.code }}"
+                    data-date="{{ reserva.date }}"
+                    data-issue_date="{{ reserva.issue_date }}"
+                    data-pedidos="{{ 0 }}"
+                    data-time_slot="{{ reserva.time_slot.name }} ( {{ reserva.time_slot.get_label_horas }} )"
+                    data-observations="{{ reserva.observations|default:"-" }}"
+                    data-tables="{% for mesa in reserva.tables.all %}{{ mesa.number }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                    Ver Detalles
+                </button>
+                <button 
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteModal"
+                    data-id="{{ reserva.id }}">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-secondary mb-0 fondo-gris">- Sin reservas -</div>
+{% endif %}

@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,13 +28,22 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Esto es por lo del User que hereda de AbstractUser en accounts_app/models.py
+
+AUTH_USER_MODEL = 'accounts_app.User'
+
+# Esto es para que despues del login se vaya a home
+
+LOGIN_REDIRECT_URL = 'home'
+AUTH_USER_MODEL = 'accounts_app.User'
 
 # Application definition
 
 INSTALLED_APPS = [
-    'menu_app',
-    'bookings_app',
     'accounts_app',
+    'bookings_app',
+    'menu_app',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +52,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Panel de Administración",
+    "site_header": "Restaurante TPI",
+    "site_brand": "Restaurante TPI",
+    "welcome_sign": "Bienvenido al Panel de Administración",
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'restaurante.urls'
@@ -58,7 +74,7 @@ ROOT_URLCONF = 'restaurante.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'menu_app/templates')],
+        'DIRS': [BASE_DIR / 'templates'],  # <- os.path.join(BASE_DIR, 'templates') usa strings, ahora usa objetos y es mas seguro
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -110,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 

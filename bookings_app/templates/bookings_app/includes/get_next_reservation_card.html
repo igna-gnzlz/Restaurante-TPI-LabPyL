@@ -1,0 +1,60 @@
+<!-- Card de Proxima Reserva / Reserva Actual -->
+
+<div class="card mb-4 sombra-verde borde-verde">
+    <div class="card-body">
+        <h4 class="card-title">
+            {% if es_reserva_actual %}
+                Reserva Actual
+            {% else %}
+                Próxima Reserva
+            {% endif %}
+        </h4>
+
+        {% if proxima_reserva %}
+            <div class="fondo-verde p-3 rounded" data-card-id="{{ proxima_reserva.id }}">
+                <p><strong>Código:</strong> {{ proxima_reserva.code }}</p>
+                <p><strong>Fecha de Reserva:</strong> {{ proxima_reserva.date }}</p>
+                <p><strong>Estado:</strong>
+                    {% if proxima_reserva.approved == None %}Pendiente
+                    {% elif proxima_reserva.approved %}Aprobada
+                    {% else %}Rechazada
+                    {% endif %}
+                </p>
+                <p><strong>Franja Horaria:</strong> {{ proxima_reserva.time_slot.name }} ( {{ proxima_reserva.time_slot.get_label_horas }} )</p>
+                <p><strong>Mesas:</strong>
+                    {% for mesa in proxima_reserva.tables.all %}
+                        {{ mesa.number }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Sin mesas asignadas
+                    {% endfor %}
+                </p>
+                <p><strong>Cantidad de Pedidos:</strong> {{ cantidad_pedidos_proxima_reserva }}</p>
+                <p><strong>Observaciones:</strong> {{ proxima_reserva.observations|default:"-" }}</p>
+                <p><strong>Fecha de Aprobación:</strong> {{ proxima_reserva.approval_date|default:"-" }}</p>
+                <p><strong>Fecha de Emisión:</strong> {{ proxima_reserva.issue_date }}</p>
+
+                {% if cantidad_pedidos_proxima_reserva > 0 %}
+                <div class="mb-2">
+                    <a href="{% url 'bookings_app:reservation_orders' proxima_reserva.pk %}" class="btn btn-light btn-sm sombra-verde">
+                        Ver Pedidos
+                    </a>
+                </div>                
+                {% endif %}
+                {% if not es_reserva_actual %}
+                <div>
+                    <button 
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        data-id="{{ proxima_reserva.id }}">
+                        Eliminar
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0 fondo-verde">- Sin reserva -</div>
+        {% endif %}
+    </div>
+</div>
