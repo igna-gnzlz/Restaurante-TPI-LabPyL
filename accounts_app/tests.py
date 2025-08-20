@@ -92,3 +92,61 @@ class NotificationModelTests(TestCase):
         now = timezone.now()
         self.assertLessEqual(notif.created_at, now)
         self.assertIsNotNone(notif.created_at)
+
+
+
+class UserNotificationModelTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='user_test',
+            email='user@test.com',
+            password='testpass',
+            name='Test',
+            last_name='User'
+        )
+        self.notification = Notification.objects.create(
+            title='Test Notification',
+            message='This is a test notification'
+        )
+
+    def test_creacion_usernotification(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.assertEqual(un.user, self.user)
+        self.assertEqual(un.notification, self.notification)
+        self.assertFalse(un.is_read)  # Valor por defecto False
+
+    def test_relaciones_usernotification(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.assertEqual(un.user.username, 'user_test')
+        self.assertEqual(un.notification.title, 'Test Notification')
+
+    def test_actualizacion_is_read(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        un.is_read = True
+        un.save()
+        updated_un = UserNotification.objects.get(id=un.id)
+        self.assertTrue(updated_un.is_read)
+
+    def test_eliminacion_usernotification(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        un_id = un.id
+        un.delete()
+        with self.assertRaises(UserNotification.DoesNotExist):
+            UserNotification.objects.get(id=un_id)
+
+    def test_user_null(self):
+        un = UserNotification.objects.create(user=None, notification=self.notification)
+        self.assertIsNone(un.user)
+
+    def test_borrado_notification_cascada(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.notification.delete()
+        with self.assertRaises(UserNotification.DoesNotExist):
+            UserNotification.objects.get(id=un.id)
+
+    def test_borrado_user_set_null(self):
+        un = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.user.delete()
+        un_after_user_delete = UserNotification.objects.get(id=un.id)
+        self.assertIsNone(un_after_user_delete.user)
