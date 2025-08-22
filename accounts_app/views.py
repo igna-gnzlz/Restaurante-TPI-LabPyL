@@ -8,22 +8,7 @@ from django.contrib.auth.models import User
 from accounts_app.forms import UserRegisterForm, UserLoginForm, EditUsernameForm
 from accounts_app.models import Notification, UserNotification
 from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, redirect
-
-
-user = get_user_model()
-
-
-class UserNotificationDeleteAllView(LoginRequiredMixin, View):
-    def post(self, request, *args, **kwargs):
-        UserNotification.objects.filter(user=request.user).delete()
-        return redirect('accounts_app:user_notifications_list')
-
-class UserNotificationDeleteView(DeleteView):
-    model = UserNotification
-    success_url = reverse_lazy('accounts_app:user_notifications_list')
-    template_name = 'accounts_app/user_notification_confirm_delete.html'
 
 
 class EditUsernameView(LoginRequiredMixin, UpdateView):
@@ -42,12 +27,6 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
         return context
-
-# Si querés conservar la función profile, podés comentarla o eliminarla
-# @login_required
-# def profile(request):
-#     user = request.user
-#     return render(request, 'accounts_app/profile.html', {'user': user})
 
 
 class UserRegisterView(FormView):
