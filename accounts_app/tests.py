@@ -2,6 +2,18 @@ from django.test import TestCase
 from accounts_app.models import User, Notification, UserNotification
 from django.db.utils import IntegrityError
 from django.utils import timezone
+from django.urls import reverse
+from django.contrib.messages import get_messages
+from django.utils.translation import activate
+from django.contrib.auth.models import Group
+
+activate('es')
+
+
+
+
+#TESTEOS DE MODELOS
+
 
 class UserModelTests(TestCase):
 
@@ -150,3 +162,167 @@ class UserNotificationModelTests(TestCase):
         self.user.delete()
         un_after_user_delete = UserNotification.objects.get(id=un.id)
         self.assertIsNone(un_after_user_delete.user)
+
+
+
+
+#TESTEOS DE VISTAS
+
+
+class UserRegisterViewTests(TestCase):
+    def setUp(self):
+        Group.objects.create(name="Cliente")
+
+    def test_get_register_view(self):
+        url = reverse('accounts_app:register')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/register.html')
+        self.assertIn('form', response.context)
+
+    def test_post_register_valid(self):
+        Group.objects.get_or_create(name="Cliente")  # asegura que existe
+        url = reverse('accounts_app:register')
+        data = {
+            'username': 'usuario.1',  # Solo letras, números, puntos
+            'email': 'usuario1@gmail.com',  # Formato válido y dominio aceptado
+            'password': 'ClaveSegura123',  # Campo obligatorio
+            'confirm_password': 'ClaveSegura123',  # Debe coincidir con password
+            'name': 'Juan',
+            'last_name': 'Perez',
+        }
+        response = self.client.post(url, data)
+        if response.context is not None:
+            print(response.context['form'].errors) # Se imprime solo si hay contexto
+        # Debe redirigir tras registro exitoso
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('accounts_app:login'))
+        # Verificar que el usuario fue creado
+        user_exists = User.objects.filter(username='usuario.1').exists()
+        self.assertTrue(user_exists)
+        # Verificar mensaje de éxito
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any("Usuario registrado correctamente" in str(m) for m in messages))
+
+
+    def test_post_register_invalid(self):
+        url = reverse('accounts_app:register')
+        data = {
+            'username': '',  # Campo username obligatorio vacío
+            'email': 'correo@ejemplo.com',
+            'password1': 'ClaveSegura123',
+            'password2': 'ClaveSegura123',
+            'name': 'Nombre',
+            'last_name': 'Apellido'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertFormError(form, 'username', 'Este campo es obligatorio.')
+
+
+class EditUsernameViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='usuario_set', password='pass')
+        self.client.login(username='usuario_set', password='pass')
+
+    def test_get_edit_username_view(self):
+        url = reverse('accounts_app:edit_username')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/edit_username.html')
+        self.assertIn('form', response.context)
+
+    def test_post_edit_username_valid(self):
+        url = reverse('accounts_app:edit_username')
+        data = {'username': 'nuevo.username'}  # Cambiado guion bajo por punto para pasar la validación
+        response = self.client.post(url, data)
+        if response.context is not None:
+            print(response.context['form'].errors)
+        self.assertRedirects(response, reverse('accounts_app:profile'))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'nuevo.username')
+
+    def test_post_edit_username_invalid(self):
+        url = reverse('accounts_app:edit_username')
+        data = {'username': ''}  # username obligatorio
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertFormError(form, 'username', ['Este campo es obligatorio.'])
+
+
+class UserNotificationDeleteAllViewTests(TestCase):
+
+    def setUp(self):
+        # Crear usuarios
+        self.user = User.objects.create_user(username='user1', password='pass')
+        self.other_user = User.objects.create_user(username='other', password='pass')
+
+        # Crear notificaciones
+        notification1 = Notification.objects.create(title="Notificación 1", message="Mensaje 1")
+        notification2 = Notification.objects.create(title="Notificación 2", message="Mensaje 2")
+        notification3 = Notification.objects.create(title="Notificación 3", message="Mensaje 3")
+
+        # Asociar notificaciones a usuarios
+        UserNotification.objects.create(user=self.user, notification=notification1)
+        UserNotification.objects.create(user=self.user, notification=notification2)
+        UserNotification.objects.create(user=self.other_user, notification=notification3)
+
+        # Loguear usuario para hacer requests autenticados
+        self.client.login(username='user1', password='pass')
+
+    def test_post_deletes_only_user_notifications_and_redirects(self):
+        url = reverse('accounts_app:user_notification_delete_all')
+        response = self.client.post(url)
+        self.assertRedirects(response, reverse('accounts_app:user_notifications_list'))
+        # Verificar que las notificaciones del usuario actual fueron eliminadas
+        self.assertFalse(UserNotification.objects.filter(user=self.user).exists())
+        # Las notificaciones de otros usuarios no deben eliminarse
+        self.assertTrue(UserNotification.objects.filter(user=self.other_user).exists())
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        url = reverse('accounts_app:user_notification_delete_all')
+        response = self.client.post(url)
+        # Debe redirigir a login u otra URL (código distinto a 200)
+        self.assertNotEqual(response.status_code, 200)
+
+
+class UserNotificationDeleteViewTests(TestCase):
+
+    def setUp(self):
+        # Crear usuarios
+        self.user = User.objects.create_user(username='user1', password='pass')
+        self.other_user = User.objects.create_user(username='other', password='pass')
+
+        # Crear notificaciones
+        notification = Notification.objects.create(title="Notificación para borrar", message="Mensaje")
+
+        # Crear UserNotification asociado al usuario
+        self.user_notification = UserNotification.objects.create(user=self.user, notification=notification)
+
+        # Loguear usuario para requests autenticados
+        self.client.login(username='user1', password='pass')
+
+    def test_get_confirmation_page(self):
+        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/user_notification_confirm_delete.html')
+        # Opcional: verificar contenido relevante en la página
+        self.assertContains(response, "Notificación para borrar")
+
+    def test_post_deletes_notification_and_redirects(self):
+        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
+        response = self.client.post(url)
+        self.assertRedirects(response, reverse('accounts_app:user_notifications_list'))
+        self.assertFalse(UserNotification.objects.filter(pk=self.user_notification.pk).exists())
+
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, 200)  # Debería redirigir a login u otra página
+
