@@ -3,69 +3,88 @@
 {% block title %}Mis Notificaciones{% endblock %}
 
 {% block content %}
-<style>
-  .card-transparent {
-    background-color: rgba(255, 255, 255, 0.15) !important; /* fondo semi-transparente */
-    color: black !important; /* texto negro por defecto */
-  }
-  /* Contorno sólo para el título */
-  .title-contorno {
-    color: white !important;
-    text-shadow:
-      -1px -1px 0 #000,
-       1px -1px 0 #000,
-      -1px  1px 0 #000,
-       1px  1px 0 #000;
-  }
-  /* Tabla con fondo transparente */
-  .card-transparent table {
-    background-color: transparent !important;
-    color: black !important;
-  }
-  /* Bordes tabla más claros */
-  .card-transparent table th,
-  .card-transparent table td {
-    border-color: rgba(0, 0, 0, 0.15) !important;
-  }
-</style>
+
 
 <div class="container mt-4">
-  <div class="card card-transparent">
-    <div class="card-header">
-      <h4 class="mb-0 title-contorno">Mis notificaciones</h4>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Mis notificaciones</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Notificación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notif in user_notifications %}
+                        <tr>
+                            <td>
+                                {{ notif.notification.title }}
+                            </td>
+                            <td>
+                                <a href="{% url 'accounts_app:user_notification_detail' notif.pk %}" class="btn btn-primary btn-sm">Ver mensaje</a>
+
+                                <!-- Botón para abrir modal de confirmación individual -->
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ notif.pk }}" title="Eliminar">
+                                    &times;
+                                </button>
+
+                                <!-- Modal de confirmación individual -->
+                                <div class="modal fade" id="deleteModal{{ notif.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ notif.pk }}" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ notif.pk }}">Confirmar eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        ¿Seguro que querés borrar la notificación "{{ notif.notification.title }}"?
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-danger">Aceptar</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2">No tienes notificaciones.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Botón para abrir modal de confirmar eliminación de todas -->
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                Eliminar todas las notificaciones
+            </button>
+
+            <!-- Modal de confirmación para eliminar todas -->
+            <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAllModalLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    ¿Seguro que querés borrar todas las notificaciones?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger">Aceptar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+        </div>
     </div>
-    <div class="card-body">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Notificación</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for notif in user_notifications %}
-          <tr>
-            <td>{{ notif.notification.title }}</td>
-            <td>
-              <a href="{% url 'accounts_app:user_notification_detail' notif.pk %}" class="btn btn-primary btn-sm">Ver mensaje</a>
-              <form action="{% url 'accounts_app:user_notification_delete' notif.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">&times;</button>
-              </form>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="2">No tienes notificaciones.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <form action="{% url 'accounts_app:user_notification_delete_all' %}" method="post" class="mt-3">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Eliminar todas las notificaciones</button>
-      </form>
-    </div>
-  </div>
 </div>
 {% endblock %}
