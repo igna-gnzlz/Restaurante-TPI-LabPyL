@@ -1,9 +1,8 @@
 from menu_app.models import Product
 
-def get_cart_items_and_total(session, booking_id):
+def get_cart_products_by_booking(session, booking_id):
     cart = session.get('cart', {})
     items = []
-    total = 0
 
     products_data = cart.get(str(booking_id), {})
     for product_id, data in products_data.items():
@@ -11,7 +10,6 @@ def get_cart_items_and_total(session, booking_id):
             product = Product.objects.get(id=product_id)
             quantity = data['quantity']
             subtotal = product.price * quantity
-            total += subtotal
             items.append({
                 'product': product,
                 'quantity': quantity,
@@ -19,5 +17,15 @@ def get_cart_items_and_total(session, booking_id):
             })
         except Product.DoesNotExist:
             continue
+    return items
 
-    return items, total
+def get_cart_total(cart_items):
+    return sum(item['subtotal'] for item in cart_items)
+
+def clear_cart(session, booking_id):
+    cart = session.get('cart', {})
+    if str(booking_id) in cart:
+        del cart[str(booking_id)]
+        session['cart'] = cart
+        session.modified = True
+    return session

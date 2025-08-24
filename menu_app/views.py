@@ -78,7 +78,7 @@ class MakeOrderView(LoginRequiredMixin, View):
     template_name = 'menu_app/make_order.html'
 
     def get(self, request):
-        from menu_app.utils.cart import get_cart_items_and_total
+        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
         from django.db.models import Q
         from django.utils import timezone
 
@@ -115,15 +115,16 @@ class MakeOrderView(LoginRequiredMixin, View):
 
 
         carrito_reserva = []
-        total_carrito = 0.00
+        total_cart = 0.00
         if reserva_seleccionada:
-            carrito_reserva, total_carrito = get_cart_items_and_total(request.session, reserva_seleccionada.id)
+            carrito_reserva = get_cart_products_by_booking(request.session, reserva_seleccionada.id)
+            total_cart = get_cart_total(carrito_reserva)
 
         context = {
             'reservas_proximas': reservas_proximas,
             'reserva_seleccionada': reserva_seleccionada,
             'carrito_reserva': carrito_reserva,
-            'total_carrito': total_carrito
+            'total_cart': total_cart
         }
 
         return render(request, self.template_name, context)
@@ -131,6 +132,7 @@ class MakeOrderView(LoginRequiredMixin, View):
 
 class AddToOrderView(LoginRequiredMixin, View):
     def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
 
@@ -154,7 +156,7 @@ class AddToOrderView(LoginRequiredMixin, View):
                 "message": f"No hay stock suficiente de '{product.name}'."
             }, status=400)
 
-        # Agregar al carrito de sesión
+        # Actualizar el carrito de la sesión
         cart.setdefault(booking_key, {}).setdefault(product_key, {"quantity": 0})
         cart[booking_key][product_key]["quantity"] += 1
 
@@ -162,17 +164,25 @@ class AddToOrderView(LoginRequiredMixin, View):
         request.session['cart'] = cart
         request.session.modified = True
 
+         # Calculo el subtotal producto
+        subtotal = product.price * cart[booking_key][product_key]["quantity"]
+
+        # Calcular el total carrito
+        total_cart = total_carrito = get_cart_total(get_cart_products_by_booking(request.session, booking_selected_id))
+
         return JsonResponse({
             "success": True,
             "message": f'Se agregó "{product.name}" al pedido.',
             "product_id": product.id,
-            "quantity": cart[booking_key][product_key]["quantity"]
+            "quantity": cart[booking_key][product_key]["quantity"],
+            "subtotal": subtotal,
+            "total_cart": total_cart
         })
 
 
 class DecrementFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        from menu_app.utils.cart import get_cart_items_and_total
+        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
 
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
@@ -204,8 +214,9 @@ class DecrementFromCartView(LoginRequiredMixin, View):
             request.session.modified = True
 
          # Recalcular el carrito actualizado
-        carrito_reserva, total_cart = get_cart_items_and_total(request.session, booking_selected_id)
-
+        carrito_reserva = get_cart_products_by_booking(request.session, booking_selected_id)
+        total_cart = get_cart_total(carrito_reserva)
+        
         return JsonResponse({
             "success": True,
             "message": f'Se quitó una unidad de "{product.name}" del pedido.',

@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'menu_app/css/make_order_styles.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <h2>Tus Reservas Aprovadas</h2>
@@ -42,7 +48,7 @@
         {% for product_data in carrito_reserva %}
         <li class="list-group-item d-flex justify-content-between align-items-center" id="row-product-{{ product_data.product.id }}">
             <div>
-                {{ product_data.product.name }} x <span id="cart-quant-prod-{{ product_data.product.id }}">{{ product_data.quantity }}</span>
+                {{ product_data.product.name }} x
                 <button
                     type="button"
                     class="btn btn-sm btn-outline-danger ms-2 product-card-isolated dec-from-cart-btn"
@@ -52,11 +58,18 @@
                     <i class="bi bi-dash-circle me-1"></i>Quitar una unidad
                 </button>
             </div>
+            <!-- Selección de cantidad -->
+            <div class="wrapper" data-product-id="{{ product_data.product.id }}"
+                data-inc-url="{% url 'menu_app:add_to_order' product_data.product.id %}">
+                <span class="minus">-</span>
+                <span id="cart-quant-prod-{{ product_data.product.id }}">{{ product_data.quantity }}</span>
+                <span class="plus">+</span>
+            </div>
             <span id="cart-subtotal-prod-{{ product_data.product.id }}">${{ product_data.subtotal }}</span>
         </li>
         {% endfor %}
     </ul>
-    <h4 class="mt-3">Total: $<span id="cart-total">{{ total_carrito }}</span></h4>
+    <h4 class="mt-3">Total: $<span id="cart-total">{{ total_cart }}</span></h4>
 
     <!-- Botón para abrir el modal de Confirmar Pedido -->
     <div id="confirm-order-container">
@@ -132,35 +145,8 @@
             </div>
         </div>
     </div>
-    
 </div>
-<style>
-    .reserva-btn {
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .reserva-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .reserva-btn.btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-        color: white;
-        box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-    }
-
-    .reserva-btn.btn-success:hover {
-        background-color: #218838;
-        border-color: #1e7e34;
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
-    }
-
-    .reserva-btn.btn-success::before {
-        font-weight: bold;
-        margin-right: 5px;
-    }
-</style>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'menu_app/js/make_order.js' %}"></script>
 {% endblock %}
