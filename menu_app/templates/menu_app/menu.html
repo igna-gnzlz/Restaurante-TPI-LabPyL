@@ -2,27 +2,6 @@
 {% load static %}
 
 {% block content %}
-<style>
-    .card-img-top {
-        object-fit: cover;
-        height: 200px;
-        width: 100%;
-    }
-
-    .btn-click-animate:hover {
-        transform: scale(0.98);
-    }
-
-    .btn-click-animate:active {
-        transform: scale(0.96);
-    }
-
-    .product-card-isolated {
-        position: relative;
-        z-index: 2;
-    }
-</style>
-
 <div class="container my-5">
     {% if messages %}
     <div class="container mt-3">
@@ -57,28 +36,28 @@
                         style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
                     {% if item.quantity > 0 %}
                         {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary mt-auto btn-click-animate product-card-isolated">
-                                Agregar a pedido
-                            </button>
-                        </form>
+                        <button 
+                            type="button"
+                            class="btn btn-primary mt-auto btn-product-animate product-card-isolated add-to-order-btn"
+                            data-url="{% url 'menu_app:add_to_order' item.pk %}">
+                            Agregar a pedido
+                        </button>
 
-                        <button type="button" class="btn btn-warning mt-2 btn-click-animate product-card-isolated"
+                        <button type="button" class="btn btn-warning mt-2 btn-product-animate product-card-isolated"
                                 data-bs-toggle="modal" data-bs-target="#modalComentar{{ item.id }}">
                             Comentar
                         </button>
-                        <button type="button" class="btn btn-info mt-2" style="position: relative; z-index: 10;" data-bs-toggle="modal" data-bs-target="#modalComentarios{{ item.id }}">
+                        <button type="button" class="btn btn-info mt-2 btn-product-animate" style="position: relative; z-index: 10;" data-bs-toggle="modal" data-bs-target="#modalComentarios{{ item.id }}">
                             Ver Comentarios
                         </button>
                         {% else %}
                         <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-                            class="btn btn-outline-secondary mt-auto btn-click-animate product-card-isolated">
+                            class="btn btn-outline-secondary mt-auto btn-product-animate product-card-isolated">
                             Iniciar sesión para pedir
                         </a>
                         {% endif %}
                         {% else %}
-                        <button class="btn btn-secondary mt-auto btn-click-animate product-card-isolated" disabled>
+                        <button class="btn btn-secondary mt-auto product-card-isolated" disabled>
                             Sin stock
                         </button>
                     {% endif %}
@@ -163,7 +142,7 @@
     <p class="text-center">No hay productos disponibles.</p>
     {% endfor %}
     <div class="text-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
+        <a href="{% url 'home' %}" class="btn btn-primary btn-product-animate mt-4">Volver al inicio</a>
     </div>
 </div>
 {% endblock %}

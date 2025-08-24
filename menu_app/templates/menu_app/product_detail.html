@@ -19,27 +19,27 @@
 
             {% if product.quantity > 0 %}
             {% if user.is_authenticated %}
-            <form method="post" action="{% url 'menu_app:add_to_order' product.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary mt-auto btn-click-animate product-card-isolated">
-                    Agregar a pedido
-                </button>
-            </form>
+            <button
+                type="button"
+                class="btn btn-primary mt-auto btn-product-animate product-card-isolated add-to-order-btn"
+                data-url="{% url 'menu_app:add_to_order' product.pk %}">
+                Agregar a pedido
+            </button>
             {% else %}
             <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-                class="btn btn-outline-secondary mt-auto btn-click-animate product-card-isolated">
+                class="btn btn-outline-secondary mt-auto btn-product-animate product-card-isolated">
                 Iniciar sesión para pedir
             </a>
             {% endif %}
             {% else %}
-            <button class="btn btn-secondary mt-auto btn-click-animate product-card-isolated" disabled>
+            <button class="btn btn-secondary mt-auto product-card-isolated" disabled>
                 Sin stock
             </button>
             {% endif %}
         </div>
     </div>
     <div class="text-center mt-4">
-        <a href="{% url 'menu_app:menu' %}#producto-{{ product.id }}" class="btn btn-primary">Volver al menú</a>
+        <a href="{% url 'menu_app:menu' %}#producto-{{ product.id }}" class="btn btn-product-animate btn-primary">Volver al menú</a>
     </div>
 </div>
 {% endblock %}

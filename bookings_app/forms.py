@@ -203,4 +203,4 @@ class MakeReservationForm(forms.Form):
         self.fields['tables'].label_from_instance = self.get_table_label
 
     def get_table_label(self, table):
-        return f"Mesa {table.number} | Capacidad: {table.capacity} | Descripción: {table.description}"
+        return f"Mesa {table.number} | Capacidad: {table.capacity}"

@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating
 from menu_app.forms import RatingForm
@@ -134,40 +135,45 @@ class AddToOrderView(LoginRequiredMixin, View):
         booking_selected_id = request.session.get('booking_selected_id')
 
         if not booking_selected_id:
-            #messages.warning(request, "Seleccione primero una reserva.")
-            return redirect('make_order')
+            return JsonResponse({
+                "success": False,
+                "message": "Seleccione primero una reserva."
+            }, status=400)
 
         cart = request.session.get('cart', {})
-
         booking_key = str(booking_selected_id)
         product_key = str(product.id)
 
-         # Obtener cantidad actual del producto en el carrito (si existe)
+        # Obtener cantidad actual del producto en el carrito (si existe)
         prod_quantity_cart = cart.get(booking_key, {}).get(product_key, {}).get('quantity', 0)
 
         # Verificar stock
         if product.quantity <= prod_quantity_cart:
-            messages.warning(request, f"No hay stock suficiente para agregar más unidades de '{product.name}'.")
-            return redirect('menu_app:menu')
+            return JsonResponse({
+                "success": False,
+                "message": f"No hay stock suficiente de '{product.name}'."
+            }, status=400)
 
-        if booking_key not in cart:
-            cart[booking_key] = {}
+        # Agregar al carrito de sesión
+        cart.setdefault(booking_key, {}).setdefault(product_key, {"quantity": 0})
+        cart[booking_key][product_key]["quantity"] += 1
 
-        if product_key in cart[booking_key]:
-            cart[booking_key][product_key]['quantity'] += 1
-        else:
-            cart[booking_key][product_key] = {'quantity': 1}
-
-        request.session['cart'] = cart  # Guardar cambios en la sesión
+        # Guardar cambios en la sesión
+        request.session['cart'] = cart
         request.session.modified = True
 
-        #messages.success(request, f'Se agregó "{product.name}" al pedido.')
-        return redirect(f"{reverse('menu_app:menu')}#producto-{product.id}")
-        
+        return JsonResponse({
+            "success": True,
+            "message": f'Se agregó "{product.name}" al pedido.',
+            "product_id": product.id,
+            "quantity": cart[booking_key][product_key]["quantity"]
+        })
 
 
 class DecrementFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_items_and_total
+
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
 
@@ -175,12 +181,20 @@ class DecrementFromCartView(LoginRequiredMixin, View):
         booking_key = str(booking_selected_id)
         product_key = str(product.id)
 
+        product_quantity = None
+        product_removed = False
+        product_subtotal = 0
+
         if booking_key in cart and product_key in cart[booking_key]:
             cart[booking_key][product_key]['quantity'] -= 1
 
             # Eliminar si la cantidad es 0 o menos
             if cart[booking_key][product_key]['quantity'] <= 0:
                 del cart[booking_key][product_key]
+                product_removed = True
+            else:
+                product_quantity = cart[booking_key][product_key]['quantity']
+                product_subtotal = product_quantity * product.price
 
             # Si ya no hay productos en la reserva, quitar la reserva del carrito
             if not cart[booking_key]:
@@ -189,9 +203,19 @@ class DecrementFromCartView(LoginRequiredMixin, View):
             request.session['cart'] = cart
             request.session.modified = True
 
-            messages.success(request, f"Se quitó una unidad de '{product.name}' del carrito.")
+         # Recalcular el carrito actualizado
+        carrito_reserva, total_cart = get_cart_items_and_total(request.session, booking_selected_id)
 
-        return redirect('make_order')
+        return JsonResponse({
+            "success": True,
+            "message": f'Se quitó una unidad de "{product.name}" del pedido.',
+            "product_id": product.id,
+            "quantity": product_quantity,            # None si fue eliminado
+            "product_removed": product_removed,      # True si ya no está en el carrito
+            "subtotal": product_subtotal,            # Subtotal del producto actualizado
+            "total_cart": total_cart,                # Total recalculado
+            "cart_empty": len(carrito_reserva) == 0  # True si ya no quedan productos
+        })
 
 
 class ConfirmOrderView(LoginRequiredMixin, View):
