@@ -5,6 +5,8 @@ from accounts_app.views import (
     UserLoginView,
     NotificationRecipientsView,
     UserNotificationsListView,
+    DeleteNotificationView,
+    DeleteAllNotificationsView,
     UserNotificationDetailView,
     EditUsernameView,
     ProfileView,
@@ -18,7 +20,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('notification_recipients/<int:pk>/', NotificationRecipientsView.as_view(), name='notification_recipients'),
     path('my_notifications/', UserNotificationsListView.as_view(), name='user_notifications_list'),
-    path('my_notifications/<int:pk>/', UserNotificationDetailView.as_view(), name='user_notification_detail'),
     path('profile/', ProfileView.as_view(), name='profile'),
-    path('profile/edit-username/', EditUsernameView.as_view(), name='edit_username')
+    path('profile/edit-username/', EditUsernameView.as_view(), name='edit_username'),
+
+    path('delete_notification/<int:pk>/', DeleteNotificationView.as_view(), name='ajax_delete_notification'),
+    path('delete_all_notifications/', DeleteAllNotificationsView.as_view(), name='ajax_delete_all_notifications'),
+    path('my_notifications/<int:pk>/', UserNotificationDetailView.as_view(), name='user_notification_detail')
 ]
