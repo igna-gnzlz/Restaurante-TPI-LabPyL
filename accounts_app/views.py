@@ -1,5 +1,5 @@
 from django.views.generic import FormView, ListView, DetailView, TemplateView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import UpdateView
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -8,7 +8,9 @@ from django.contrib.auth.models import User
 from accounts_app.forms import UserRegisterForm, UserLoginForm, EditUsernameForm
 from accounts_app.models import Notification, UserNotification
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+
+from django.http import JsonResponse
 
 
 class EditUsernameView(LoginRequiredMixin, UpdateView):
@@ -86,15 +88,27 @@ class UserNotificationsListView(LoginRequiredMixin, ListView):
         # Solo las notificaciones del usuario autenticado
         return UserNotification.objects.filter(user=self.request.user)
 
+class DeleteNotificationView(LoginRequiredMixin, View):
+
+    def post(self, request, pk, *args, **kwargs):
+        notif = get_object_or_404(UserNotification, pk=pk, user=request.user)
+        notif.delete()
+        return JsonResponse({'status': 'success'})
+
+class DeleteAllNotificationsView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        request.user.usernotification_set.all().delete()
+        return JsonResponse({'status': 'success'})
 
 class UserNotificationDetailView(LoginRequiredMixin, DetailView):
     model = UserNotification
     template_name = 'accounts_app/user_notification_detail.html'
-    context_object_name = 'user_notification'
 
-    def get_object(self, queryset=None):
-        obj = get_object_or_404(UserNotification, pk=self.kwargs['pk'], user=self.request.user)
-        if not obj.is_read:
-            obj.is_read = True
-            obj.save()
-        return obj
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            notif = self.get_object()
+            # Suponiendo que el contenido está en notif.notification.message_text
+            return JsonResponse({'message': notif.notification.message})
+        else:
+            return super().get(request, *args, **kwargs)
+
