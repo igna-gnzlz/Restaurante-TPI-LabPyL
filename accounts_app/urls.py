@@ -10,7 +10,9 @@ from accounts_app.views import (
     UserNotificationDetailView,
     EditUsernameView,
     ProfileView,
+    MarkNotificationReadView
 )
+from . import views
 
 app_name = 'accounts_app'
 
@@ -25,5 +27,6 @@ urlpatterns = [
 
     path('delete_notification/<int:pk>/', DeleteNotificationView.as_view(), name='ajax_delete_notification'),
     path('delete_all_notifications/', DeleteAllNotificationsView.as_view(), name='ajax_delete_all_notifications'),
-    path('my_notifications/<int:pk>/', UserNotificationDetailView.as_view(), name='user_notification_detail')
+    path('my_notifications/<int:pk>/', UserNotificationDetailView.as_view(), name='user_notification_detail'),
+    path('notifications/mark-read/<int:pk>/', views.MarkNotificationReadView.as_view(), name='mark_notification_read'),
 ]

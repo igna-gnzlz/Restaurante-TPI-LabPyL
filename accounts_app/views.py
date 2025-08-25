@@ -112,3 +112,10 @@ class UserNotificationDetailView(LoginRequiredMixin, DetailView):
         else:
             return super().get(request, *args, **kwargs)
 
+
+class MarkNotificationReadView(LoginRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        notif = get_object_or_404(UserNotification, pk=pk, user=request.user)
+        notif.is_read = True
+        notif.save(update_fields=['is_read'])
+        return JsonResponse({'status': 'ok'})

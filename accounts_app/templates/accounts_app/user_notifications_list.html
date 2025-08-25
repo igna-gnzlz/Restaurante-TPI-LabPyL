@@ -8,24 +8,28 @@
 <div class="container mt-4">
     <div class="card">
         <div class="card-header">
-            <h4 class="mb-0">Mis notificaciones</h4>
+            <h4 class="mb-0">Mis Notificaciones</h4>
         </div>
         <div class="card-body">
+          
             <table class="table table-bordered">
               <thead>
                   <tr>
                       <th>Titulo</th>
-                      <th>Acciones</th>
+                      <th class="w-25">Fecha de Emisión</th>
+                      <th class="w-25">Acciones</th>
                   </tr>
               </thead>
               <tbody>
                   {% for notif in user_notifications %}
                       <tr id="notifRow{{ notif.pk }}">
                           <td>{{ notif.notification.title }}</td>
-                          <td>
+                          <td class="w-25">{{ notif.notification.created_at|date:"d/m/Y" }}</td>
+                          <td class="w-25">
                               <a class="btn btn-primary btn-sm view-message-btn" 
                                 data-url="{% url 'accounts_app:user_notification_detail' notif.pk %}"
-                                data-title="{{ notif.notification.title }}">
+                                data-title="{{ notif.notification.title }}"
+                                data-notif-pk="{{ notif.pk }}">
                                 Ver Mensaje
                               </a>
                               <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ notif.pk }}" title="Eliminar">
@@ -206,11 +210,15 @@
     .catch(() => alert('Error en la comunicación con el servidor'));
   });
 
+
+  const markReadBaseUrl = "{% url 'accounts_app:mark_notification_read' 0 %}".slice(0, -2);
+
   document.querySelectorAll('.view-message-btn').forEach(button => {
     button.addEventListener('click', function (e) {
       e.preventDefault();
       const url = this.getAttribute('data-url');  // URL desde template
       const title = this.getAttribute('data-title');  // Obtener título
+      const notifPk = this.getAttribute('data-notif-pk'); // Pasa el PK
 
       fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(response => {
@@ -227,6 +235,15 @@
           const modalElement = document.getElementById('viewMessageModal');
           const modal = new bootstrap.Modal(modalElement);
           modal.show();
+
+          // Marcar notificación como leída con POST
+          fetch(`${markReadBaseUrl}${notifPk}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+          });
         })
         .catch(() => alert('Error al cargar el mensaje'));
     });
