@@ -12,59 +12,79 @@
         </div>
         <div class="card-body">
             <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Notificación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for notif in user_notifications %}
-                        <tr>
-                            <td>
-                                {{ notif.notification.title }}
-                            </td>
-                            <td>
-                                <a href="{% url 'accounts_app:user_notification_detail' notif.pk %}" class="btn btn-primary btn-sm">Ver mensaje</a>
+              <thead>
+                  <tr>
+                      <th>Titulo</th>
+                      <th>Acciones</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for notif in user_notifications %}
+                      <tr id="notifRow{{ notif.pk }}">
+                          <td>{{ notif.notification.title }}</td>
+                          <td>
+                              <a class="btn btn-primary btn-sm view-message-btn" 
+                                data-url="{% url 'accounts_app:user_notification_detail' notif.pk %}"
+                                data-title="{{ notif.notification.title }}">
+                                Ver Mensaje
+                              </a>
+                              <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ notif.pk }}" title="Eliminar">
+                                  &times;
+                              </button>
+                        
+                          </td>
+                      </tr>
 
-                                <!-- Botón para abrir modal de confirmación individual -->
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ notif.pk }}" title="Eliminar">
-                                    &times;
-                                </button>
 
-                                <!-- Modal de confirmación individual -->
-                                <div class="modal fade" id="deleteModal{{ notif.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ notif.pk }}" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel{{ notif.pk }}">Confirmar eliminación</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                      </div>
-                                      <div class="modal-body">
-                                        ¿Seguro que querés borrar la notificación "{{ notif.notification.title }}"?
-                                      </div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="button" class="btn btn-danger">Aceptar</button>
-                                      </div>
-                                    </div>
+                      <!-- Modal Ver Mensaje -->
+                      <div class="modal fade" id="viewMessageModal" tabindex="-1" aria-labelledby="viewMessageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="viewMessageModalLabel">Notificación</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body" id="viewMessageContent">
+                              <!-- Aquí se cargará el mensaje dinámicamente -->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Modal individual -->
+                      <div class="modal fade" id="deleteModal{{ notif.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ notif.pk }}" aria-hidden="true">
+                          <div class="modal-dialog">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="deleteModalLabel{{ notif.pk }}">Confirmar eliminación</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                   </div>
-                                </div>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="2">No tienes notificaciones.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+                                  <div class="modal-body">
+                                      ¿Seguro que querés borrar la notificación "{{ notif.notification.title }}"?
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                      <button type="button" class="btn btn-danger accept-delete-btn" data-notif-pk="{{ notif.pk }}">Aceptar</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  {% empty %}
+                      <tr>
+                          <td colspan="2">No tienes notificaciones.</td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
             </table>
 
-            <!-- Botón para abrir modal de confirmar eliminación de todas -->
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
-                Eliminar todas las notificaciones
-            </button>
-
+            {% if user_notifications|length > 1 %}
+                <!-- Botón para abrir modal de confirmar eliminación de todas -->
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                  Eliminar todas las notificaciones
+                </button>
+            {% endif %}
+            </div>
+            
             <!-- Modal de confirmación para eliminar todas -->
             <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
               <div class="modal-dialog">
@@ -78,7 +98,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger">Aceptar</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-all-btn">Aceptar</button>
                   </div>
                 </div>
               </div>
@@ -87,4 +107,131 @@
         </div>
     </div>
 </div>
+
+<script>
+
+  // Genera la URL base para borrar la notificación
+  const deleteNotificationUrlBase = "{% url 'accounts_app:ajax_delete_notification' 0 %}".slice(0, -2);
+  // Función para obtener el CSRF token (de la cookie o del template)
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let cookie of cookies) {
+              cookie = cookie.trim();
+              if (cookie.startsWith(name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  document.querySelectorAll('.accept-delete-btn').forEach(button => {
+      button.addEventListener('click', function () {
+          const notifId = this.getAttribute('data-notif-pk');
+          const csrfToken = getCookie('csrftoken');
+
+          fetch(`${deleteNotificationUrlBase}${notifId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+            body: '',
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  // Cerrar modal
+                  const modalId = `deleteModal${notifId}`;
+                  const modalElement = document.getElementById(modalId);
+                  const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                  modalInstance.hide();
+
+                  // Eliminar fila de la tabla
+                  const rowId = `notifRow${notifId}`;
+                  const rowElement = document.getElementById(rowId);
+                  if (rowElement) rowElement.remove();
+
+                  // Verificar si quedan filas en tbody
+                  const tbody = document.querySelector('table tbody');
+                  if (tbody.children.length === 0) {
+                      tbody.innerHTML = `
+                          <tr>
+                              <td colspan="2">No tienes notificaciones.</td>
+                          </tr>
+                      `;
+                      // Ocultar el botón "Eliminar todas las notificaciones"
+                      const deleteAllBtn = document.querySelector('button[data-bs-target="#deleteAllModal"]');
+                      if (deleteAllBtn) {
+                          deleteAllBtn.style.display = 'none';
+                      }
+                  }
+              } else {
+                  alert('Error al borrar la notificación');
+              }
+          })
+          .catch(() => alert('Error en la comunicación con el servidor'));
+      });
+  });
+
+  document.getElementById('confirm-delete-all-btn').addEventListener('click', () => {
+    const csrfToken = getCookie('csrftoken');
+
+    fetch("{% url 'accounts_app:ajax_delete_all_notifications' %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+      },
+      body: '',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        // Limpiar tabla y ocultar botón
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = `<tr><td colspan="2">No tienes notificaciones.</td></tr>`;
+        const btnDeleteAll = document.querySelector('button[data-bs-target="#deleteAllModal"]');
+        if (btnDeleteAll) btnDeleteAll.style.display = 'none';
+
+        // Cerrar modal
+        const modal = document.getElementById('deleteAllModal');
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance.hide();
+      } else {
+        alert('Error al borrar todas las notificaciones');
+      }
+    })
+    .catch(() => alert('Error en la comunicación con el servidor'));
+  });
+
+  document.querySelectorAll('.view-message-btn').forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      const url = this.getAttribute('data-url');  // URL desde template
+      const title = this.getAttribute('data-title');  // Obtener título
+
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          const modalBody = document.getElementById('viewMessageContent');
+          modalBody.textContent = data.message;
+
+          const modalTitle = document.getElementById('viewMessageModalLabel');
+          modalTitle.textContent = title;  // Poner título dinámico
+
+          const modalElement = document.getElementById('viewMessageModal');
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+        })
+        .catch(() => alert('Error al cargar el mensaje'));
+    });
+  });
+
+</script>
+
 {% endblock %}
