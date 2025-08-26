@@ -3,167 +3,235 @@
 
 {% block content %}
 <style>
-    .card-img-top {
-        object-fit: cover;
-        height: 200px;
-        width: 100%;
-    }
+ 
 
-    .btn-click-animate:hover {
-        transform: scale(0.98);
-    }
+  /* Contenedor principal transparente y sin bordes */
+  .content-container-transparent {
+    position: relative;
+    z-index: 1;
+    background-color: transparent !important;
+    padding: 1.5rem;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
 
-    .btn-click-animate:active {
-        transform: scale(0.96);
-    }
+  .category-card {
+    background-color: rgba(255, 255, 255, 0.15);
+    margin-bottom: 30px;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: none;
+  }
 
-    .product-card-isolated {
-        position: relative;
-        z-index: 2;
-    }
+  .item-card {
+    border: 2px solid black;
+    border-radius: 0.75rem;
+    padding: 10px;
+    background-color: #ffffffdd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .item-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .card-img-top {
+    object-fit: cover;
+    height: 200px;
+    width: 100%;
+    border-radius: 0.5rem;
+    margin-bottom: 10px;
+  }
+
+  /* Estilo para títulos blancos con contorno negro */
+  .title-white-outline {
+    color: white;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+
+  .btn-click-animate:hover {
+    transform: scale(0.98);
+  }
+
+  .btn-click-animate:active {
+    transform: scale(0.96);
+  }
+
+  .product-card-isolated {
+    position: relative;
+    z-index: 2;
+  }
 </style>
 
-<div class="container my-5">
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
-            role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
+<div class="background-image"></div>
+
+<div class="container my-5 content-container-transparent">
+  {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
-    {% endif %}
-    <h1 class="text-center mb-5">Menú</h1>
-
-    {% for category, items in categorized_items.items %}
-    <h3 class="mb-4">{{ category.name }}</h3>
-    <div class="row mb-5">
-        {% for item in items %}
-        <div class="col-md-4 mb-4" id="producto-{{ item.id }}">
-            <div class="card h-100 position-relative">
-                {% if item.image %}
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-                {% else %}
-                <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
-                {% endif %}
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ item.name }}</h5>
-                    <p class="card-text">{{ item.description }}</p>
-                    <p class="card-text">Stock: {{ item.quantity }}</p>
-                    <span class="card-text mb-3"><strong>${{ item.price }}</strong></span>
-                    <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
-                        style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
-                    {% if item.quantity > 0 %}
-                        {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary mt-auto btn-click-animate product-card-isolated">
-                                Agregar a pedido
-                            </button>
-                        </form>
-
-                        <button type="button" class="btn btn-warning mt-2 btn-click-animate product-card-isolated"
-                                data-bs-toggle="modal" data-bs-target="#modalComentar{{ item.id }}">
-                            Comentar
-                        </button>
-                        <button type="button" class="btn btn-info mt-2" style="position: relative; z-index: 10;" data-bs-toggle="modal" data-bs-target="#modalComentarios{{ item.id }}">
-                            Ver Comentarios
-                        </button>
-                        {% else %}
-                        <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-                            class="btn btn-outline-secondary mt-auto btn-click-animate product-card-isolated">
-                            Iniciar sesión para pedir
-                        </a>
-                        {% endif %}
-                        {% else %}
-                        <button class="btn btn-secondary mt-auto btn-click-animate product-card-isolated" disabled>
-                            Sin stock
-                        </button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal de Comentar-->
-        <div class="modal fade" id="modalComentar{{ item.id }}" tabindex="-1" aria-labelledby="modalLabel{{ item.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="post" action="{% url 'menu_app:make_rating' item.id %}">
-                        {% csrf_token %}
-
-                        <h5 class="modal-title" id="modalLabel{{ item.id }}">Producto: {{ item.name }}</h5>
-                        <div class="mb-3">
-                            <label for="{{ rating_form.title.id_for_label }}" class="form-label">Título</label>
-                            {{ rating_form.title }}
-                            {% if rating_form.title.errors %}
-                            <div class="text-danger small">{{ rating_form.title.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="{{ rating_form.text.id_for_label }}" class="form-label">Comentario</label>
-                            {{ rating_form.text }}
-                            {% if rating_form.text.errors %}
-                            <div class="text-danger small">{{ rating_form.text.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="{{ rating_form.rating.id_for_label }}" class="form-label">Calificación</label>
-                            {{ rating_form.rating }}
-                            {% if rating_form.rating.errors %}
-                            <div class="text-danger small">{{ rating_form.rating.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Aceptar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Ver Comentarios -->
-        <div class="modal fade" id="modalComentarios{{ item.id }}" tabindex="-1" aria-labelledby="modalComentariosLabel{{ item.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalComentariosLabel{{ item.id }}">Comentarios de {{ item.name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        {% if item.comments %}
-                        <ul class="list-group">
-                            {% for comment in item.comments %}
-                            <li class="list-group-item">
-                                <strong>{{ comment.user.name }} {{ comment.user.last_name }}</strong> 
-                                <small class="text-muted"> - {{ comment.created_at|date:"d/m/Y H:i" }}</small>
-                                <br>
-                                <em>{{ comment.title }}</em>
-                                <p>{{ comment.text }}</p>
-                                <p>Calificación: {{ comment.rating }} / 5</p>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p>No hay comentarios para este producto.</p>
-                        {% endif %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% empty %}
-    <p class="text-center">No hay productos disponibles.</p>
     {% endfor %}
-    <div class="text-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
+  </div>
+  {% endif %}
+  <h1 class="text-center mb-5 title-white-outline">Menú</h1>
+
+  {% for category, items in categorized_items.items %}
+  <div class="category-card">
+    <h3 class="mb-4 title-white-outline">{{ category.name }}</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+      {% for item in items %}
+      <div class="col d-flex align-items-stretch">
+        <div class="item-card w-100">
+          <div class="item-title">{{ item.name }}</div>
+          {% if item.image %}
+          <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+          {% else %}
+          <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
+          {% endif %}
+          <p>{{ item.description }}</p>
+          <p>Stock: {{ item.quantity }}</p>
+          <p><strong>${{ item.price }}</strong></p>
+
+          {% if item.quantity > 0 %}
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">
+              Agregar a pedido
+            </button>
+          </form>
+
+          <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
+            data-bs-toggle="modal" data-bs-target="#modalComentar{{ item.id }}">
+            Comentar
+          </button>
+
+          <button type="button" class="btn btn-info w-100" data-bs-toggle="modal"
+            data-bs-target="#modalComentarios{{ item.id }}">
+            Ver Comentarios
+          </button>
+          {% else %}
+          <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+            class="btn btn-outline-secondary btn-click-animate w-100">
+            Iniciar sesión para pedir
+          </a>
+          {% endif %}
+          {% else %}
+          <button class="btn btn-secondary btn-click-animate w-100" disabled>
+            Sin stock
+          </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Modal de Comentar -->
+      <div class="modal fade" id="modalComentar{{ item.id }}" tabindex="-1" aria-labelledby="modalLabel{{ item.id }}"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form method="post" action="{% url 'menu_app:make_rating' item.id %}">
+              {% csrf_token %}
+
+              <h5 class="modal-title" id="modalLabel{{ item.id }}">Producto: {{ item.name }}</h5>
+              <div class="mb-3">
+                <label for="{{ rating_form.title.id_for_label }}" class="form-label">Título</label>
+                {{ rating_form.title }}
+                {% if rating_form.title.errors %}
+                <div class="text-danger small">{{ rating_form.title.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ rating_form.text.id_for_label }}" class="form-label">Comentario</label>
+                {{ rating_form.text }}
+                {% if rating_form.text.errors %}
+                <div class="text-danger small">{{ rating_form.text.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ rating_form.rating.id_for_label }}" class="form-label">Calificación</label>
+                {{ rating_form.rating }}
+                {% if rating_form.rating.errors %}
+                <div class="text-danger small">{{ rating_form.rating.errors }}</div>
+                {% endif %}
+              </div>
+
+              <button type="submit" class="btn btn-primary">Aceptar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Ver Comentarios -->
+      <div class="modal fade" id="modalComentarios{{ item.id }}" tabindex="-1"
+        aria-labelledby="modalComentariosLabel{{ item.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalComentariosLabel{{ item.id }}">Comentarios de {{ item.name }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              {% if item.comments %}
+              <ul class="list-group">
+                {% for comment in item.comments %}
+                <li class="list-group-item">
+                  <strong>{{ comment.user.name }} {{ comment.user.last_name }}</strong> <small
+                    class="text-muted"> - {{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                  <br>
+                  <em>{{ comment.title }}</em>
+                  <p>{{ comment.text }}</p>
+                  <p>Calificación: {{ comment.rating }} / 5</p>
+                </li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              <p>No hay comentarios para este producto.</p>
+              {% endif %}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
+  {% empty %}
+  <p class="text-center">No hay productos disponibles.</p>
+  {% endfor %}
+
+  <div class="text-center mt-4">
+    <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
+  </div>
 </div>
+
+<script>
+  // Evitar soft-bloqueo al cerrar modales limpiando backdrop y scroll lock
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('hidden.bs.modal', () => {
+      document.body.classList.remove('modal-open');
+      document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+    });
+  });
+</script>
+
 {% endblock %}

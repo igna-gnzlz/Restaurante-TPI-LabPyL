@@ -3,49 +3,111 @@
 {% block title %}Perfil de {{ user.username }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card mx-auto" style="max-width: 600px;">
-        <div class="card-header">
-            <h3>Perfil de: {{ user.username }}</h3>
-        </div>
-        <div class="card-body d-flex gap-4 align-items-center">
-            {% if user.profile.image.url %}
-                <img src="{{ user.profile.image.url }}" alt="Foto de perfil" class="rounded" style="width: 120px; height: 120px; object-fit: cover;">
-            {% else %}
-                <div class="d-flex justify-content-center align-items-center bg-secondary text-white rounded" style="width: 120px; height: 120px;">
-                    -sin foto-
-                </div>
-            {% endif %}
+<style>
+ 
 
-            <div class="flex-grow-1">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <strong>Nombre de usuario:</strong> {{ user.username }}
-                    </div>
-                    <a href="{% url 'accounts_app:edit_username' %}" class="btn btn-sm btn-outline-primary" title="Editar nombre de usuario">
-                        ✏️ Editar
-                    </a>
-                </div>
+  /* Contenedor principal transparente con padding */
+  .content-container-transparent {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+  }
 
-                <p><strong>Apellido:</strong> {{ user.last_name }}</p>
-                <p><strong>Nombre:</strong> {{ user.name }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-            </div>
-        </div>
+  /* Cards transparentes */
+  .card-transparent {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: none;
+    color: white;
+  }
+
+  /* Titulos blancos con contorno negro */
+  .title-white-outline {
+    color: white;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+
+  /* Para texto dentro de cards transparentes ajustar texto para legibilidad */
+  .card-transparent p,
+  .card-transparent strong,
+  .card-transparent a {
+    color: white;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+
+  .btn-outline-primary {
+    color: white;
+    border-color: white;
+  }
+  .btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: white;
+    color: #000;
+  }
+
+  /* Foto perfil redondeada y con borde */
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid white;
+  }
+</style>
+
+<div class="background-image"></div>
+
+<div class="container my-4 content-container-transparent">
+  <div class="card card-transparent mx-auto" style="max-width: 600px;">
+    <div class="card-header">
+      <h3 class="title-white-outline">Perfil de: {{ user.username }}</h3>
     </div>
-
-    <div class="card mx-auto mt-4" style="max-width: 600px;">
-        <div class="card-header">
-            <h3>Opciones</h3>
+    <div class="card-body d-flex gap-4 align-items-center">
+      {% if user.profile.image.url %}
+        <img src="{{ user.profile.image.url }}" alt="Foto de perfil" class="profile-image rounded">
+      {% else %}
+        <div class="d-flex justify-content-center align-items-center bg-secondary text-white rounded" style="width: 120px; height: 120px;">
+          -sin foto-
         </div>
-        <div class="card-body d-flex justify-content-around">
-            <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary">Mis reservas y pedidos</a>
-            <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary">Notificaciones</a>
-        </div>
-    </div>
+      {% endif %}
 
-    <div class="text-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <strong>Nombre de usuario:</strong> {{ user.username }}
+          </div>
+          <a href="{% url 'accounts_app:edit_username' %}" class="btn btn-sm btn-outline-primary" title="Editar nombre de usuario">
+            ✏️ Editar
+          </a>
+        </div>
+
+        <p><strong>Apellido:</strong> {{ user.last_name }}</p>
+        <p><strong>Nombre:</strong> {{ user.name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+      </div>
     </div>
+  </div>
+
+  <div class="card card-transparent mx-auto mt-4" style="max-width: 600px;">
+    <div class="card-header">
+      <h3 class="title-white-outline">Opciones</h3>
+    </div>
+    <div class="card-body d-flex justify-content-around">
+      <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary">Mis reservas y pedidos</a>
+      <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary">Notificaciones</a>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+  </div>
 </div>
 {% endblock %}

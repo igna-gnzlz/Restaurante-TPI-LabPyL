@@ -1,12 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
+<style>
+  /* Aplica texto blanco con contorno negro excepto a botones e inputs */
+  .texto-contorno *:not(button):not(input) {
+    color: white !important;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+
+  /* Contenedor relativo para posicionar el icono */
+  .password-input-group {
+    position: relative;
+  }
+
+  /* Posición absoluta para el icono dentro del contenedor */
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem; /* Ajusta la separación del borde derecho */
+    transform: translateY(20%);
+    cursor: pointer;
+    color: #666;
+    z-index: 3;
+    user-select: none;
+  }
+</style>
+
+<div class="row justify-content-center mt-5 texto-contorno">
   <div class="col-md-5 col-lg-4">
     <h4 class="mb-4 text-center">Registrar Usuario</h4>
     <form method="post" novalidate>
       {% csrf_token %}
-      
+
       {% if form.non_field_errors %}
         <div class="alert alert-danger">
           {% for err in form.non_field_errors %}
@@ -14,12 +43,10 @@
           {% endfor %}
         </div>
       {% endif %}
-      
+
       <!-- Campo name -->
       <div class="mb-3">
-        <label for="{{ form.name.id_for_label }}" class="form-label">
-          {{ form.name.label }}:
-        </label>
+        <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}:</label>
         {{ form.name }}
         {% for err in form.name.errors %}
           <div class="text-danger small">{{ err }}</div>
@@ -28,9 +55,7 @@
 
       <!-- Campo last_name -->
       <div class="mb-3">
-        <label for="{{ form.last_name.id_for_label }}" class="form-label">
-          {{ form.last_name.label }}:
-        </label>
+        <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}:</label>
         {{ form.last_name }}
         {% for err in form.last_name.errors %}
           <div class="text-danger small">{{ err }}</div>
@@ -39,9 +64,7 @@
 
       <!-- Campo username -->
       <div class="mb-3">
-        <label for="{{ form.username.id_for_label }}" class="form-label">
-          {{ form.username.label }}:
-        </label>
+        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}:</label>
         {{ form.username }}
         {% for err in form.username.errors %}
           <div class="text-danger small">{{ err }}</div>
@@ -50,32 +73,28 @@
 
       <!-- Campo email -->
       <div class="mb-3">
-        <label for="{{ form.email.id_for_label }}" class="form-label">
-          {{ form.email.label }}:
-        </label>
+        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}:</label>
         {{ form.email }}
         {% for err in form.email.errors %}
           <div class="text-danger small">{{ err }}</div>
         {% endfor %}
       </div>
 
-      <!-- Campo password -->
-      <div class="mb-3">
-        <label for="{{ form.password.id_for_label }}" class="form-label">
-          {{ form.password.label }}:
-        </label>
+      <!-- Campo password con toggle -->
+      <div class="mb-3 password-input-group">
+        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}:</label>
         {{ form.password }}
+        <i class="bi bi-eye-slash toggle-password" id="togglePassword" title="Mostrar/Ocultar Contraseña"></i>
         {% for err in form.password.errors %}
           <div class="text-danger small">{{ err }}</div>
         {% endfor %}
       </div>
 
-      <!-- Campo confirm_password -->
-      <div class="mb-3">
-        <label for="{{ form.confirm_password.id_for_label }}" class="form-label">
-          {{ form.confirm_password.label }}:
-        </label>
+      <!-- Campo confirm_password con toggle -->
+      <div class="mb-3 password-input-group">
+        <label for="{{ form.confirm_password.id_for_label }}" class="form-label">{{ form.confirm_password.label }}:</label>
         {{ form.confirm_password }}
+        <i class="bi bi-eye-slash toggle-password" id="toggleConfirmPassword" title="Mostrar/Ocultar Confirmar Contraseña"></i>
         {% for err in form.confirm_password.errors %}
           <div class="text-danger small">{{ err }}</div>
         {% endfor %}
@@ -89,4 +108,29 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const togglePassword = document.querySelector("#togglePassword");
+    const passwordInput = document.querySelector("input[name='password']");
+
+    togglePassword.addEventListener("click", function() {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      this.classList.toggle("bi-eye");
+      this.classList.toggle("bi-eye-slash");
+    });
+
+    const toggleConfirmPassword = document.querySelector("#toggleConfirmPassword");
+    const confirmPasswordInput = document.querySelector("input[name='confirm_password']");
+
+    toggleConfirmPassword.addEventListener("click", function() {
+      const type = confirmPasswordInput.getAttribute("type") === "password" ? "text" : "password";
+      confirmPasswordInput.setAttribute("type", type);
+      this.classList.toggle("bi-eye");
+      this.classList.toggle("bi-eye-slash");
+    });
+  });
+</script>
+
 {% endblock %}
