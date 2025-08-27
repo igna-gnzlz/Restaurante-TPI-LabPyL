@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'menu_app/css/make_order_styles.css' %}">
+<link rel="stylesheet" href="{% static 'menu_app/css/make_order.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -48,22 +48,25 @@
         {% for product_data in carrito_reserva %}
         <li class="list-group-item d-flex justify-content-between align-items-center" id="row-product-{{ product_data.product.id }}">
             <div>
-                {{ product_data.product.name }} x
-                <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger ms-2 product-card-isolated dec-from-cart-btn"
-                    data-product-id="{{ product_data.product.id }}"
-                    data-url="{% url 'decrement_from_cart' product_data.product.id %}"
-                    title="Quitar una unidad">
-                    <i class="bi bi-dash-circle me-1"></i>Quitar una unidad
-                </button>
+                {{ product_data.product.name }}
             </div>
             <!-- Selección de cantidad -->
             <div class="wrapper" data-product-id="{{ product_data.product.id }}"
                 data-inc-url="{% url 'menu_app:add_to_order' product_data.product.id %}">
-                <span class="minus">-</span>
-                <span id="cart-quant-prod-{{ product_data.product.id }}">{{ product_data.quantity }}</span>
-                <span class="plus">+</span>
+                <button type="button" class="btn btn-outline-danger icon-btn trash" title="Eliminar producto">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                <button type="button" data-product-id="{{ product_data.product.id }}"
+                    data-url="{% url 'decrement_from_cart' product_data.product.id %}"
+                    class="btn btn-outline-secondary icon-btn dec-from-cart-btn" title="Quitar una unidad">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+                <span id="cart-quant-prod-{{ product_data.product.id }}" class="num">
+                    {{ product_data.quantity }}
+                </span>
+                <button type="button" class="btn btn-outline-success icon-btn plus" title="Agregar una unidad">
+                    <i class="bi bi-plus-circle"></i>
+                </button>
             </div>
             <span id="cart-subtotal-prod-{{ product_data.product.id }}">${{ product_data.subtotal }}</span>
         </li>

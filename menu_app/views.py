@@ -168,7 +168,7 @@ class AddToOrderView(LoginRequiredMixin, View):
         subtotal = product.price * cart[booking_key][product_key]["quantity"]
 
         # Calcular el total carrito
-        total_cart = total_carrito = get_cart_total(get_cart_products_by_booking(request.session, booking_selected_id))
+        total_cart = get_cart_total(get_cart_products_by_booking(request.session, booking_selected_id))
 
         return JsonResponse({
             "success": True,
