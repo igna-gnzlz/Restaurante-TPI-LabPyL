@@ -117,12 +117,19 @@
           </form>
 
           <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
-            data-bs-toggle="modal" data-bs-target="#modalComentar{{ item.id }}">
+            data-bs-toggle="modal"
+            data-bs-target="#modalComentar"
+            data-item-id="{{ item.id }}"
+            data-item-name="{{ item.name }}"
+            data-action-url="{% url 'menu_app:make_rating' item.id %}">
             Comentar
           </button>
 
-          <button type="button" class="btn btn-info w-100" data-bs-toggle="modal"
-            data-bs-target="#modalComentarios{{ item.id }}">
+          <button type="button" class="btn btn-info w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#modalComentarios"
+            data-item-id="{{ item.id }}"
+            data-item-name="{{ item.name }}">
             Ver Comentarios
           </button>
           {% else %}
@@ -140,47 +147,51 @@
       </div>
 
       <!-- Modal de Comentar -->
-      <div class="modal fade" id="modalComentar{{ item.id }}" tabindex="-1" aria-labelledby="modalLabel{{ item.id }}"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <form method="post" action="{% url 'menu_app:make_rating' item.id %}">
-              {% csrf_token %}
-
-              <h5 class="modal-title" id="modalLabel{{ item.id }}">Producto: {{ item.name }}</h5>
-              <div class="mb-3">
-                <label for="{{ rating_form.title.id_for_label }}" class="form-label">Título</label>
-                {{ rating_form.title }}
-                {% if rating_form.title.errors %}
-                <div class="text-danger small">{{ rating_form.title.errors }}</div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ rating_form.text.id_for_label }}" class="form-label">Comentario</label>
-                {{ rating_form.text }}
-                {% if rating_form.text.errors %}
-                <div class="text-danger small">{{ rating_form.text.errors }}</div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ rating_form.rating.id_for_label }}" class="form-label">Calificación</label>
-                {{ rating_form.rating }}
-                {% if rating_form.rating.errors %}
-                <div class="text-danger small">{{ rating_form.rating.errors }}</div>
-                {% endif %}
-              </div>
-
-              <button type="submit" class="btn btn-primary">Aceptar</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            </form>
+     <!-- <div class="modal fade" id="modalComentar{{ item.id }}" tabindex="-1" aria-labelledby="modalLabel{{ item.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="{% url 'menu_app:make_rating' item.id %}" class="modal-content">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel{{ item.id }}">Producto: {{ item.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div>
-      </div>
 
-      <!-- Modal de Ver Comentarios -->
-      <div class="modal fade" id="modalComentarios{{ item.id }}" tabindex="-1"
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="{{ rating_form.title.id_for_label }}" class="form-label">Título</label>
+              {{ rating_form.title }}
+              {% if rating_form.title.errors %}
+              <div class="text-danger small">{{ rating_form.title.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ rating_form.text.id_for_label }}" class="form-label">Comentario</label>
+              {{ rating_form.text }}
+              {% if rating_form.text.errors %}
+              <div class="text-danger small">{{ rating_form.text.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ rating_form.rating.id_for_label }}" class="form-label">Calificación</label>
+              {{ rating_form.rating }}
+              {% if rating_form.rating.errors %}
+              <div class="text-danger small">{{ rating_form.rating.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div> -->
+
+      <!-- Modal de Ver Comentarios --> 
+      <!-- <div class="modal fade" id="modalComentarios{{ item.id }}" tabindex="-1"
         aria-labelledby="modalComentariosLabel{{ item.id }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable">
           <div class="modal-content">
@@ -209,9 +220,7 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
-          </div>
-        </div>
-      </div>
+          </div> -->
       {% endfor %}
     </div>
   </div>
@@ -224,14 +233,146 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalComentar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="post" action="" class="modal-content" id="ratingForm">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="{{ rating_form.title.id_for_label }}" class="form-label">Título</label>
+          {{ rating_form.title }}
+          {% if rating_form.title.errors %}
+          <div class="text-danger small">{{ rating_form.title.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ rating_form.text.id_for_label }}" class="form-label">Comentario</label>
+          {{ rating_form.text }}
+          {% if rating_form.text.errors %}
+          <div class="text-danger small">{{ rating_form.text.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="{{ rating_form.rating.id_for_label }}" class="form-label">Calificación</label>
+          {{ rating_form.rating }}
+          {% if rating_form.rating.errors %}
+          <div class="text-danger small">{{ rating_form.rating.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-smodalLabelecondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Aceptar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="modalComentarios" tabindex="-1" aria-labelledby="modalComentariosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalComentariosLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="commentsModalBody">
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+  const allItemsData = [
+    {% for category, items in categorized_items.items %}
+      {% for item in items %}
+        {
+          "id": {{ item.id }},
+          "name": "{{ item.name }}",
+          "comments": [
+            {% for comment in item.comments %}
+              {
+                "user": "{{ comment.user.name }} {{ comment.user.last_name }}",
+                "title": "{{ comment.title }}",
+                "text": "{{ comment.text }}",
+                "rating": {{ comment.rating }},
+                "created_at": "{{ comment.created_at|date:'d/m/Y H:i' }}"
+              },
+            {% endfor %}
+          ]
+        },
+      {% endfor %}
+    {% endfor %}
+  ];
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const comentarModal = document.getElementById('modalComentar');
+    const comentariosModal = document.getElementById('modalComentarios');
+
+    // Lógica para el modal de Comentar
+    comentarModal.addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const itemName = button.getAttribute('data-item-name');
+      const urlAction = button.getAttribute('data-action-url');
+      const modalTitle = comentarModal.querySelector('.modal-title');
+      const form = comentarModal.querySelector('#ratingForm');
+      modalTitle.textContent = `Producto: ${itemName}`;
+      form.action = urlAction;
+      });
+
+    comentariosModal.addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const itemId = parseInt(button.getAttribute('data-item-id')); // Convertir a entero
+      const itemName = button.getAttribute('data-item-name');
+
+      const modalTitle = comentariosModal.querySelector('.modal-title');
+      const modalBody = comentariosModal.querySelector('#commentsModalBody');
+      
+      modalTitle.textContent = `Comentarios de ${itemName}`;
+
+      // Buscar el ítem en el array de datos
+      const itemData = allItemsData.find(item => item.id === itemId);
+
+      if (itemData && itemData.comments.length > 0) {
+        modalBody.innerHTML = ''; // Limpiar el contenido anterior
+        const commentsList = document.createElement('ul');
+        commentsList.className = 'list-group';
+        
+        itemData.comments.forEach(comment => {
+          const commentItem = document.createElement('li');
+          commentItem.className = 'list-group-item';
+          commentItem.innerHTML = `
+            <strong>${comment.user}</strong> <small class="text-muted"> - ${comment.created_at}</small>
+            <br>
+            <em>${comment.title}</em>
+            <p>${comment.text}</p>
+            <p>Calificación: ${comment.rating} / 5</p>
+          `;
+          commentsList.appendChild(commentItem);
+        });
+        modalBody.appendChild(commentsList);
+      } else {
+        modalBody.innerHTML = '<p>No hay comentarios para este producto.</p>';
+      }
+    });
+  });
   // Evitar soft-bloqueo al cerrar modales limpiando backdrop y scroll lock
-  document.querySelectorAll('.modal').forEach(modal => {
+  /*document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('hidden.bs.modal', () => {
       document.body.classList.remove('modal-open');
       document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
     });
-  });
+  });*/
 </script>
 
 {% endblock %}
