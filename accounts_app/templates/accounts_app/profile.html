@@ -4,87 +4,147 @@
 
 {% block content %}
 <style>
- 
-
-  /* Contenedor principal transparente con padding */
+  /* Contenedor transparente con padding */
   .content-container-transparent {
     position: relative;
     z-index: 1;
     padding: 1.5rem;
   }
 
-  /* Cards transparentes */
-  .card-transparent {
-    background-color: rgba(255, 255, 255, 0.15);
+  /* Card principal menos transparente */
+  .card-transparent-main {
+    background-color: rgba(255, 255, 255, 0.25);
     border-radius: 0.5rem;
     border: none;
     box-shadow: none;
     color: white;
   }
 
-  /* Titulos blancos con contorno negro */
+  /* Card opciones más oscuro y apilado */
+  .options-card {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 0 15px #0008 inset;
+    color: white;
+    padding: 1.5rem 1rem;
+    max-width: 400px;
+    margin: 0 auto 2rem;
+  }
+
+  /* Títulos con contorno */
   .title-white-outline {
     color: white;
     text-shadow:
       -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000;
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000;
   }
 
-  /* Para texto dentro de cards transparentes ajustar texto para legibilidad */
-  .card-transparent p,
-  .card-transparent strong,
-  .card-transparent a {
+  /* Texto dentro del card principal */
+  .card-transparent-main p,
+  .card-transparent-main strong,
+  .card-transparent-main a:not(.btn) {
     color: white;
     text-shadow:
       -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000;
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000;
   }
 
-  .btn-outline-primary {
+  /* Botón editar menos opaco */
+  .btn-outline-primary.edit-btn {
+    background-color: rgba(255, 255, 255, 0.25);
     color: white;
     border-color: white;
+    transition: all 0.3s ease;
   }
-  .btn-outline-primary:hover, .btn-outline-primary:focus {
-    background-color: white;
+  .btn-outline-primary.edit-btn:hover,
+  .btn-outline-primary.edit-btn:focus {
+    background-color: rgba(255, 255, 255, 0.45);
     color: #000;
   }
 
-  /* Foto perfil redondeada y con borde */
+  /* Foto perfil redondeada */
   .profile-image {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
-    border-radius: 0.5rem;
-    border: 2px solid white;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px #0008;
   }
+
+  /* Contenedor info usuario */
+  .profile-info {
+    min-width: 0;
+    flex-grow: 1;
+  }
+
+  /* Espaciado y alineación en datos y botón editar */
+  .info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Texto "Opciones" centrado y contorneado */
+  .options-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Botones en sección opciones apilados y con misma longitud */
+  .options-card .btn {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000;
+    border-color: white;
+  }
+  .options-card .btn:last-child {
+    margin-bottom: 0;
+  }
+  .options-card .btn:hover,
+  .options-card .btn:focus {
+    background-color: white;
+    color: black;
+  }
+
 </style>
 
 <div class="background-image"></div>
 
-<div class="container my-4 content-container-transparent">
-  <div class="card card-transparent mx-auto" style="max-width: 600px;">
+<div class="container my-5 content-container-transparent">
+
+  <!-- Perfil -->
+  <div class="card card-transparent-main mx-auto" style="max-width: 700px;">
     <div class="card-header">
-      <h3 class="title-white-outline">Perfil de: {{ user.username }}</h3>
+      <h3 class="title-white-outline mb-0">Perfil de: {{ user.username }}</h3>
     </div>
-    <div class="card-body d-flex gap-4 align-items-center">
+    <div class="card-body d-flex flex-wrap gap-4 align-items-center">
+
       {% if user.profile.image.url %}
-        <img src="{{ user.profile.image.url }}" alt="Foto de perfil" class="profile-image rounded">
+        <img src="{{ user.profile.image.url }}" alt="Foto de perfil" class="profile-image">
       {% else %}
-        <div class="d-flex justify-content-center align-items-center bg-secondary text-white rounded" style="width: 120px; height: 120px;">
+        <div class="profile-image d-flex justify-content-center align-items-center bg-secondary text-white">
           -sin foto-
         </div>
       {% endif %}
 
-      <div class="flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            <strong>Nombre de usuario:</strong> {{ user.username }}
-          </div>
-          <a href="{% url 'accounts_app:edit_username' %}" class="btn btn-sm btn-outline-primary" title="Editar nombre de usuario">
+      <div class="profile-info">
+        <div class="info-header">
+          <strong>Nombre de usuario: </strong> <span>{{user.username}}</span>
+          <a href="{% url 'accounts_app:edit_username' %}" class="btn btn-sm btn-outline-primary edit-btn" title="Editar nombre de usuario">
             ✏️ Editar
           </a>
         </div>
@@ -96,18 +156,18 @@
     </div>
   </div>
 
-  <div class="card card-transparent mx-auto mt-4" style="max-width: 600px;">
-    <div class="card-header">
-      <h3 class="title-white-outline">Opciones</h3>
-    </div>
-    <div class="card-body d-flex justify-content-around">
-      <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary">Mis reservas y pedidos</a>
-      <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary">Notificaciones</a>
-    </div>
+  <!-- Opciones apiladas -->
+  <div class="card options-card mx-auto">
+    <h3 class="options-title title-white-outline">Opciones</h3>
+    <a href="{% url 'bookings_app:my_reservation' %}" class="btn btn-outline-primary btn-lg">Mis reservas y pedidos</a>
+    <a href="{% url 'accounts_app:user_notifications_list' %}" class="btn btn-outline-primary btn-lg">Notificaciones</a>
   </div>
 
-  <div class="text-center mt-4">
-    <a href="{% url 'home' %}" class="btn btn-primary">Volver al inicio</a>
+  <!-- Volver -->
+  <div class="text-center mt-5">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5">Volver al inicio</a>
   </div>
+
 </div>
+
 {% endblock %}

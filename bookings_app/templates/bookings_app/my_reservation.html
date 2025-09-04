@@ -2,92 +2,106 @@
 
 {% block content %}
 <style>
-
-
-  /* Contenedor principal con fondo blanco para legibilidad */
+  /* Contenedor principal con fondo blanco semi-transparente */
   .content-container {
     position: relative;
     z-index: 1;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9); /* Menos opaco que antes */
     padding: 1.5rem;
     border-radius: 0.375rem;
+  }
+
+  /* Cards semi-transparentes con más transparencia */
+  .card-custom {
+    background-color: rgba(255, 255, 255, 0.1); /* Más transparente */
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: none;
+    color: #111;
+  }
+
+  /* Títulos en cards contorneados */
+  .card-title-white-outline {
+    color: white;
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000;
+    margin-bottom: 1rem;
+  }
+
+  /* Contenedores para tarjetas historial */
+  .history-card {
+    background-color: rgba(255, 255, 255, 0.1); /* Más transparente */
+  }
+
+  /* Layout responsive de las cards */
+  .row-cols-custom {
+    row-gap: 1rem;
   }
 </style>
 
 <div class="background-image"></div>
 
 <div class="container mt-4 content-container">
-    {% if messages %}
-        <div>
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
+
+  {% if messages %}
+    <div>
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Proxima Reserva / Reserva Actual -->
+  <div id="proxima-reserva-container">
+    {% include 'bookings_app/includes/get_next_reservation_card.html' with proxima_reserva=proxima_reserva cantidad_pedidos_proxima_reserva=cantidad_pedidos_proxima_reserva %}
+  </div>
+
+  <!-- Reservas Futuras -->
+  <div id="reservas-futuras-container" class="mt-4">
+    {% include 'bookings_app/includes/get_future_reservations_card.html' %}
+  </div>
+
+  <!-- Reservas Pendientes -->
+  <div id="reservas-pendientes-container" class="mt-4">
+    {% include 'bookings_app/includes/get_pending_reservations_card.html' %}
+  </div>
+
+  <!-- Historial de Reservas -->
+  <div class="card card-custom sombra-gris mt-4">
+    <div class="card-body">
+      <h4 class="card-title-white-outline text-center">Historial de Reservas</h4>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-custom">
+        <!-- Aprobadas -->
+        <div class="col">
+          <div class="card history-card mb-3">
+            <div class="card-body">
+              <div id="historial-aprobadas-container">
+                {% include 'bookings_app/includes/get_history_reservations_aprobadas_card.html' %}
+              </div>
             </div>
-            {% endfor %}
+          </div>
         </div>
-    {% endif %}
-
-    <!-- Card de Proxima Reserva / Reserva Actual -->
-    <div id="proxima-reserva-container">
-        {% include 'bookings_app/includes/get_next_reservation_card.html' with proxima_reserva=proxima_reserva cantidad_pedidos_proxima_reserva=cantidad_pedidos_proxima_reserva %}
-    </div>
-
-    <!-- Card Reservas Futuras -->
-    <div id="reservas-futuras-container">
-        {% include 'bookings_app/includes/get_future_reservations_card.html' %}
-    </div>
-
-    <!-- Card Reservas Pendientes -->
-    <div id="reservas-pendientes-container">
-        {% include 'bookings_app/includes/get_pending_reservations_card.html' %}
-    </div>
-
-    <!-- Card Historial de Reservas -->
-    <div class="card mb-4 sombra-gris">
-        <div class="card-body">
-            <h4 class="card-title text-center">Historial de Reservas</h4>
-            <div class="row">
-                <!-- Aprobadas -->
-                <div class="col-md-6">
-                    <div class="card mb-3 ">
-                        <div class="card-body">
-                            <div id="historial-aprobadas-container">
-                                {% include 'bookings_app/includes/get_history_reservations_aprobadas_card.html' %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rechazadas -->
-                <div class="col-md-6">
-                    <div class="card mb-3 ">
-                        <div class="card-body">
-                            <div id="historial-rechazadas-container">
-                                {% include 'bookings_app/includes/get_history_reservations_rechazadas_card.html' %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+        <!-- Rechazadas -->
+        <div class="col">
+          <div class="card history-card mb-3">
+            <div class="card-body">
+              <div id="historial-rechazadas-container">
+                {% include 'bookings_app/includes/get_history_reservations_rechazadas_card.html' %}
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <a href="/" class="btn btn-secondary mt-4 mb-3">Volver al inicio</a>
-
-    <!-- Modals... (se mantienen iguales) -->
-
-<style>
-    /* Tus estilos de sombras y bordes igual que antes */
-    .sombra-verde {
-        box-shadow: 0 0 15px rgba(0, 128, 0, 0.4);
-    }
-    /* ...otros estilos ya definidos antes... */
-</style>
-
-<script>
-    // Scripts mantienen igual (omitidos para brevedad)
-</script>
+  <a href="/" class="btn btn-secondary mt-4 mb-3">Volver al inicio</a>
 
 </div>
+
 {% endblock %}
