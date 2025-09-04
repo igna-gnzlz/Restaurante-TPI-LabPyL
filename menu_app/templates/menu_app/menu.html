@@ -165,7 +165,6 @@
   </div>
 </div>
 
-<!-- Los modales y el script JS para comentar/ver comentarios siguen exactamente igual, no debes moverlos ni borrarlos -->
 <div class="modal fade" id="modalComentar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form method="post" action="" class="modal-content" id="ratingForm">
@@ -197,30 +196,32 @@
           {% endif %}
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-smodalLabelecondary" data-bs-dismiss="modal">Cancelar</button>
         <button type="submit" class="btn btn-primary">Aceptar</button>
       </div>
     </form>
   </div>
 </div>
+
 <div class="modal fade" id="modalComentarios" tabindex="-1" aria-labelledby="modalComentariosLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalComentariosLabel"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body" id="commentsModalBody">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalComentariosLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="commentsModalBody">
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
 <script>
-  // El script JS para los modales y comentarios queda idéntico, no cambiar ni borrar
   const allItemsData = [
     {% for category, items in categorized_items.items %}
       {% for item in items %}
@@ -242,9 +243,12 @@
       {% endfor %}
     {% endfor %}
   ];
+
   document.addEventListener('DOMContentLoaded', function() {
     const comentarModal = document.getElementById('modalComentar');
     const comentariosModal = document.getElementById('modalComentarios');
+
+    // Lógica para el modal de Comentar
     comentarModal.addEventListener('show.bs.modal', function(event) {
       const button = event.relatedTarget;
       const itemName = button.getAttribute('data-item-name');
@@ -253,19 +257,26 @@
       const form = comentarModal.querySelector('#ratingForm');
       modalTitle.textContent = `Producto: ${itemName}`;
       form.action = urlAction;
-    });
+      });
+
     comentariosModal.addEventListener('show.bs.modal', function(event) {
       const button = event.relatedTarget;
-      const itemId = parseInt(button.getAttribute('data-item-id'));
+      const itemId = parseInt(button.getAttribute('data-item-id')); // Convertir a entero
       const itemName = button.getAttribute('data-item-name');
+
       const modalTitle = comentariosModal.querySelector('.modal-title');
       const modalBody = comentariosModal.querySelector('#commentsModalBody');
+      
       modalTitle.textContent = `Comentarios de ${itemName}`;
+
+      // Buscar el ítem en el array de datos
       const itemData = allItemsData.find(item => item.id === itemId);
+
       if (itemData && itemData.comments.length > 0) {
-        modalBody.innerHTML = '';
+        modalBody.innerHTML = ''; // Limpiar el contenido anterior
         const commentsList = document.createElement('ul');
         commentsList.className = 'list-group';
+        
         itemData.comments.forEach(comment => {
           const commentItem = document.createElement('li');
           commentItem.className = 'list-group-item';
