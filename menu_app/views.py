@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, ListView, DetailView, FormView
-from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating
+from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating,Combo
 from menu_app.forms import RatingForm
 from accounts_app.models import User
 from django.shortcuts import get_object_or_404, redirect, render
@@ -62,6 +62,9 @@ class MenuListView(ListView):
         context['categorized_items'] = categorized_items
         context['rating_form'] = RatingForm()
         return context
+        
+
+
 
 
 class HomeView(TemplateView):
