@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, time
 from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.utils import DateTimeUtils
 
@@ -211,3 +211,219 @@ class TableManagerTest(TestCase):
         self.assertIn(self.table2, qs)
         self.assertIn(self.table3, qs)
         self.assertNotIn(self.table1, qs)  # Mesa reservada no debe aparecer
+
+
+class BookingModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        # Crear usuario para asignar a Booking
+        cls.user = User.objects.create_user(username='testuser', password='pass')
+        now = timezone.localtime()
+        cls.timeslot = TimeSlot.objects.create(
+            name="Test Slot",
+            start_time=now.time(),
+            end_time=(now + timedelta(hours=1)).time()
+        )
+        cls.table1 = Table.objects.create(capacity=4, number=1, description="Mesa 1")
+        cls.table2 = Table.objects.create(capacity=6, number=2, description="Mesa 2")
+
+        # Crear instancia Booking válida
+        cls.booking = Booking.objects.create(
+            approved=True,
+            approval_date=DateTimeUtils.get_local_date(),
+            code="RES123",
+            observations="Test booking",
+            date=DateTimeUtils.get_local_date(),
+            time_slot=cls.timeslot,
+            user=cls.user,
+            issue_date=DateTimeUtils.get_local_date()
+        )
+        cls.booking.tables.add(cls.table1, cls.table2)
+
+    def test_creacion_y_guardado(self):
+        booking = Booking.objects.create(
+            approved=False,
+            code="UNQ001",
+            date=DateTimeUtils.get_local_date(),
+            time_slot=self.timeslot,
+            user=self.user
+        )
+        booking.tables.add(self.table1)
+        self.assertEqual(booking.code, "UNQ001")
+        self.assertFalse(booking.approved)
+
+    def test_validacion_unicidad_code(self):
+        with self.assertRaises(Exception):
+            Booking.objects.create(
+                approved=False,
+                code="RES123",  # código duplicado
+                date=DateTimeUtils.get_local_date(),
+                time_slot=self.timeslot,
+                user=self.user
+            )
+
+    def test_str_representacion(self):
+        self.assertEqual(str(self.booking), f'Codigo de Reserva: {self.booking.code}')
+
+    def test_get_cantidad_pedidos(self):
+        # Suponiendo que pueda tener atributo cantidad_pedidos
+        self.booking.cantidad_pedidos = 5
+        self.assertEqual(self.booking.get_cantidad_pedidos(), 5)
+
+    def test_es_reserva_actual(self):
+        hoy = DateTimeUtils.get_local_date()
+        ahora = timezone.localtime().time()
+        # Asegurar que para tu fecha y hour actuales devuelva True o False según corresponda
+        self.booking.date = hoy
+        self.booking.time_slot.start_time = (timezone.localtime() - timedelta(minutes=30)).time()
+        self.booking.time_slot.end_time = (timezone.localtime() + timedelta(minutes=30)).time()
+        self.assertTrue(self.booking.es_reserva_actual)
+        # Y para otra fecha falso
+        self.booking.date = hoy - timedelta(days=1)
+        self.assertFalse(self.booking.es_reserva_actual)
+
+    def test_get_card_title(self):
+        fecha_actual = DateTimeUtils.get_local_date()
+        hora_actual = timezone.localtime().time()
+        self.booking.date = fecha_actual
+        self.booking.time_slot.start_time = (timezone.localtime() - timedelta(minutes=30)).time()
+        self.booking.time_slot.end_time = (timezone.localtime() + timedelta(minutes=30)).time()
+        self.assertEqual(self.booking.get_card_title(fecha_actual, hora_actual), "Reserva Actual")
+
+    def test_is_past_due(self):
+        hoy = DateTimeUtils.get_local_date()
+        ahora = timezone.localtime().time()
+        self.booking.date = hoy - timedelta(days=1)
+        self.assertTrue(self.booking.is_past_due())
+        self.booking.date = hoy
+        self.booking.time_slot.end_time = (timezone.localtime() - timedelta(minutes=30)).time()
+        self.assertTrue(self.booking.is_past_due())
+        self.booking.date = hoy
+        self.booking.time_slot.end_time = (timezone.localtime() + timedelta(minutes=30)).time()
+        self.assertFalse(self.booking.is_past_due())
+
+    def test_relacion_tables_m2m(self):
+        self.assertIn(self.table1, self.booking.tables.all())
+        self.assertIn(self.table2, self.booking.tables.all())
+
+    def test_integridad_on_delete(self):
+        # Borrar usuario debería borrar reserva por on_delete=models.CASCADE
+        self.user.delete()
+        with self.assertRaises(Booking.DoesNotExist):
+            Booking.objects.get(pk=self.booking.pk)
+
+
+class TableModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.table = Table.objects.create(capacity=4, number=1, description="Mesa de prueba")
+
+    def test_creacion_y_guardado(self):
+        table = Table.objects.create(capacity=6, number=2)
+        self.assertEqual(table.capacity, 6)
+        self.assertEqual(table.number, 2)
+
+    def test_str_representacion(self):
+        self.assertEqual(str(self.table), f"Table {self.table.number}")
+
+    def test_get_label(self):
+        label = self.table.get_label()
+        self.assertIn(f"Mesa {self.table.number}", label)
+        self.assertIn(str(self.table.capacity), label)
+
+    def test_save_autoincrement_number(self):
+        # Guardar tabla sin número asignado activa autoincremento
+        table = Table(capacity=2)
+        table.save()
+        self.assertIsNotNone(table.number)
+        self.assertTrue(table.number > 0)
+
+    def test_is_available(self):
+        user = User.objects.create_user(username='tester')
+        now = timezone.localtime()
+        timeslot = TimeSlot.objects.create(
+            name='Slot Test',
+            start_time=now.time(),
+            end_time=(now + timedelta(hours=1)).time()
+        )
+        booking = Booking.objects.create(
+            approved=True,
+            approval_date=DateTimeUtils.get_local_date(),
+            code='CODE2',
+            date=DateTimeUtils.get_local_date(),
+            time_slot=timeslot,
+            user=user,
+            issue_date=DateTimeUtils.get_local_date()
+        )
+        booking.tables.add(self.table)
+
+        # La mesa está reservada, no disponible
+        self.assertFalse(self.table.is_available(timeslot, DateTimeUtils.get_local_date()))
+
+        # Para otro timeslot o fecha estará disponible
+        otro_slot = TimeSlot.objects.create(
+            name='Otro Slot',
+            start_time=(now + timedelta(hours=2)).time(),
+            end_time=(now + timedelta(hours=3)).time()
+        )
+        self.assertTrue(self.table.is_available(otro_slot, DateTimeUtils.get_local_date()))
+
+        otra_fecha = DateTimeUtils.get_local_date() + timedelta(days=1)
+        self.assertTrue(self.table.is_available(timeslot, otra_fecha))
+
+
+class TimeSlotModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_time = time(9, 0)
+        cls.end_time = time(11, 0)
+        cls.timeslot = TimeSlot.objects.create(
+            name="Mañana",
+            start_time=cls.start_time,
+            end_time=cls.end_time,
+        )
+        cls.table1 = Table.objects.create(capacity=4, number=1, description="Mesa 1")
+        cls.table2 = Table.objects.create(capacity=6, number=2, description="Mesa 2")
+        cls.timeslot.tables.add(cls.table1, cls.table2)
+
+    def test_creacion_y_guardado(self):
+        self.assertEqual(self.timeslot.name, "Mañana")
+        self.assertEqual(self.timeslot.start_time, self.start_time)
+        self.assertEqual(self.timeslot.end_time, self.end_time)
+
+    def test_str_representacion(self):
+        self.assertEqual(str(self.timeslot), "Mañana")
+
+    def test_get_label_horas(self):
+        label = self.timeslot.get_label_horas()
+        self.assertEqual(label, "09:00 hs. - 11:00 hs.")
+
+    def test_is_future_true_false(self):
+        ahora = DateTimeUtils.get_local_time()
+        # Preparar timeslot con start_time en el futuro
+        future_time = (timezone.localtime() + timedelta(hours=1)).time()
+        past_time = (timezone.localtime() - timedelta(hours=1)).time()
+
+        self.timeslot.start_time = future_time
+        self.timeslot.save()
+        self.assertTrue(self.timeslot.is_future())
+
+        self.timeslot.start_time = past_time
+        self.timeslot.save()
+        self.assertFalse(self.timeslot.is_future())
+
+    def test_m2m_tables_asociacion(self):
+        tables = self.timeslot.tables.all()
+        self.assertIn(self.table1, tables)
+        self.assertIn(self.table2, tables)
+
+    def test_m2m_tables_agregar_eliminar(self):
+        table3 = Table.objects.create(capacity=2, number=3)
+        self.timeslot.tables.add(table3)
+        self.assertIn(table3, self.timeslot.tables.all())
+
+        self.timeslot.tables.remove(table3)
+        self.assertNotIn(table3, self.timeslot.tables.all())
