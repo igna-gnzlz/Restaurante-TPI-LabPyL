@@ -1,4 +1,4 @@
-from django.views.generic import FormView, ListView, DetailView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
 from django.views import View
 from django.contrib import messages
@@ -100,17 +100,13 @@ class DeleteAllNotificationsView(LoginRequiredMixin, View):
         request.user.usernotification_set.all().delete()
         return JsonResponse({'status': 'success'})
 
-class UserNotificationDetailView(LoginRequiredMixin, DetailView):
-    model = UserNotification
-    template_name = 'accounts_app/user_notification_detail.html'
-
-    def get(self, request, *args, **kwargs):
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            notif = self.get_object()
-            # Suponiendo que el contenido está en notif.notification.message_text
-            return JsonResponse({'message': notif.notification.message})
-        else:
-            return super().get(request, *args, **kwargs)
+class UserNotificationDetailView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        notif = get_object_or_404(UserNotification, pk=pk, user=request.user)
+        return JsonResponse({
+            'title': notif.notification.title,
+            'message': notif.notification.message,
+        })
 
 
 class MarkNotificationReadView(LoginRequiredMixin, View):
