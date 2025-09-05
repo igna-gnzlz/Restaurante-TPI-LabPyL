@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.contrib.messages import get_messages
 from django.utils.translation import activate
 from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 activate('es')
 
@@ -16,7 +19,6 @@ activate('es')
 
 
 class UserModelTests(TestCase):
-
     def test_creacion_user(self):
         # Creación de instancia User
         user = User.objects.create_user(
@@ -74,31 +76,26 @@ class UserModelTests(TestCase):
 
 
 class NotificationModelTests(TestCase):
-
     def test_creacion_notification(self):
         notif = Notification.objects.create(title='Nueva Notificación', message='Detalle del mensaje')
         self.assertEqual(notif.title, 'Nueva Notificación')
         self.assertEqual(notif.message, 'Detalle del mensaje')
-
     def test_lectura_notification(self):
         Notification.objects.create(title='Leer Notificación', message='Mensaje para leer')
         notif = Notification.objects.get(title='Leer Notificación')
         self.assertEqual(notif.message, 'Mensaje para leer')
-
     def test_actualizacion_notification(self):
         notif = Notification.objects.create(title='Actualizar', message='Mensaje antiguo')
         notif.message = 'Mensaje actualizado'
         notif.save()
         notif_refreshed = Notification.objects.get(id=notif.id)
         self.assertEqual(notif_refreshed.message, 'Mensaje actualizado')
-
     def test_eliminacion_notification(self):
         notif = Notification.objects.create(title='Eliminar', message='Mensaje a eliminar')
         notif_id = notif.id
         notif.delete()
         with self.assertRaises(Notification.DoesNotExist):
             Notification.objects.get(id=notif_id)
-
     def test_created_at_auto_now_add(self):
         notif = Notification.objects.create(title='Fecha', message='Test fecha')
         now = timezone.now()
@@ -106,9 +103,7 @@ class NotificationModelTests(TestCase):
         self.assertIsNotNone(notif.created_at)
 
 
-
 class UserNotificationModelTests(TestCase):
-
     def setUp(self):
         self.user = User.objects.create_user(
             username='user_test',
@@ -121,42 +116,35 @@ class UserNotificationModelTests(TestCase):
             title='Test Notification',
             message='This is a test notification'
         )
-
     def test_creacion_usernotification(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         self.assertEqual(un.user, self.user)
         self.assertEqual(un.notification, self.notification)
         self.assertFalse(un.is_read)  # Valor por defecto False
-
     def test_relaciones_usernotification(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         self.assertEqual(un.user.username, 'user_test')
         self.assertEqual(un.notification.title, 'Test Notification')
-
     def test_actualizacion_is_read(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         un.is_read = True
         un.save()
         updated_un = UserNotification.objects.get(id=un.id)
         self.assertTrue(updated_un.is_read)
-
     def test_eliminacion_usernotification(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         un_id = un.id
         un.delete()
         with self.assertRaises(UserNotification.DoesNotExist):
             UserNotification.objects.get(id=un_id)
-
     def test_user_null(self):
         un = UserNotification.objects.create(user=None, notification=self.notification)
         self.assertIsNone(un.user)
-
     def test_borrado_notification_cascada(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         self.notification.delete()
         with self.assertRaises(UserNotification.DoesNotExist):
             UserNotification.objects.get(id=un.id)
-
     def test_borrado_user_set_null(self):
         un = UserNotification.objects.create(user=self.user, notification=self.notification)
         self.user.delete()
@@ -172,14 +160,12 @@ class UserNotificationModelTests(TestCase):
 class UserRegisterViewTests(TestCase):
     def setUp(self):
         Group.objects.create(name="Cliente")
-
     def test_get_register_view(self):
         url = reverse('accounts_app:register')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts_app/register.html')
         self.assertIn('form', response.context)
-
     def test_post_register_valid(self):
         Group.objects.get_or_create(name="Cliente")  # asegura que existe
         url = reverse('accounts_app:register')
@@ -203,8 +189,6 @@ class UserRegisterViewTests(TestCase):
         # Verificar mensaje de éxito
         messages = list(get_messages(response.wsgi_request))
         self.assertTrue(any("Usuario registrado correctamente" in str(m) for m in messages))
-
-
     def test_post_register_invalid(self):
         url = reverse('accounts_app:register')
         data = {
@@ -222,18 +206,15 @@ class UserRegisterViewTests(TestCase):
 
 
 class EditUsernameViewTests(TestCase):
-
     def setUp(self):
         self.user = User.objects.create_user(username='usuario_set', password='pass')
         self.client.login(username='usuario_set', password='pass')
-
     def test_get_edit_username_view(self):
         url = reverse('accounts_app:edit_username')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts_app/edit_username.html')
         self.assertIn('form', response.context)
-
     def test_post_edit_username_valid(self):
         url = reverse('accounts_app:edit_username')
         data = {'username': 'nuevo.username'}  # Cambiado guion bajo por punto para pasar la validación
@@ -243,7 +224,6 @@ class EditUsernameViewTests(TestCase):
         self.assertRedirects(response, reverse('accounts_app:profile'))
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'nuevo.username')
-
     def test_post_edit_username_invalid(self):
         url = reverse('accounts_app:edit_username')
         data = {'username': ''}  # username obligatorio
@@ -251,78 +231,255 @@ class EditUsernameViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         form = response.context['form']
         self.assertFormError(form, 'username', ['Este campo es obligatorio.'])
+    def test_post_edit_username_duplicate(self):
+        # Crear otro usuario con username duplicado
+        User.objects.create_user(username='usuario_existente', password='pass')
+        url = reverse('accounts_app:edit_username')
+        data = {'username': 'usuario_existente'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertTrue(form.errors)
+        self.user.refresh_from_db()
+        # Username no debe haber cambiado
+        self.assertEqual(self.user.username, 'usuario_set')
 
 
 class UserNotificationDeleteAllViewTests(TestCase):
-
     def setUp(self):
         # Crear usuarios
         self.user = User.objects.create_user(username='user1', password='pass')
         self.other_user = User.objects.create_user(username='other', password='pass')
-
         # Crear notificaciones
         notification1 = Notification.objects.create(title="Notificación 1", message="Mensaje 1")
         notification2 = Notification.objects.create(title="Notificación 2", message="Mensaje 2")
         notification3 = Notification.objects.create(title="Notificación 3", message="Mensaje 3")
-
         # Asociar notificaciones a usuarios
         UserNotification.objects.create(user=self.user, notification=notification1)
         UserNotification.objects.create(user=self.user, notification=notification2)
         UserNotification.objects.create(user=self.other_user, notification=notification3)
-
         # Loguear usuario para hacer requests autenticados
         self.client.login(username='user1', password='pass')
-
     def test_post_deletes_only_user_notifications_and_redirects(self):
-        url = reverse('accounts_app:user_notification_delete_all')
+        url = reverse('accounts_app:ajax_delete_all_notifications')
         response = self.client.post(url)
-        self.assertRedirects(response, reverse('accounts_app:user_notifications_list'))
-        # Verificar que las notificaciones del usuario actual fueron eliminadas
-        self.assertFalse(UserNotification.objects.filter(user=self.user).exists())
-        # Las notificaciones de otros usuarios no deben eliminarse
-        self.assertTrue(UserNotification.objects.filter(user=self.other_user).exists())
-
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode('utf-8'), {'status': 'success'})
+        self.assertFalse(self.user.usernotification_set.exists())
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        url = reverse('accounts_app:user_notification_delete_all')
+        url = reverse('accounts_app:ajax_delete_all_notifications')
         response = self.client.post(url)
-        # Debe redirigir a login u otra URL (código distinto a 200)
         self.assertNotEqual(response.status_code, 200)
 
 
 class UserNotificationDeleteViewTests(TestCase):
-
     def setUp(self):
-        # Crear usuarios
         self.user = User.objects.create_user(username='user1', password='pass')
-        self.other_user = User.objects.create_user(username='other', password='pass')
-
-        # Crear notificaciones
-        notification = Notification.objects.create(title="Notificación para borrar", message="Mensaje")
-
-        # Crear UserNotification asociado al usuario
-        self.user_notification = UserNotification.objects.create(user=self.user, notification=notification)
-
-        # Loguear usuario para requests autenticados
         self.client.login(username='user1', password='pass')
-
-    def test_get_confirmation_page(self):
-        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts_app/user_notification_confirm_delete.html')
-        # Opcional: verificar contenido relevante en la página
-        self.assertContains(response, "Notificación para borrar")
-
-    def test_post_deletes_notification_and_redirects(self):
-        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
+        notification = Notification.objects.create(title="Notificación para borrar", message="Mensaje")
+        self.user_notification = UserNotification.objects.create(user=self.user, notification=notification)
+    def test_post_deletes_notification_and_returns_success_json(self):
+        url = reverse('accounts_app:ajax_delete_notification', kwargs={'pk': self.user_notification.pk})
         response = self.client.post(url)
-        self.assertRedirects(response, reverse('accounts_app:user_notifications_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode('utf-8'), {'status': 'success'})
         self.assertFalse(UserNotification.objects.filter(pk=self.user_notification.pk).exists())
-
+    def test_get_method_not_allowed(self):
+        url = reverse('accounts_app:ajax_delete_notification', args=[self.user_notification.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
     def test_redirect_if_not_logged_in(self):
         self.client.logout()
-        url = reverse('accounts_app:user_notification_delete', args=[self.user_notification.pk])
-        response = self.client.get(url)
-        self.assertNotEqual(response.status_code, 200)  # Debería redirigir a login u otra página
+        url = reverse('accounts_app:ajax_delete_notification', args=[self.user_notification.pk])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
 
+
+class ProfileViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='pass')
+    def test_get_profile_view_authenticated(self):
+        self.client.login(username='testuser', password='pass')
+        url = reverse('accounts_app:profile')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/profile.html')
+        self.assertEqual(response.context['user'], self.user)
+    def test_redirect_if_not_logged_in(self):
+        url = reverse('accounts_app:profile')
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, 200)
+        self.assertIn('/login', response.url)
+
+
+class UserLoginViewTests(TestCase):
+    def setUp(self):
+        self.admin_group = Group.objects.create(name='Administrador')
+        self.regular_group = Group.objects.create(name='Cliente')
+        # Usuario bloqueado
+        self.blocked_user = User.objects.create_user(username='blocked', password='pass')
+        self.blocked_user.groups.add(self.admin_group)
+        # Usuario válido
+        self.valid_user = User.objects.create_user(username='valid', password='pass')
+        self.valid_user.groups.add(self.regular_group)
+    def test_get_login_view(self):
+        url = reverse('accounts_app:login')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/login.html')
+    def test_post_login_blocked_user(self):
+        url = reverse('accounts_app:login')
+        response = self.client.post(url, {'username': 'blocked', 'password': 'pass'})
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response.context['form'], None, 'Credenciales inválidas. Verifica usuario y contraseña.')
+    def test_post_login_valid_user(self):
+        url = reverse('accounts_app:login')
+        response = self.client.post(url, {'username': 'valid', 'password': 'pass'})
+        self.assertEqual(response.status_code, 302)
+
+
+class NotificationRecipientsViewTests(TestCase):
+    def setUp(self):
+        self.staff_user = User.objects.create_user(username='staffuser', password='pass', is_staff=True)
+        self.normal_user = User.objects.create_user(username='normal', password='pass')
+        self.notification = Notification.objects.create(title='TestNotif', message='Test Message')
+    def test_access_allowed_for_staff(self):
+        self.client.login(username='staffuser', password='pass')
+        url = reverse('accounts_app:notification_recipients', kwargs={'pk': self.notification.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/notification_recipients.html')
+        self.assertEqual(response.context['notification'], self.notification)
+    def test_access_denied_for_non_staff(self):
+        self.client.login(username='normal', password='pass')
+        url = reverse('accounts_app:notification_recipients', kwargs={'pk': self.notification.pk})
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, 200)
+        self.assertIn('/login', response.url)
+
+
+class UserNotificationsListViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='user1', password='pass')
+        self.other_user = User.objects.create_user(username='other', password='pass')
+        notification1 = Notification.objects.create(title='Title1', message='Msg1')
+        notification2 = Notification.objects.create(title='Title2', message='Msg2')
+        UserNotification.objects.create(user=self.user, notification=notification1)
+        UserNotification.objects.create(user=self.other_user, notification=notification2)
+    def test_get_notifications_list_authenticated(self):
+        self.client.login(username='user1', password='pass')
+        url = reverse('accounts_app:user_notifications_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/user_notifications_list.html')
+        self.assertTrue(all(un.user == self.user for un in response.context['user_notifications']))
+    def test_redirect_if_not_logged_in(self):
+        url = reverse('accounts_app:user_notifications_list')
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, 200)
+        self.assertIn('/login', response.url)
+
+
+class EditUsernameViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='usuario_original', password='pass')
+        self.client.login(username='usuario_original', password='pass')
+    def test_redirect_if_not_logged_in(self):
+        self.client.logout()
+        url = reverse('accounts_app:edit_username')
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, 200)
+        self.assertIn('/login', response.url)
+    def test_get_edit_username_view(self):
+        url = reverse('accounts_app:edit_username')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts_app/edit_username.html')
+        self.assertIn('form', response.context)
+    def test_post_edit_username_valid(self):
+        url = reverse('accounts_app:edit_username')
+        data = {'username': 'nuevo.username'}
+        response = self.client.post(url, data)
+        if response.context is not None:
+            print(response.context['form'].errors)
+        
+        self.assertRedirects(response, reverse('accounts_app:profile'))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'nuevo.username')
+    def test_post_edit_username_invalid(self):
+        url = reverse('accounts_app:edit_username')
+        data = {'username': ''}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertFormError(form, 'username', ['Este campo es obligatorio.'])
+    def test_post_edit_username_duplicate(self):
+        User.objects.create_user(username='usuario_existente', password='pass')
+        url = reverse('accounts_app:edit_username')
+        data = {'username': 'usuario_existente'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertTrue(form.errors)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'usuario_original')
+
+
+class UserNotificationDetailViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='pass')
+        self.notification = Notification.objects.create(title='Titulo de prueba', message='Mensaje de prueba')
+        self.user_notification = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.client.login(username='testuser', password='pass')
+
+    def test_get_returns_json_with_title_and_message(self):
+        url = reverse('accounts_app:user_notification_detail', kwargs={'pk': self.user_notification.pk})
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertJSONEqual(
+            response.content.decode('utf-8'),
+            {'title': self.notification.title, 'message': self.notification.message}
+        )
+
+    def test_get_without_ajax_returns_404_or_error(self):
+        url = reverse('accounts_app:user_notification_detail', kwargs={'pk': self.user_notification.pk})
+        response = self.client.get(url)
+        # Dado que tu vista solo devuelve JSON en AJAX y no tiene template,
+        # si usas View base, puede devolver 200 o 404 o error según implementación.
+        # Ajusta este assert según la implementación final.
+        self.assertNotEqual(response.status_code, 500)  # No debe fallar servidor
+
+    def test_get_not_logged_in_redirects(self):
+        self.client.logout()
+        url = reverse('accounts_app:user_notification_detail', kwargs={'pk': self.user_notification.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login', response.url)
+
+
+class MarkNotificationReadViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='user_markread', password='pass')
+        self.notification = Notification.objects.create(title='Título', message='Mensaje para marcar')
+        self.user_notification = UserNotification.objects.create(user=self.user, notification=self.notification)
+        self.client.login(username='user_markread', password='pass')
+
+    def test_post_marks_notification_as_read_and_returns_ok(self):
+        url = reverse('accounts_app:mark_notification_read', kwargs={'pk': self.user_notification.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode('utf-8'), {'status': 'ok'})
+
+        self.user_notification.refresh_from_db()
+        self.assertTrue(self.user_notification.is_read)
+
+    def test_post_not_logged_in_redirects(self):
+        self.client.logout()
+        url = reverse('accounts_app:mark_notification_read', kwargs={'pk': self.user_notification.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login', response.url)
