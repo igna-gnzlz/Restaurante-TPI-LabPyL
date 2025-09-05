@@ -21,14 +21,39 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(Combo)
 class ComboAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'price', 'list_products']
+    list_display = ['name', 'description', 'price', 'list_products', 'on_promotion', 'dicount_percentage', 'is_active']
+    list_editable = ['on_promotion', 'dicount_percentage', 'is_active']
     search_fields = ['name', 'description']
     filter_horizontal = ['products']
+    list_filter = ['on_promotion', 'is_active']
+
+    actions = ['activate_combos', 'deactivate_combos', 'apply_promotion', 'remove_promotion']
 
     def list_products(self, obj):
         return ", ".join([p.name for p in obj.products.all()])
     list_products.short_description = 'Productos'
 
+    @admin.action(description='Habilitar combos seleccionados')
+    def activate_combos(self, request, queryset):
+        queryset.update(is_active=True)
+        self.message_user(request, 'Combos habilitados correctamente.')
+
+    @admin.action(description='Deshabilitar combos seleccionados')
+    def deactivate_combos(self, request, queryset):
+        queryset.update(is_active=False)
+        self.message_user(request, 'Combos deshabilitados correctamente.')
+
+    @admin.action(description='Aplicar promoción 20% a combos seleccionados')
+    def apply_promotion(self, request, queryset):
+        for combo in queryset:
+            combo.setDiscount(20)  # Aplicar descuento del 20%
+        self.message_user(request, 'Promoción del 20% aplicada a combos seleccionados.')
+
+    @admin.action(description='Quitar promoción de combos seleccionados')
+    def remove_promotion(self, request, queryset):
+        for combo in queryset:
+            combo.setPromotion(False)
+        self.message_user(request, 'Promociones removidas de combos seleccionados.')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
