@@ -157,6 +157,77 @@
 </style>
 
 <script>
-    // Los scripts quedan igual (omito para brevedad)
+    // Al cargar la página, forzar day y month si no están en la URL
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // Enero = 0
+        const currentDay = now.getDate();
+
+        const urlMonth = params.get("month");
+        const urlDay = params.get("day");
+
+        // Si no hay month o day, forzamos al mes y día actual en la URL
+        if (!urlMonth || !urlDay) {
+            params.set("month", currentMonth);
+            params.set("day", currentDay);
+            // Mantener el time_slot si existe, si no no se toca
+            window.location.search = params.toString();
+        }
+    })();
+
+    function updateMonth() {
+        const monthSelect = document.getElementById("monthSelect");
+        const selectedMonth = parseInt(monthSelect.value);
+
+        const params = new URLSearchParams(window.location.search);
+        const prevMonth = params.get("month");
+        const prevDay = params.get("day");
+
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentDay = now.getDate();
+
+        // Actualizamos el mes seleccionado
+        params.set("month", selectedMonth);
+
+        if (selectedMonth === currentMonth) {
+            // Si volvemos al mes actual, chequear prevDay para ajustar day
+            if (prevDay && parseInt(prevDay) >= currentDay) {
+                // Mantener prevDay si es igual o mayor al día actual
+                params.set("day", prevDay);
+            } else {
+                // Caso contrario, forzar el día actual
+                params.set("day", currentDay);
+            }
+        } else {
+            // Mes distinto al actual
+            if (prevDay) {
+                params.set("day", prevDay);
+            } else {
+                params.set("day", 1);
+            }
+        }
+
+        window.location.search = params.toString();
+    }
+
+    function updateTimeSlot() {
+        const timeSlotSelect = document.getElementById("id_time_slot");
+        const selectedTimeSlot = timeSlotSelect.value;
+
+        const params = new URLSearchParams(window.location.search);
+
+        // Solo actualizamos el time_slot, sin modificar ni day ni month
+        params.set("time_slot", selectedTimeSlot);
+
+        window.location.search = params.toString();
+    }
+
+    function selectDay(dia) {
+        const params = new URLSearchParams(window.location.search);
+        params.set("day", dia);
+        window.location.search = params.toString();
+    }
 </script>
 {% endblock %}
