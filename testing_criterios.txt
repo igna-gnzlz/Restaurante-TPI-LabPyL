@@ -67,3 +67,28 @@ Simulación de cabeceras AJAX: Usar HTTP_X_REQUESTED_WITH='XMLHttpRequest'para d
 Efectos en base de datos después de llamadas POST: Por ejemplo, borrar un objeto o marcarlo como leído.
 
 Manejo adecuado de métodos HTTP: Por ejemplo, que GET no permite devolver 405.
+
+
+
+
+
+
+......................................................
+En managers...
+Validar que cada método personalizado retorna un QuerySet que cumple con el criterio esperado (ejemplo: aprobados() retorna solo reservas aprobadas).
+
+Probar todos los métodos de filtrado, ordenamiento, anotaciones y combinaciones de QuerySets para asegurar que funcionen bien con distintos datos.
+
+Crear datos de prueba representativos y variados para poder verificar correctamente cada método (reservas con estados diferentes, fechas pasadas y futuras, distintos usuarios, etc).
+
+Considere simulacros de datos controlados para métodos que dependen de utilidades como DateTimeUtils.get_local_date() y get_local_time() para evitar resultados variables temporales.
+
+Pruebe también métodos que devuelvan un solo objeto (ejemplo: proxima()) para que devuelvan el correcto o Ninguno en ausencia de datos.
+
+Cubrir tanto los métodos definidos en los QuerySets personalizados (BookingQuerySet, TimeSlotQuerySet, TableQuerySet) como los métodos expuestos a través de los managers (BookingManager, TimeSlotManager, TableManager).
+
+Asegurarse que los métodos que esperan parámetros (como del_usuario(user)) se comportan correctamente con diferentes entradas.
+
+Mantenga pruebas independientes y atómicas, que prueben un comportamiento o método por separado.
+
+Prepare un entorno de pruebas usando TestCase que cree y limpie la base de datos temporales para cada prueba.
