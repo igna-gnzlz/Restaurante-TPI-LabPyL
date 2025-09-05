@@ -134,4 +134,14 @@ class TableManager(models.Manager):
         return TableQuerySet(self.model, using=self._db)
 
     def disponibles_para_fecha_y_timeslot(self, fecha, time_slot_id):
-        return self.get_queryset().disponibles_para_fecha_y_timeslot(fecha, time_slot_id)
+        if time_slot_id is None:
+            return self.none()
+        else:
+            from bookings_app.models import Booking
+            mesas_reservadas_ids = Booking.objects.filter(
+                date=fecha,
+                time_slot_id=time_slot_id,
+                approved=True
+            ).values_list('tables__id', flat=True)
+
+            return self.exclude(id__in=mesas_reservadas_ids).distinct()
