@@ -1,0 +1,69 @@
+...............................................................
+Test para modelos "singulares" (simples)...
+Creación y guardado de instancias: Se prueba crear y guardar un objeto con datos válidos sin errores.
+
+Validación de campos: Se prueban restricciones y validaciones de cada campo (ej: longitud, formato, unicidadm valores permitidos, etc).
+
+Métodos personalizados: Si el modelo tiene métodos propios, se testea que devuelvan lo esperado.
+
+Representación y propiedades: Se verifica que el método __str__() u otras propiedades funcionen correctamente mostrando información lógica.
+
+Restricciones y relaciones foráneas: Se prueban reglas asociadas a claves foráneas o integridad referencal (ej: comportamiento ante borrados en cascada).
+
+
+...............................................................
+Test en modelos con relación muchos a muchos (M2M)...
+Aclaración: Cuando un modelo tiene relaciones M2M, los aspectos se expanden incluyendo...
+Prueba de creación asociación: Verificar que se pueden crear objetos y asociarlos correctamente a uno o varios objetos relacionados mediante la relación M2M.
+
+Gestión de la relación M2M: Se prueba agregar, eliminar, y consultar objetos asociados para comprobar que la relación funciona como se espera.
+
+Integridad y cascada: Verificar que las eliminaciones o modificaciones en objetos relacionados manejen bien la relación M2M (no queden relaciones huérfanas o inconsistentes).
+
+Consulta y acceso a través del campo M2M: Que se puedan acceder correctamente a los objetos relacionados desde ambos lados y que las consultas filttren conforme a la relación.
+
+
+
+...............................................................
+Aspectos evaluados en pruebas de vistas estándar...
+Accesibilidad de la URL: Verifique que la vista responda correctamente a una petición GET o POST según corresponda.
+
+Código de estado HTTP: Esperar respuestas 200 para acceso válido, 302 para redirecciones, etc.
+
+Uso del template adecuado: Verifique que la vista renderiza el template esperado.
+
+Contexto enviado al template: Confirmar que los datos relevantes están en el contexto.
+
+Comportamiento con datos válidos e inválidos: Probar formularios con entradas válidas e inválidas y su efecto en la vista.
+
+Redirección tras operación exitosa: Por ejemplo, tras un registro o edición exitosas, la vista redirige a la página adecuada.
+
+Validación de mensajes flash o de éxito: Confirmar que se muestran mensajes esperados tras acciones.
+
+
+..........................................................................................
+En vistas que incorporan permisos (p. ej. LoginRequiredMixin, UserPassesTestMixin)...
+Acceso para usuario no autenticado: La petición debe redireccionar un inicio de sesión (código 302 y URL con inicio de sesión).
+
+Acceso para usuario no autorizado (p. ej. no staff): Debería devolver el error 403 o redirigir (según configuración de la vista).
+
+Acceso para usuario autorizado: Debe funcionar con normalidad.
+
+Validación de permisos específicos: Probar que la condición de test_funco permisos personalizados se aplica correctamente.
+
+Redirección o mensaje correcto cuando falla la autorización.
+
+
+.........................................................
+En vistas AJAX o que devuelven JSON...
+Respuesta con JSON válida: Confirmar que la respuesta es JSON (Content-Type) y contiene los datos esperados.
+
+Código de estado adecuado: Por ejemplo, 200 para éxito, 403/401 para acceso no autorizado.
+
+Pruebas con y sin autenticación: Que usuarios no autenticados no podrán acceder, usuarios autenticados sí.
+
+Simulación de cabeceras AJAX: Usar HTTP_X_REQUESTED_WITH='XMLHttpRequest'para diferenciar petición AJAX de normal.
+
+Efectos en base de datos después de llamadas POST: Por ejemplo, borrar un objeto o marcarlo como leído.
+
+Manejo adecuado de métodos HTTP: Por ejemplo, que GET no permite devolver 405.
