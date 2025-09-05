@@ -3,7 +3,7 @@ from bookings_app.models import Table, TimeSlot, Booking
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.utils import timezone
+from bookings_app.utils import DateTimeUtils
 
 
 class TableAdminForm(forms.ModelForm):
@@ -59,7 +59,7 @@ class TimeSlotAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance.pk:
-            local_now = timezone.localtime()
+            local_now = DateTimeUtils.get_local_datetime()
             hoy = local_now.date()
             hora_actual = local_now.time()
 
@@ -115,7 +115,7 @@ class TimeSlotAdminForm(forms.ModelForm):
     
         # Validación de desasignación de mesas con reservas futuras  
         if self.instance.pk and mesas_seleccionadas is not None:
-                local_now = timezone.localtime()
+                local_now = DateTimeUtils.get_local_datetime()
                 hoy = local_now.date()
                 hora_actual = local_now.time()
 
