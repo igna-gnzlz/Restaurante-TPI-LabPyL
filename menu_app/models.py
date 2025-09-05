@@ -231,6 +231,7 @@ class Combo(models.Model):
     products = models.ManyToManyField('Product', related_name='combos')
     on_promotion = models.BooleanField(default=False)
     dicount_percentage = models.IntegerField(default=0) # 0 a 80
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -280,4 +281,12 @@ class Combo(models.Model):
 
     def clear_products(self):
         self.products.clear()
+        self.save()
+
+    def activeCombo(self):
+        self.is_active = True
+        self.save()
+    
+    def deactivaeCombo(self):
+        self.is_active=False
         self.save()
