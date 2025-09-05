@@ -3,11 +3,11 @@ from bookings_app.mixins import ClienteRequiredMixin
 from bookings_app.utils import DateTimeUtils
 from bookings_app.helpers import BookingHelpers
 from menu_app.models import Order, OrderContainsProduct
+from bookings_app.forms import MakeReservationForm
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.views.generic import ListView, FormView, DetailView
-from bookings_app.forms import MakeReservationForm
 from django.utils.crypto import get_random_string
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
