@@ -22,7 +22,19 @@ Integridad y cascada: Verificar que las eliminaciones o modificaciones en objeto
 
 Consulta y acceso a través del campo M2M: Que se puedan acceder correctamente a los objetos relacionados desde ambos lados y que las consultas filttren conforme a la relación.
 
+...............................................................
+Tambien hay que testear estos aspectos...
+Validar y probar métodos clean()y validadores personalizados que afectan la integridad de los datos.
 
+Probar propiedades calculadas o con lógica, especialmente las que dependen de variables dinámicas (fechas, horas, estados).
+
+Verificar integridad referencial avanzada: efectividad de on_deleteen relaciones foráneas y mantenimiento de consistencia en eliminaciones o actualizaciones.
+
+Testear métodos que devuelven anotaciones o resultados agregados para asegurar precisión en consultas complejas.
+
+Incluir pruebas de serialización o transformación de datos que se usan para APIs o exportación.
+
+Validar comportamiento y manejo de errores en casos límite o con datos inválidos para reforzar robustez.
 
 ...............................................................
 Aspectos evaluados en pruebas de vistas estándar...
