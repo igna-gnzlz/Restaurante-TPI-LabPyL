@@ -1,7 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
-
 from bookings_app.managers import BookingManager, TimeSlotManager, TableManager
 from bookings_app.utils import DateTimeUtils
 
@@ -96,7 +94,7 @@ class TimeSlot(models.Model):
         return self.name
     
     def is_future(self):
-        ahora = timezone.localtime().time()
+        ahora = DateTimeUtils.get_local_time()
         return self.start_time > ahora
 
     def get_label_horas(self):
