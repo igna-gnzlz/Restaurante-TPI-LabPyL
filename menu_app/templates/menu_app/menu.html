@@ -75,6 +75,30 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     z-index: 3;
   }
+  .combo-product-img {
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+    border-radius: 0.4rem;
+    margin-right: 5px;
+  }
+  .combo-products-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .combo-empty-text {
+    font-size: 2rem;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+    margin-top: 20px;
+  }
 </style>
 
 <div class="background-image"></div>
@@ -83,15 +107,16 @@
   {% if messages %}
   <div class="container mt-3">
     {% for message in messages %}
-    <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
-      role="alert">
+    <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
       {{ message }}
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endfor %}
   </div>
   {% endif %}
+
   <h1 class="text-center mb-5 title-white-outline">Menú</h1>
+
   {% for category, items in categorized_items.items %}
   <div class="category-card">
     <h3 class="mb-4 title-white-outline">{{ category.name }}</h3>
@@ -101,7 +126,7 @@
         <div class="item-card w-100">
           {% if item.on_promotion %}
           <div class="ribbon-promo">
-            ¡OFERTA DE {{ item.dicpount_percentage }}%!
+            ¡OFERTA DE {{ item.dicount_percentage }}%!
           </div>
           {% endif %}
           <div class="item-title">{{ item.name }}</div>
@@ -123,32 +148,32 @@
             {% endif %}
           </p>
           {% if item.quantity > 0 %}
-          {% if user.is_authenticated %}
-          <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
-          </form>
-          <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#modalComentar"
-            data-item-id="{{ item.id }}"
-            data-item-name="{{ item.name }}"
-            data-action-url="{% url 'menu_app:make_rating' item.id %}">
-            Comentar
-          </button>
-          <button type="button" class="btn btn-info w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#modalComentarios"
-            data-item-id="{{ item.id }}"
-            data-item-name="{{ item.name }}">
-            Ver Comentarios
-          </button>
-          {% else %}
-          <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-            class="btn btn-outline-secondary btn-click-animate w-100">
-            Iniciar sesión para pedir
-          </a>
-          {% endif %}
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
+            </form>
+            <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
+              data-bs-toggle="modal"
+              data-bs-target="#modalComentar"
+              data-item-id="{{ item.id }}"
+              data-item-name="{{ item.name }}"
+              data-action-url="{% url 'menu_app:make_rating' item.id %}">
+              Comentar
+            </button>
+            <button type="button" class="btn btn-info w-100"
+              data-bs-toggle="modal"
+              data-bs-target="#modalComentarios"
+              data-item-id="{{ item.id }}"
+              data-item-name="{{ item.name }}">
+              Ver Comentarios
+            </button>
+            {% else %}
+            <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+              class="btn btn-outline-secondary btn-click-animate w-100">
+              Iniciar sesión para pedir
+            </a>
+            {% endif %}
           {% else %}
           <button class="btn btn-secondary btn-click-animate w-100" disabled>Sin stock</button>
           {% endif %}
@@ -160,11 +185,86 @@
   {% empty %}
   <p class="text-center">No hay productos disponibles.</p>
   {% endfor %}
+
+  <!-- Card de Promociones para Combos -->
+  <div class="category-card">
+    <h3 class="mb-4 title-white-outline">Promociones</h3>
+    {% if combos %}
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+      {% for combo in combos %}
+      <div class="col d-flex align-items-stretch">
+        <div class="item-card w-100 product-card-isolated position-relative">
+          {% if combo.on_promotion %}
+          <div class="ribbon-promo">
+            ¡OFERTA DE {{ combo.dicount_percentage }}%!
+          </div>
+          {% endif %}
+          <div class="item-title">{{ combo.name }}</div>
+
+          <p>{{ combo.description }}</p>
+
+          <div class="combo-products-container">
+            {% for product in combo.products.all %}
+              {% if product.image %}
+              <img src="{{ product.image.url }}" class="combo-product-img" alt="{{ product.name }}">
+              {% else %}
+              <img src="{% static 'images/default_product.jpg' %}" class="combo-product-img" alt="Producto sin imagen">
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <p>
+            {% if combo.on_promotion and combo.dicount_percentage > 0 %}
+              <span style="text-decoration: line-through; color: gray;">${{ combo.price }}</span>
+              <span style="color: green; font-weight: bold; margin-left: 10px;">
+                ${{ combo.discounted_price|floatformat:2 }}
+              </span>
+            {% else %}
+              <strong>${{ combo.price }}</strong>
+            {% endif %}
+          </p>
+
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'menu_app:add_combo_to_order' combo.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
+          </form>
+          <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#modalComentar"
+            data-item-id="combo-{{ combo.id }}"
+            data-item-name="{{ combo.name }}"
+            data-action-url="{% url 'menu_app:make_rating_combo' combo.id %}">
+            Comentar
+          </button>
+          <button type="button" class="btn btn-info w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#modalComentarios"
+            data-item-id="combo-{{ combo.id }}"
+            data-item-name="{{ combo.name }}">
+            Ver Comentarios
+          </button>
+          {% else %}
+          <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+            class="btn btn-outline-secondary btn-click-animate w-100">
+            Iniciar sesión para pedir
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="combo-empty-text">Sin combos disponibles</p>
+    {% endif %}
+  </div>
+
   <div class="text-center mt-4">
     <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
   </div>
 </div>
 
+<!-- Modal Comentar -->
 <div class="modal fade" id="modalComentar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form method="post" action="" class="modal-content" id="ratingForm">
@@ -198,27 +298,28 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-smodalLabelecondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         <button type="submit" class="btn btn-primary">Aceptar</button>
       </div>
     </form>
   </div>
 </div>
 
+<!-- Modal Comentarios -->
 <div class="modal fade" id="modalComentarios" tabindex="-1" aria-labelledby="modalComentariosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalComentariosLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body" id="commentsModalBody">
-                </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
+  <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="modalComentariosLabel"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="commentsModalBody">
+              </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+  </div>
 </div>
 
 <script>
@@ -242,13 +343,31 @@
         },
       {% endfor %}
     {% endfor %}
+
+    {% for combo in combos %}
+    {
+      "id": "combo-{{ combo.id }}",
+      "name": "{{ combo.name }}",
+      "comments": [
+        {% for comment in combo.comments %}
+          {
+            "user": "{{ comment.user.name }} {{ comment.user.last_name }}",
+            "title": "{{ comment.title }}",
+            "text": "{{ comment.text }}",
+            "rating": {{ comment.rating }},
+            "created_at": "{{ comment.created_at|date:'d/m/Y H:i' }}"
+          },
+        {% endfor %}
+      ]
+    },
+    {% endfor %}
   ];
 
   document.addEventListener('DOMContentLoaded', function() {
     const comentarModal = document.getElementById('modalComentar');
     const comentariosModal = document.getElementById('modalComentarios');
 
-    // Lógica para el modal de Comentar
+    // Modal Comentar
     comentarModal.addEventListener('show.bs.modal', function(event) {
       const button = event.relatedTarget;
       const itemName = button.getAttribute('data-item-name');
@@ -257,26 +376,27 @@
       const form = comentarModal.querySelector('#ratingForm');
       modalTitle.textContent = `Producto: ${itemName}`;
       form.action = urlAction;
-      });
+    });
 
+    // Modal Comentarios
     comentariosModal.addEventListener('show.bs.modal', function(event) {
       const button = event.relatedTarget;
-      const itemId = parseInt(button.getAttribute('data-item-id')); // Convertir a entero
+      const itemId = button.getAttribute('data-item-id');
       const itemName = button.getAttribute('data-item-name');
 
       const modalTitle = comentariosModal.querySelector('.modal-title');
       const modalBody = comentariosModal.querySelector('#commentsModalBody');
-      
+
       modalTitle.textContent = `Comentarios de ${itemName}`;
 
       // Buscar el ítem en el array de datos
-      const itemData = allItemsData.find(item => item.id === itemId);
+      const itemData = allItemsData.find(item => item.id.toString() === itemId.toString());
 
       if (itemData && itemData.comments.length > 0) {
-        modalBody.innerHTML = ''; // Limpiar el contenido anterior
+        modalBody.innerHTML = '';
         const commentsList = document.createElement('ul');
         commentsList.className = 'list-group';
-        
+
         itemData.comments.forEach(comment => {
           const commentItem = document.createElement('li');
           commentItem.className = 'list-group-item';
