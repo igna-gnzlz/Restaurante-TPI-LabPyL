@@ -117,17 +117,9 @@ class ComboAdmin(admin.ModelAdmin):
         products_list = ", ".join([p.name for p in obj.products.all()])
         url = reverse('admin:combo-calculate-price', args=[obj.pk])
         return format_html(
-            '''
-            <button type="button" class="button" onclick="
-                if(confirm('Are you sure you want to calculate price?\nProducts in combo: {}')){
-                    window.location.href='{}';
-                }
-            ">
-                Calculate Average Price
-            </button>
-            ''',
-            products_list,
-            url
+            '<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to calculate price?\\nProducts in combo: {}\');">Calculate Average Price</a>',
+            url,
+            products_list
         )
     calculate_price_button.short_description = 'Calculate Price'
         
