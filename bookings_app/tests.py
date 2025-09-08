@@ -6,12 +6,21 @@ from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.utils import DateTimeUtils
 from bookings_app.helpers import BookingHelpers
 from bookings_app.forms import TableAdminForm, TimeSlotAdminForm, MakeReservationForm
-
+from django.urls import reverse
 from unittest.mock import patch, MagicMock
 from django.http import HttpRequest
 from datetime import date, datetime
+from django.utils.crypto import get_random_string
+from django.contrib.auth.models import Group
+from django.contrib.messages import get_messages
+
 
 User = get_user_model()
+
+
+
+
+# Testeos para los Managers
 
 class BookingManagerTest(TestCase):
 
@@ -217,6 +226,10 @@ class TableManagerTest(TestCase):
         self.assertIn(self.table3, qs)
         self.assertNotIn(self.table1, qs)  # Mesa reservada no debe aparecer
 
+
+
+
+# Testoes para los Modelos
 
 class BookingModelTest(TestCase):
 
@@ -434,6 +447,9 @@ class TimeSlotModelTest(TestCase):
         self.assertNotIn(table3, self.timeslot.tables.all())
 
 
+
+
+# Testeos para el Helper
 class TestBookingHelpers(TestCase):
     @patch('bookings_app.helpers.DateTimeUtils.get_local_datetime')
     def test_get_selected_date_from_request_defaults(self, mock_local_datetime):
@@ -551,6 +567,12 @@ class TableAdminFormTest(TestCase):
         html_output = form.as_p()
         self.assertIn(f'<input type="hidden" name="number" value="{table.number}">', html_output)
 
+
+
+
+
+# Testeos para Formularios
+
 class TimeSlotAdminFormTest(TestCase):
     def setUp(self):
         # Crear datos iniciales necesarios para las pruebas
@@ -598,3 +620,351 @@ class MakeReservationFormTest(TestCase):
         self.assertIn(f"Mesa {table.number}", label)
         self.assertIn(f"Capacidad: {table.capacity}", label)
         self.assertIn(f"Descripción: {table.description}", label)
+
+
+
+
+# Testeos para las Vistas
+
+class BookingListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+        
+        # Crear o cargar grupo esperado
+        grupo_cliente, created = Group.objects.get_or_create(name='Cliente')
+        
+        # Asignar grupo al usuario
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+        
+        cls.time_slot = TimeSlot.objects.create(name='Mañana', start_time='09:00', end_time='12:00')
+        cls.booking1 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+        cls.booking2 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=False,
+            code=get_random_string(10)
+        )
+
+    def test_redirect_if_not_logged_in(self):
+        url = reverse('bookings_app:my_reservation')  # Cambiar por el name real de la url
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    def test_logged_in_user_access(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:my_reservation')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bookings_app/my_reservation.html')
+
+        context = response.context
+        self.assertIn('proxima_reserva', context)
+        self.assertIn('card_title', context)
+        self.assertIn('reservas_futuras', context)
+        self.assertIn('reservas_pendientes', context)
+        self.assertIn('reservas_historial_aprobadas', context)
+        self.assertIn('reservas_historial_rechazadas', context)
+        self.assertIn('reservas_sin_confirmar', context)
+        self.assertIn('cantidad_pedidos_proxima_reserva', context)
+
+        # Confirmar que el queryset solo trae reservas del usuario
+        bookings = context['bookings']
+        self.assertTrue(all(b.user == self.user for b in bookings))
+
+
+class GetNextReservationViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+
+        # Asegurar que usuario tiene el grupo requerido para ClienteRequiredMixin
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Mañana', start_time='09:00', end_time='12:00')
+        cls.booking = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+
+    def test_get_next_reservation_ajax(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:get_next_reservation')
+
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        json_data = response.json()
+        self.assertIn('card_html', json_data)
+        self.assertTrue(len(json_data['card_html']) > 0)  # Confirmar que envío algo en HTML
+
+
+class GetFutureReservationsViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+
+        # Asignar usuario al grupo requerido
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Mañana', start_time='09:00', end_time='12:00')
+        # Crear reservas aprobadas y futuras
+        cls.booking1 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+        cls.booking2 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+
+    def test_get_future_reservations_ajax(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:get_future_reservations')
+
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        json_data = response.json()
+        self.assertIn('card_html', json_data)
+        self.assertTrue(len(json_data['card_html']) > 0)  # Confirmar que html no está vacío
+
+
+class GetPendingReservationsViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+
+        # Asignar usuario al grupo para pasar ClienteRequiredMixin
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Tarde', start_time='15:00', end_time='18:00')
+        cls.booking1 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=False,  # Pendiente
+            code=get_random_string(10)
+        )
+        cls.booking2 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=False,  # Pendiente
+            code=get_random_string(10)
+        )
+
+    def test_get_pending_reservations_ajax(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:get_pending_reservations')
+
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        json_data = response.json()
+        self.assertIn('card_html', json_data)
+        self.assertTrue(len(json_data['card_html']) > 0)  # Validar html renderizado
+
+
+class GetHistoryAprobadasViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+
+        # Asignar usuario al grupo requerido para pasar ClienteRequiredMixin
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Noche', start_time='20:00', end_time='23:00')
+        # Crear reservas aprobadas para historial
+        cls.booking1 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+        cls.booking2 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+
+    def test_get_history_aprobadas_ajax(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:get_history_aprobadas')
+
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        json_data = response.json()
+        self.assertIn('card_html', json_data)
+        self.assertTrue(len(json_data['card_html']) > 0)  # Validar HTML no vacío
+
+
+class GetHistoryRechazadasViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+
+        # Asignar grupo Cliente para pasar ClienteRequiredMixin
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Mañana', start_time='09:00', end_time='12:00')
+        # Crear reservas rechazadas
+        cls.booking1 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=False,
+            code=get_random_string(10)
+        )
+        cls.booking2 = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=False,
+            code=get_random_string(10)
+        )
+
+    def test_get_history_rechazadas_ajax(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:get_history_rechazadas')
+
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        json_data = response.json()
+        self.assertIn('card_html', json_data)
+        self.assertTrue(len(json_data['card_html']) > 0)
+
+
+class DeleteBookingViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        cls.time_slot = TimeSlot.objects.create(name='Tarde', start_time='15:00', end_time='18:00')
+        cls.booking = Booking.objects.create(
+            user=cls.user,
+            time_slot=cls.time_slot,
+            approved=True,
+            code=get_random_string(10)
+        )
+
+    def test_delete_booking(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:delete_booking', kwargs={'pk': self.booking.pk})
+
+        response = self.client.post(url)
+
+        # Test que la respuesta es JSON y success True
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertJSONEqual(response.content, {'success': True})
+
+        # Test que el objeto Booking fue eliminado
+        self.assertFalse(Booking.objects.filter(pk=self.booking.pk).exists())
+
+    def test_delete_booking_not_owner(self):
+        # Otro usuario intenta borrar reserva que no es suya
+        otro_usuario = User.objects.create_user(username='otro', password='testpass123')
+        self.client.login(username='otro', password='testpass123')
+        url = reverse('bookings_app:delete_booking', kwargs={'pk': self.booking.pk})
+
+        response = self.client.post(url)
+        
+        # Debe obtener 404 porque no pertenece al usuario logueado
+        self.assertEqual(response.status_code, 403)
+
+
+class MakeReservationViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='cliente', password='testpass123')
+        grupo_cliente, _ = Group.objects.get_or_create(name='Cliente')
+        cls.user.groups.add(grupo_cliente)
+        cls.user.save()
+
+        # Crear tablas y franjas horarias para usar en los tests
+        cls.table1 = Table.objects.create(number=1, capacity=4, description='Mesa 1')
+        cls.table2 = Table.objects.create(number=2, capacity=4, description='Mesa 2')
+        cls.time_slot = TimeSlot.objects.create(name='Mañana', start_time='10:00', end_time='12:00')
+
+    def setUp(self):
+        self.client.login(username='cliente', password='testpass123')
+        session = self.client.session
+        session.save()
+
+    def test_get_view_authenticated(self):
+        self.client.login(username='cliente', password='testpass123')
+        url = reverse('bookings_app:make_reservation')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'bookings_app/make_reservation.html')
+
+    def test_get_view_redirect_if_not_logged_in(self):
+        self.client.logout()
+        url = reverse('bookings_app:make_reservation')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    @patch('bookings_app.helpers.BookingHelpers.get_selected_date_from_request')
+    @patch('bookings_app.helpers.BookingHelpers.get_selected_timeslot_from_request')
+    @patch('bookings_app.helpers.BookingHelpers.generar_codigo_reserva')
+    @patch('bookings_app.models.Booking.objects.del_usuario')
+    def test_post_form_valid_creates_booking(self, mock_del_usuario, mock_generar_codigo, mock_get_selected_timeslot, mock_get_selected_date):
+        self.client.login(username='cliente', password='testpass123')
+        mock_del_usuario.return_value.pendientes.return_value.exists.return_value = False
+        mock_generar_codigo.return_value = 'ABC1234567'
+        mock_get_selected_date.return_value = date(2025, 9, 20)
+
+        mock_time_slot = MagicMock()
+        mock_time_slot.id = self.time_slot.id  # Usar id real
+        mock_get_selected_timeslot.return_value = mock_time_slot
+
+        url = reverse('bookings_app:make_reservation')
+
+        post_data = {
+            'time_slot': self.time_slot.id,
+            'tables': [self.table1.id, self.table2.id],
+            'observations': 'Test reservation'
+        }
+
+        response = self.client.post(url, post_data, follow=True)
+
+        self.assertRedirects(response, reverse('bookings_app:my_reservation'))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any('Reserva solicitada con éxito' in str(message) for message in messages))
