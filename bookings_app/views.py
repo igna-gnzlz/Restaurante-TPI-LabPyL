@@ -8,7 +8,6 @@ from bookings_app.forms import MakeReservationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.views.generic import ListView, FormView, DetailView
-from django.utils.crypto import get_random_string
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -198,7 +197,7 @@ class DeleteOrderView(View):
         return redirect('bookings_app:reservation_orders', booking_pk)
 
 
-class MakeReservationView(ClienteRequiredMixin, FormView):
+class MakeReservationView(LoginRequiredMixin, ClienteRequiredMixin, FormView):
     template_name = "bookings_app/make_reservation.html"
     form_class = MakeReservationForm
     success_url = reverse_lazy("bookings_app:my_reservation")
