@@ -104,3 +104,23 @@ Asegurarse que los métodos que esperan parámetros (como del_usuario(user)) se 
 Mantenga pruebas independientes y atómicas, que prueben un comportamiento o método por separado.
 
 Prepare un entorno de pruebas usando TestCase que cree y limpie la base de datos temporales para cada prueba.
+
+
+
+..........................................
+Para bookings_app/helpers.py  ....
+
+Aspectos generales a evaluar en ayudantes
+Validación correcta de entradas: Que los parámetros recibidos (como request.GETo listas/querysets) sean interpretados y manejados correctamente, incluso con valores inválidos o nulos.
+
+Comportamiento esperado en casos borde o excepciones: Por ejemplo, cuando se dan fechas no válidas, o ids que no existen en el filtro.
+
+Devolución del tipo de dato correcto: Validar que el método retorna el tipo esperado (fecha, lista de diccionarios, lista de strings, tuplas, etc).
+
+Correcta manipulación y cálculo de datos: Confirmar que la lógica para calcular meses disponibles o el calendario del mes es correcta.
+
+Cobertura de variantes y validación de resultados: Probar diferentes escenarios, como fechas distintas a hoy, disponibilidad total o parcial, y múltiples opciones de franja horaria.
+
+Integración con otros modelos o utilidades: Que se integra correctamente con modelos ( Booking) o utilidades ( DateTimeUtils), por ejemplo en generación de código único.
+
+Seguridad y unicidad: En el caso del método que genera código, validar que se genera código válido y nunca repetir (mockear la consulta a DB para simulación).
