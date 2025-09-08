@@ -5,6 +5,7 @@ from datetime import timedelta, time
 from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.utils import DateTimeUtils
 from bookings_app.helpers import BookingHelpers
+from bookings_app.forms import TableAdminForm, TimeSlotAdminForm, MakeReservationForm
 
 from unittest.mock import patch, MagicMock
 from django.http import HttpRequest
@@ -463,7 +464,7 @@ class TestBookingHelpers(TestCase):
             def __init__(self, id):
                 self.id = id
         
-        
+
         timeslot1 = DummyTimeslot(1)
         timeslot2 = DummyTimeslot(2)
 
@@ -540,3 +541,60 @@ class TestBookingHelpers(TestCase):
             codigo = BookingHelpers.generar_codigo_reserva()
         self.assertEqual(codigo, 'UNIQUE123')
         self.assertEqual(len(codigo), 9)
+
+
+class TableAdminFormTest(TestCase):
+    def test_number_field_disabled_and_hidden(self):
+        table = Table.objects.create(number=1, capacity=4)
+        form = TableAdminForm(instance=table)
+        self.assertTrue(form.fields['number'].disabled)
+        html_output = form.as_p()
+        self.assertIn(f'<input type="hidden" name="number" value="{table.number}">', html_output)
+
+class TimeSlotAdminFormTest(TestCase):
+    def setUp(self):
+        # Crear datos iniciales necesarios para las pruebas
+        self.tables = [Table.objects.create(number=i, capacity=4) for i in range(1, 4)]
+        self.time_slot = TimeSlot.objects.create(name="Mañana", start_time="09:00", end_time="12:00")
+        self.time_slot.tables.set(self.tables)
+    
+    def test_clean_validate_time_overlap(self):
+        form_data = {
+            'name': 'Tarde',
+            'start_time': '11:00',
+            'end_time': '14:00',
+            'tables': [self.tables[0].id]
+        }
+        form = TimeSlotAdminForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('El horario se superpone con las siguientes franjas:', form.errors['__all__'][0])
+
+    def test_clean_requires_at_least_one_table(self):
+        form_data = {
+            'name': 'Noche',
+            'start_time': '18:00',
+            'end_time': '21:00',
+            'tables': []
+        }
+        form = TimeSlotAdminForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Debe asignar al menos una mesa a la franja horaria.', form.errors['__all__'][0])
+
+
+class MakeReservationFormTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.table1 = Table.objects.create(number=1, capacity=4, description="Mesa VIP")
+        cls.table2 = Table.objects.create(number=2, capacity=6, description="Mesa Patio")
+
+    def test_queryset_assignment_and_labels(self):
+        tables_queryset = Table.objects.all()
+        form = MakeReservationForm(available_tables=tables_queryset)
+
+        self.assertEqual(list(form.fields['tables'].queryset), list(tables_queryset))
+        
+        table = tables_queryset.first()
+        label = form.get_table_label(table)
+        self.assertIn(f"Mesa {table.number}", label)
+        self.assertIn(f"Capacidad: {table.capacity}", label)
+        self.assertIn(f"Descripción: {table.description}", label)
