@@ -4,7 +4,11 @@ from django.utils import timezone
 from datetime import timedelta, time
 from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.utils import DateTimeUtils
+from bookings_app.helpers import BookingHelpers
 
+from unittest.mock import patch, MagicMock
+from django.http import HttpRequest
+from datetime import date, datetime
 
 User = get_user_model()
 
@@ -427,3 +431,112 @@ class TimeSlotModelTest(TestCase):
 
         self.timeslot.tables.remove(table3)
         self.assertNotIn(table3, self.timeslot.tables.all())
+
+
+class TestBookingHelpers(TestCase):
+    @patch('bookings_app.helpers.DateTimeUtils.get_local_datetime')
+    def test_get_selected_date_from_request_defaults(self, mock_local_datetime):
+        mock_local_datetime.return_value = datetime(2025, 9, 8)
+        request = HttpRequest()
+        request.GET = {}
+        result = BookingHelpers.get_selected_date_from_request(request)
+        self.assertEqual(result, date(2025, 9, 8))
+
+    @patch('bookings_app.helpers.DateTimeUtils.get_local_datetime')
+    def test_get_selected_date_from_request_with_params(self, mock_local_datetime):
+        mock_local_datetime.return_value = datetime(2025, 9, 8)
+        request = HttpRequest()
+        request.GET = {'month': '10', 'day': '15'}
+        result = BookingHelpers.get_selected_date_from_request(request)
+        self.assertEqual(result, date(2025, 10, 15))
+
+    @patch('bookings_app.helpers.DateTimeUtils.get_local_datetime')
+    def test_get_selected_date_from_request_day_exceeds_max(self, mock_local_datetime):
+        mock_local_datetime.return_value = datetime(2025, 2, 1)
+        request = HttpRequest()
+        request.GET = {'month': '2', 'day': '31'}  # Feb max 28/29
+        result = BookingHelpers.get_selected_date_from_request(request)
+        self.assertEqual(result, date(2025, 2, 28))
+
+    def test_get_selected_timeslot_from_request(self):
+        class DummyTimeslot:
+            def __init__(self, id):
+                self.id = id
+        
+        
+        timeslot1 = DummyTimeslot(1)
+        timeslot2 = DummyTimeslot(2)
+
+        filtered_mock = MagicMock()
+        filtered_mock.exists.return_value = True
+
+        available_timeslots = MagicMock()
+        available_timeslots.filter.return_value = filtered_mock
+        available_timeslots.get.return_value = timeslot1
+        available_timeslots.first.return_value = timeslot2
+
+        request = HttpRequest()
+
+        # Caso parámetro inválido - debería devolver first()
+        request.GET = {'time_slot': 'abc'}
+        result = BookingHelpers.get_selected_timeslot_from_request(request, available_timeslots)
+        self.assertEqual(result.id, 2)
+
+        # Caso parámetro válido - debería devolver get()
+        request.GET = {'time_slot': '1'}
+        result = BookingHelpers.get_selected_timeslot_from_request(request, available_timeslots)
+        self.assertEqual(result.id, 1)
+    
+    def test_get_available_months(self):
+        today = date(2025, 9, 15)
+        months = BookingHelpers.get_available_months(today)
+        expected_names = ["Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        self.assertEqual([m['nombre'] for m in months], expected_names)
+        self.assertEqual([m['numero'] for m in months], [9, 10, 11, 12])
+
+    def test_get_weekdays(self):
+        weekdays = BookingHelpers.get_weekdays()
+        self.assertEqual(weekdays, ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"])
+
+    def test_get_month_calendar(self):
+        cal = BookingHelpers.get_month_calendar(2025, 9)
+        self.assertIsInstance(cal, list)
+        for week in cal:
+            self.assertIsInstance(week, list)
+
+    @patch('bookings_app.helpers.DateTimeUtils.get_local_date')
+    def test_get_availability_status(self, mock_get_local_date):
+        mock_get_local_date.return_value = date(2025, 9, 8)
+
+        time_slots = MagicMock()
+        time_slots.exists.return_value = False
+        available_tables = MagicMock()
+        available_tables.exists.return_value = False
+
+        msg = BookingHelpers.get_availability_status(date(2025, 9, 8), time_slots, available_tables)
+        self.assertFalse(msg[2])
+        self.assertIn("NO SE PUEDEN HACER MAS RESERVAS", msg[0])
+
+        available_tables.exists.return_value = True
+        msg = BookingHelpers.get_availability_status(date(2025, 9, 7), time_slots, available_tables)
+        self.assertTrue(msg[2])
+        self.assertEqual(msg[0], "Mesas Disponibles")
+
+        available_tables.exists.return_value = False
+        time_slots.exists.return_value = True
+        msg = BookingHelpers.get_availability_status(date(2025, 9, 7), time_slots, available_tables)
+        self.assertFalse(msg[2])
+        self.assertIn("FRANJA HORARIA COMPLETA", msg[0])
+
+    @patch('bookings_app.helpers.get_random_string')
+    def test_generar_codigo_reserva_unique(self, mock_get_random_string):
+        mock_get_random_string.side_effect = ['ABC123XYZ', 'UNIQUE123']
+
+        with patch('bookings_app.helpers.Booking.objects.filter') as mock_filter:
+            mock_filter.side_effect = [
+                MagicMock(exists=lambda: True),
+                MagicMock(exists=lambda: False)
+            ]
+            codigo = BookingHelpers.generar_codigo_reserva()
+        self.assertEqual(codigo, 'UNIQUE123')
+        self.assertEqual(len(codigo), 9)
