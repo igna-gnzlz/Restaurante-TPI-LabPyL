@@ -36,6 +36,15 @@ Incluir pruebas de serialización o transformación de datos que se usan para AP
 
 Validar comportamiento y manejo de errores en casos límite o con datos inválidos para reforzar robustez.
 
+
+
+
+
+
+
+
+
+
 ...............................................................
 Aspectos evaluados en pruebas de vistas estándar...
 Accesibilidad de la URL: Verifique que la vista responda correctamente a una petición GET o POST según corresponda.
@@ -85,6 +94,10 @@ Manejo adecuado de métodos HTTP: Por ejemplo, que GET no permite devolver 405.
 
 
 
+
+
+
+
 ......................................................
 En managers...
 Validar que cada método personalizado retorna un QuerySet que cumple con el criterio esperado (ejemplo: aprobados() retorna solo reservas aprobadas).
@@ -107,6 +120,16 @@ Prepare un entorno de pruebas usando TestCase que cree y limpie la base de datos
 
 
 
+
+
+
+
+
+
+
+
+
+
 ..........................................
 Para bookings_app/helpers.py  ....
 
@@ -124,6 +147,14 @@ Cobertura de variantes y validación de resultados: Probar diferentes escenarios
 Integración con otros modelos o utilidades: Que se integra correctamente con modelos ( Booking) o utilidades ( DateTimeUtils), por ejemplo en generación de código único.
 
 Seguridad y unicidad: En el caso del método que genera código, validar que se genera código válido y nunca repetir (mockear la consulta a DB para simulación).
+
+
+
+
+
+
+
+
 
 
 
