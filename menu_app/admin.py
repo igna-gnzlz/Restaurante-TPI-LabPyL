@@ -1,6 +1,27 @@
 from django.contrib import admin
 from .models import Product, Category, Order,Combo,Rating
 
+#Librerias importadas para calculo de precio de combo
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import path
+from django.contrib import messages
+from django.urls import reverse
+from django.utils.html import format_html
+from django.contrib.admin.views.decorators import staff_member_required
+
+
+#Vista personalizada
+@staff_member_required
+def calculate_combo_price_view(request, pk):
+    combo = get_object_or_404(Combo, pk=pk)
+    try:
+        new_price = combo.CalculateComboPrice()
+        combo.price = new_price
+        combo.save()
+        messages.success(request, f'Price calculated successfully: {new_price:.2f}')
+    except ValueError as e:
+        messages.warning(request, str(e))
+    return redirect(f'/admin/menu_app/combo/{pk}/change/')
 
 class MenuAdmin(admin.ModelAdmin):
     ##########Se agrego los campos on_promotion y dicount_percentage
@@ -54,6 +75,54 @@ class ComboAdmin(admin.ModelAdmin):
         for combo in queryset:
             combo.setPromotion(False)
         self.message_user(request, 'Promociones removidas de combos seleccionados.')
+
+    #Actualizar precio en base a los productos
+    @admin.site.admin_view
+    def calculate_combo_price(self, request, pk):
+        combo = get_object_or_404(Combo, pk=pk)
+        try:
+            new_price = combo.CalculateComboPrice()
+            combo.price = new_price
+            combo.save()
+            self.message_user(request, f'Price calculated successfully: {new_price:.2f}', level=messages.SUCCESS)
+        except ValueError as e:
+            self.message_user(request, str(e), level=messages.WARNING)
+        return redirect(f'../{pk}/change/')
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<int:pk>/calculate-price/',
+                calculate_combo_price_view,
+                name='combo-calculate-price',
+            ),
+        ]
+        return custom_urls + urls
+    
+    readonly_fields = ['calculate_price_button']
+    fields = (
+        'name',
+        'description',
+        'products',
+        'price',
+        'on_promotion',
+        'dicount_percentage',
+        'is_active',
+        'calculate_price_button',  # Aquí se muestra el botón, solo 1 vez
+    )
+    def calculate_price_button(self, obj):
+        if not obj.pk:
+            return ''
+        products_list = ", ".join([p.name for p in obj.products.all()])
+        url = reverse('admin:combo-calculate-price', args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}" onclick="return confirm(\'Are you sure you want to calculate price?\\nProducts in combo: {}\');">Calculate Average Price</a>',
+            url,
+            products_list
+        )
+    calculate_price_button.short_description = 'Calculate Price'
+        
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

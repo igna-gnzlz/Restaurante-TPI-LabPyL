@@ -290,3 +290,11 @@ class Combo(models.Model):
     def deactivaeCombo(self):
         self.is_active=False
         self.save()
+
+    def CalculateComboPrice(self):
+        products = self.products.all()
+        if not products.exists():
+            raise ValueError("Sin productos para calcular")
+        total_price = sum([product.price for product in products])
+        average_price = total_price / products.count()
+        return average_price
