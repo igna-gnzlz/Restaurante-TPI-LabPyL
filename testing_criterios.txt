@@ -124,3 +124,41 @@ Cobertura de variantes y validación de resultados: Probar diferentes escenarios
 Integración con otros modelos o utilidades: Que se integra correctamente con modelos ( Booking) o utilidades ( DateTimeUtils), por ejemplo en generación de código único.
 
 Seguridad y unicidad: En el caso del método que genera código, validar que se genera código válido y nunca repetir (mockear la consulta a DB para simulación).
+
+
+Aspectos para evaluar en tests para form.py
+Validación de campos y datos
+
+Probar que cada formulario sea válido con datos correctos os.
+
+Probar que cada formulario sea inválido con datosincorrectos o incompletos.
+
+En ModelForms con campos deshabilitados (como numberen TableAdminForm), verifique que el valor se mantengacorrectamentedesde el inicioo instancia.
+
+Probar validaciones personalizadas en métodos clean, por ejemplo en TimeSlotAdminForm.clean:
+
+Verifique que el nombre de franja no se repita.
+
+Validar que start_timesea antes que end_time.
+
+Probar que no se solapen franjas horas arias.
+
+Validar que al menos una mesa esté asignada.
+
+Validar que no se puedan desasignar mesas con reservas futuras.
+
+Campos con widgets específicos
+
+Verificar que el widget usado es el correcto (p.ej. FilteredSelectMultipleen TimeSlotAdminForm).
+
+Probar que los campos del formulario tengan el queryset esperado (p.ej. tablesen MakeReservationFormrecibe queryset dinámico).
+
+Inicialización y comportamiento del formulario
+
+Probar el constructor __init__cuando reciba argumentos personalizados (ej. en MakeReservationFormcon available_tables).
+
+Verificar etiquetas personalizadas o funciones como label_from_instance.
+
+Renderizado personalizado
+
+En TableAdminForm.as_p, probar que el renderizado incluye el campo ocultoo con el valor correcto y el campo visible esté deshabilitado.
