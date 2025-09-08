@@ -126,39 +126,29 @@ Integración con otros modelos o utilidades: Que se integra correctamente con mo
 Seguridad y unicidad: En el caso del método que genera código, validar que se genera código válido y nunca repetir (mockear la consulta a DB para simulación).
 
 
-Aspectos para evaluar en tests para form.py
-Validación de campos y datos
 
-Probar que cada formulario sea válido con datos correctos os.
+......................................................
+Aspectos para evaluar en tests para form.py ....
+Campos del formulario:
 
-Probar que cada formulario sea inválido con datosincorrectos o incompletos.
+Que el formulario tenga los campos esperados definidos.
 
-En ModelForms con campos deshabilitados (como numberen TableAdminForm), verifique que el valor se mantengacorrectamentedesde el inicioo instancia.
+Que las etiquetas (labels), textos de ayuda (help_text) y widgets sean correctos para cada campo.
 
-Probar validaciones personalizadas en métodos clean, por ejemplo en TimeSlotAdminForm.clean:
+Validaciones:
 
-Verifique que el nombre de franja no se repita.
+Probar las validaciones personalizadas definidas en métodos clean_ <campo> () y clean().
 
-Validar que start_timesea antes que end_time.
+Verifique que los mensajes de error se generen correctamente para datos inválidos.
 
-Probar que no se solapen franjas horas arias.
+Validar que el formulario sea válido para datos correctos y no válido para datos incorrectos o incompletos.
 
-Validar que al menos una mesa esté asignada.
+Inicialización y comportamiento:
 
-Validar que no se puedan desasignar mesas con reservas futuras.
+Comprobar el comportamiento del constructor init si recibe parámetros personalizados que modifican campos o conjuntos de consultas.
 
-Campos con widgets específicos
+Asegúrese de que los campos deshabilitados funcionen correctamente (como mantener los valores iniciales aunque estén desactivados).
 
-Verificar que el widget usado es el correcto (p.ej. FilteredSelectMultipleen TimeSlotAdminForm).
+Renderizado:
 
-Probar que los campos del formulario tengan el queryset esperado (p.ej. tablesen MakeReservationFormrecibe queryset dinámico).
-
-Inicialización y comportamiento del formulario
-
-Probar el constructor __init__cuando reciba argumentos personalizados (ej. en MakeReservationFormcon available_tables).
-
-Verificar etiquetas personalizadas o funciones como label_from_instance.
-
-Renderizado personalizado
-
-En TableAdminForm.as_p, probar que el renderizado incluye el campo ocultoo con el valor correcto y el campo visible esté deshabilitado.
+Verificar renderizados personalizados (como el método as_p que agrega campos ocultos con valores).
