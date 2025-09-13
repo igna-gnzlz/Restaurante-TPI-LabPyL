@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-3">{{ combo.name }}</h2>
+            <p>{{ combo.description }}</p>
+            <h4 class="text">
+                Precio: 
+                {% if combo.on_promotion and combo.dicount_percentage > 0 %}
+                    <span class="text-decoration-line-through">${{ combo.price }}</span>
+                    <span class="text-danger">${{ combo.discounted_price }}</span>
+                    <small class="text-success">Descuento {{ combo.dicount_percentage }}%</small>
+                {% else %}
+                    ${{ combo.price }}
+                {% endif %}
+            </h4>
+            <hr>
+            <h5>Productos incluidos en este combo:</h5>
+            <ul class="list-group">
+                {% for product in combo.products.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ product.name }}
+                    <span>${{ product.price }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item">No hay productos en este combo.</li>
+                {% endfor %}
+            </ul>
+            <hr>
+            {% if combo.is_active %}
+                <span class="badge bg-success">Combo activo</span>
+            {% else %}
+                <span class="badge bg-secondary">Combo inactivo</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'menu_app:combo_list' %}" class="btn btn-primary">Volver a los combos</a>
+    </div>
+</div>
+{% endblock %}

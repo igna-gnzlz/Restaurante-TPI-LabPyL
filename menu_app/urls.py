@@ -4,6 +4,7 @@ from menu_app.views import (
     ProductDetailView,
     AddToOrderView,
     MakeRatingView,
+    AddComboToOrderView
 
 )
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path('add-to-order/<int:pk>/', AddToOrderView.as_view(), name='add_to_order'),
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
     path("make_rating/<int:product_id>/", MakeRatingView.as_view(), name="make_rating"),
+    path('add-combo/<int:pk>/', AddComboToOrderView.as_view(), name='add_combo_to_order'),
 ]

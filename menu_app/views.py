@@ -61,10 +61,13 @@ class MenuListView(ListView):
                 
         context['categorized_items'] = categorized_items
         context['rating_form'] = RatingForm()
+        context['combos'] = Combo.objects.all()
         return context
         
-
-
+class ComboDetailView(ListView):
+    model = Combo
+    template_name = 'menu_app/combo_detail.html'
+    context_object_name= 'combo'
 
 
 class HomeView(TemplateView):
@@ -166,6 +169,31 @@ class AddToOrderView(LoginRequiredMixin, View):
 
         #messages.success(request, f'Se agregó "{product.name}" al pedido.')
         return redirect(f"{reverse('menu_app:menu')}#producto-{product.id}")
+
+class AddComboToOrderView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        combo = get_object_or_404(Combo, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        if not booking_selected_id:
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        combo_key = f"combo_{combo.id}"  # prefijo para distinguir combos de productos
+
+        if booking_key not in cart:
+            cart[booking_key] = {}
+
+        if combo_key in cart[booking_key]:
+            cart[booking_key][combo_key]['quantity'] += 1
+        else:
+            cart[booking_key][combo_key] = {'quantity': 1}
+
+        request.session['cart'] = cart
+        request.session.modified = True
+
+        return redirect(f"{reverse('menu_app:menu')}#combo-{combo.id}")
         
 
 
