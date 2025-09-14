@@ -172,6 +172,16 @@ class OrderContainsProduct(models.Model):
         self.subtotal = self.product.price * self.quantity
         super().save(*args, **kwargs)
 
+class OrderContainsCombo(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    combo = models.ForeignKey('Combo', on_delete=models.CASCADE, null=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def save(self, *args, **kwargs):
+        self.subtotal = self.combo.price * self.quantity
+        super().save(*args, **kwargs)
+
 class Rating(models.Model):
     title = models.CharField(max_length=15)
     text = models.TextField()

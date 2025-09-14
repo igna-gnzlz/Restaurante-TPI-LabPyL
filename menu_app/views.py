@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, ListView, DetailView, FormView
-from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating,Combo
+from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating, Combo, OrderContainsCombo
 from menu_app.forms import RatingForm
 from accounts_app.models import User
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,7 +8,7 @@ from bookings_app.models import Booking
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.views import View
-
+from django.utils.timezone import now
 
 
 class MakeRatingView(FormView):
@@ -227,8 +227,6 @@ class DecrementFromCartView(LoginRequiredMixin, View):
 
 class ConfirmOrderView(LoginRequiredMixin, View):
     def post(self, request):
-        from django.utils.timezone import now
-
         booking_selected_id = request.session.get('booking_selected_id')
         if not booking_selected_id:
             messages.warning(request, "Debe seleccionar una reserva para confirmar un pedido.")
@@ -253,32 +251,54 @@ class ConfirmOrderView(LoginRequiredMixin, View):
         )
 
         total = 0
-        for product_id, data in booking_selected_cart.items():
-            product = get_object_or_404(Product, id=product_id)
-            quantity = data['quantity']
+        for item_key, data in booking_selected_cart.items():
+            quantity = data.get('quantity', 1)
 
-            order_product = OrderContainsProduct.objects.create(
-                order=order,
-                product=product,
-                quantity=quantity,
-                # El subtotal se calculará automáticamente en el método save de OrderContainsProduct
-            )
+            if item_key.startswith('combo_'):
+                # Es un combo
+                try:
+                    combo_id = int(item_key.replace('combo_', ''))
+                    combo = get_object_or_404(Combo, id=combo_id)
 
-            # Decrementar stock
-            product.quantity -= quantity
-            product.save()
+                    order_combo = OrderContainsCombo.objects.create(
+                        order=order,
+                        combo=combo,
+                        quantity=quantity,
+                    )
 
-            # Refresco desde la BD para asegurar que el subtotal se calcule correctamente
-            order_product.refresh_from_db()
-            # Sumar subtotales de productos al total de la orden
-            total += order_product.subtotal
+                    order_combo.refresh_from_db()
+                    total += order_combo.subtotal
+
+                except (ValueError, Combo.DoesNotExist):
+                    continue  # Ignora si hay algún problema
+
+            else:
+                # Es un producto
+                try:
+                    product_id = int(item_key)
+                    product = get_object_or_404(Product, id=product_id)
+
+                    # Descontar stock
+                    product.quantity -= quantity
+                    product.save()
+
+                    order_product = OrderContainsProduct.objects.create(
+                        order=order,
+                        product=product,
+                        quantity=quantity,
+                    )
+
+                    order_product.refresh_from_db()
+                    total += order_product.subtotal
+
+                except (ValueError, Product.DoesNotExist):
+                    continue
 
         order.amount = total
         order.save()
 
-        # Vaciar carrito de esa reserva
-        cart.pop(str(booking_selected_id))
-        # Actualizar la sesión
+        # Limpiar el carrito para esa reserva
+        cart.pop(str(booking_selected_id), None)
         request.session['cart'] = cart
         request.session.modified = True
 

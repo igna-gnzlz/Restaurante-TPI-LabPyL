@@ -1,4 +1,4 @@
-from menu_app.models import Product
+from menu_app.models import Product, Combo
 
 def get_cart_items_and_total(session, booking_id):
     cart = session.get('cart', {})
@@ -6,18 +6,39 @@ def get_cart_items_and_total(session, booking_id):
     total = 0
 
     products_data = cart.get(str(booking_id), {})
-    for product_id, data in products_data.items():
-        try:
-            product = Product.objects.get(id=product_id)
-            quantity = data['quantity']
-            subtotal = product.price * quantity
-            total += subtotal
-            items.append({
-                'product': product,
-                'quantity': quantity,
-                'subtotal': subtotal
-            })
-        except Product.DoesNotExist:
-            continue
+    for item_key, data in products_data.items():
+        quantity = data.get('quantity', 1)
+
+        # Verificar si es un combo
+        if item_key.startswith('combo_'):
+            try:
+                combo_id = int(item_key.replace('combo_', ''))
+                combo = Combo.objects.get(id=combo_id)
+                subtotal = combo.price * quantity
+                total += subtotal
+                items.append({
+                    'item': combo,
+                    'type': 'combo',
+                    'quantity': quantity,
+                    'subtotal': subtotal
+                })
+            except (Combo.DoesNotExist, ValueError):
+                continue
+
+        else:
+            # Procesar como producto
+            try:
+                product_id = int(item_key)
+                product = Product.objects.get(id=product_id)
+                subtotal = product.price * quantity
+                total += subtotal
+                items.append({
+                    'item': product,
+                    'type': 'product',
+                    'quantity': quantity,
+                    'subtotal': subtotal
+                })
+            except (Product.DoesNotExist, ValueError):
+                continue
 
     return items, total

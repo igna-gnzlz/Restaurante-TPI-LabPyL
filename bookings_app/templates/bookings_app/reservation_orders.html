@@ -38,6 +38,17 @@
                 </li>
                 {% endfor %}
             </ul>
+            <h6 class="mt-3">Combos:</h6>
+            <ul class="list-group">
+                {% for combo_item in pedido.combos %}
+                <li class="list-group-item d-flex justify-content-between">
+                    {{ combo_item.combo.name }} x {{ combo_item.quantity }}
+                    <span>${{ combo_item.subtotal }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item">No hay combos en este pedido.</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
     {% endfor %}

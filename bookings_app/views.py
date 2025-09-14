@@ -2,7 +2,7 @@ from bookings_app.models import Booking, TimeSlot, Table
 from bookings_app.mixins import ClienteRequiredMixin
 from bookings_app.utils import DateTimeUtils
 from bookings_app.helpers import BookingHelpers
-from menu_app.models import Order, OrderContainsProduct
+from menu_app.models import Order, OrderContainsProduct, OrderContainsCombo
 from bookings_app.forms import MakeReservationForm
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -163,7 +163,7 @@ class ReservationOrdersView(LoginRequiredMixin, DetailView):
         # Enlazar productos
         for pedido in pedidos:
             pedido.items = OrderContainsProduct.objects.filter(order=pedido).select_related('product')
-
+            pedido.combos = OrderContainsCombo.objects.filter(order=pedido).select_related('combo')
         context['pedidos'] = pedidos
         return context
     
