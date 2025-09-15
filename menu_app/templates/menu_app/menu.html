@@ -187,76 +187,73 @@
   {% endfor %}
 
   <!-- Card de Promociones para Combos -->
-  <div class="category-card">
-    <h3 class="mb-4 title-white-outline">Promociones</h3>
-    {% if combos %}
-    <div class="row row-cols-1 row-cols-md-3 g-3">
-      {% for combo in combos %}
-      <div class="col d-flex align-items-stretch">
-        <div class="item-card w-100 product-card-isolated position-relative">
-          {% if combo.on_promotion %}
-          <div class="ribbon-promo">
-            ¡OFERTA DE {{ combo.dicount_percentage }}%!
-          </div>
-          {% endif %}
-          <div class="item-title">{{ combo.name }}</div>
-
-          <p>{{ combo.description }}</p>
-
-          <div class="combo-products-container">
-            {% for product in combo.products.all %}
-              {% if product.image %}
-              <img src="{{ product.image.url }}" class="combo-product-img" alt="{{ product.name }}">
-              {% else %}
-              <img src="{% static 'images/default_product.jpg' %}" class="combo-product-img" alt="Producto sin imagen">
-              {% endif %}
-            {% endfor %}
-          </div>
-
-          <p>
-            {% if combo.on_promotion and combo.dicount_percentage > 0 %}
-              <span style="text-decoration: line-through; color: gray;">${{ combo.price }}</span>
-              <span style="color: green; font-weight: bold; margin-left: 10px;">
-                ${{ combo.discounted_price|floatformat:2 }}
-              </span>
-            {% else %}
-              <strong>${{ combo.price }}</strong>
-            {% endif %}
-          </p>
-
-          {% if user.is_authenticated %}
-          <form method="post" action="{% url 'menu_app:add_combo_to_order' combo.pk %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
-          </form>
-          <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#modalComentar"
-            data-item-id="combo-{{ combo.id }}"
-            data-item-name="{{ combo.name }}">
-            Comentar
-          </button>
-          <button type="button" class="btn btn-info w-100"
-            data-bs-toggle="modal"
-            data-bs-target="#modalComentarios"
-            data-item-id="combo-{{ combo.id }}"
-            data-item-name="{{ combo.name }}">
-            Ver Comentarios
-          </button>
-          {% else %}
-          <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-            class="btn btn-outline-secondary btn-click-animate w-100">
-            Iniciar sesión para pedir
-          </a>
-          {% endif %}
+<div class="category-card">
+  <h3 class="mb-4 title-white-outline">Promociones</h3>
+  {% if combos %}
+  <div class="row row-cols-1 g-3"> <!-- SOLO CAMBIA ESTA LINEA -->
+    {% for combo in combos %}
+    <div class="col d-flex align-items-stretch">
+      <div class="item-card w-100 product-card-isolated position-relative">
+        {% if combo.on_promotion %}
+        <div class="ribbon-promo">
+          ¡OFERTA DE {{ combo.dicount_percentage }}%!
         </div>
+        {% endif %}
+        <div class="item-title">{{ combo.name }}</div>
+        <p>{{ combo.description }}</p>
+        <div class="combo-products-container">
+          {% for product in combo.products.all %}
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="combo-product-img" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'images/default_product.jpg' %}" class="combo-product-img" alt="Producto sin imagen">
+            {% endif %}
+          {% endfor %}
+        </div>
+        <p>
+          {% if combo.on_promotion and combo.dicount_percentage > 0 %}
+            <span style="text-decoration: line-through; color: gray;">${{ combo.price }}</span>
+            <span style="color: green; font-weight: bold; margin-left: 10px;">
+              ${{ combo.discounted_price|floatformat:2 }}
+            </span>
+          {% else %}
+            <strong>${{ combo.price }}</strong>
+          {% endif %}
+        </p>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'menu_app:add_combo_to_order' combo.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
+        </form>
+      <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
+      data-bs-toggle="modal"
+      data-bs-target="#modalComentar"
+      data-item-id="combo-{{ combo.id }}"
+      data-item-name="{{ combo.name }}"
+      data-action-url="{% url 'menu_app:make_rating' combo.id %}">
+      Comentar
+    </button>
+        <button type="button" class="btn btn-info w-100"
+          data-bs-toggle="modal"
+          data-bs-target="#modalComentarios"
+          data-item-id="combo-{{ combo.id }}"
+          data-item-name="{{ combo.name }}">
+          Ver Comentarios
+        </button>
+        {% else %}
+        <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+          class="btn btn-outline-secondary btn-click-animate w-100">
+          Iniciar sesión para pedir
+        </a>
+        {% endif %}
       </div>
-      {% endfor %}
     </div>
-    {% else %}
-    <p class="combo-empty-text">Sin combos disponibles</p>
-    {% endif %}
+    {% endfor %}
   </div>
+  {% else %}
+  <p class="combo-empty-text">Sin combos disponibles</p>
+  {% endif %}
+</div>
 
   <div class="text-center mt-4">
     <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
