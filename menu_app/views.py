@@ -195,33 +195,34 @@ class AddComboToOrderView(LoginRequiredMixin, View):
 
         return redirect(f"{reverse('menu_app:menu')}#combo-{combo.id}")
 
-#Quitar combo del carrito
 class RemoveComboFromCartView(LoginRequiredMixin, View):
-        def post(self, request, pk):
-            combo = get_object_or_404(Combo, pk=pk)
-            booking_selected_id = request.session.get('booking_selected_id')
+    def post(self, request, pk):
+        combo = get_object_or_404(Combo, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
 
-            if not booking_selected_id:
-                return redirect('make_order')
-
-            cart = request.session.get('cart', {})
-            booking_key = str(booking_selected_id)
-            combo_key = f"combo_{combo.id}"  # mismo prefijo usado para combos
-
-            if booking_key in cart and combo_key in cart[booking_key]:
-                del cart[booking_key][combo_key]  # eliminar el combo completo
-
-                # Si ya no hay combos/productos en la reserva, quitar la reserva del carrito
-                if not cart[booking_key]:
-                    del cart[booking_key]
-
-                request.session['cart'] = cart
-                request.session.modified = True
-
-                messages.success(request, f"Se eliminó '{combo.name}' del carrito.")
-
+        if not booking_selected_id:
             return redirect('make_order')
-    
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        combo_key = f"combo_{combo.id}"
+
+        if booking_key in cart and combo_key in cart[booking_key]:
+            cart[booking_key][combo_key]['quantity'] -= 1
+
+            if cart[booking_key][combo_key]['quantity'] <= 0:
+                del cart[booking_key][combo_key]
+
+            if not cart[booking_key]:
+                del cart[booking_key]
+
+            request.session['cart'] = cart
+            request.session.modified = True
+
+            messages.success(request, f"Se quitó una unidad de '{combo.name}' del carrito.")
+
+        return redirect('make_order')
+
 
 
 class DecrementFromCartView(LoginRequiredMixin, View):
@@ -386,5 +387,53 @@ class AddComboToOrderFromMakeOrderView(LoginRequiredMixin, View):
 
         request.session['cart'] = cart
         request.session.modified = True
+
+        return redirect('make_order')
+
+#Vistas para eliminar todos los producto o combo del carrito
+class RemoveProductFromCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        booking_selected_id = request.session.get('booking_selected_id')
+        if not booking_selected_id:
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        product_key = str(pk)
+
+        if booking_key in cart and product_key in cart[booking_key]:
+            del cart[booking_key][product_key]  # Eliminar todas las unidades del producto
+
+            # Si no queda nada en la reserva, la quitamos
+            if not cart[booking_key]:
+                del cart[booking_key]
+
+            request.session['cart'] = cart
+            request.session.modified = True
+
+            messages.success(request, "Producto eliminado completamente del carrito.")
+
+        return redirect('make_order')
+
+class RemoveComboAllFromCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        booking_selected_id = request.session.get('booking_selected_id')
+        if not booking_selected_id:
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        combo_key = f"combo_{pk}"
+
+        if booking_key in cart and combo_key in cart[booking_key]:
+            del cart[booking_key][combo_key]  # Eliminar todas las unidades del combo
+
+            if not cart[booking_key]:
+                del cart[booking_key]
+
+            request.session['cart'] = cart
+            request.session.modified = True
+
+            messages.success(request, "Combo eliminado completamente del carrito.")
 
         return redirect('make_order')
