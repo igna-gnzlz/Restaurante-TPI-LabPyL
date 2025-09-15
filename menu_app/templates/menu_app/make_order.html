@@ -43,9 +43,9 @@
         </div>
     </div>
     {% else %}
-        <div class="alert alert-danger text-center">
-            No puedes realizar pedidos porque no tienes reservas aprobadas.
-        </div>
+    <div class="alert alert-danger text-center">
+        No puedes realizar pedidos porque no tienes reservas aprobadas.
+    </div>
     {% endif %}
 
     {% if reserva_seleccionada %}
@@ -54,20 +54,26 @@
         {% if carrito_reserva %}
         <ul class="list-group mb-3">
             {% for product in carrito_reserva %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <div class="d-flex align-items-center flex-wrap">
                     {% if product.type == 'combo' %}
                         <strong>Combo:</strong> {{ product.item.name }} x {{ product.quantity }}
                         <form method="post" action="{% url 'menu_app:remove_combo_from_cart' product.item.id %}" class="d-inline ms-3 mb-0 align-self-center">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar combo" aria-label="Eliminar combo {{ product.item.name }}">
-                                <i class="bi bi-trash"></i> Eliminar
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar 1 combo" aria-label="Quitar una unidad del combo {{ product.item.name }}">
+                                <i class="bi bi-dash-circle me-1"></i>Quitar 1 combo
                             </button>
                         </form>
                         <form method="post" action="{% url 'menu_app:add_combo_to_order_make_order' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir una unidad" aria-label="Añadir una unidad al combo {{ product.item.name }}">
-                                <i class="bi bi-plus-circle me-1"></i>Añadir unidad
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir 1 combo" aria-label="Añadir una unidad al combo {{ product.item.name }}">
+                                <i class="bi bi-plus-circle me-1"></i>Añadir 1 combo
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'menu_app:remove_combo_all_from_cart' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Eliminar todo combo" aria-label="Eliminar todas las unidades del combo {{ product.item.name }}">
+                                <i class="bi bi-x-circle me-1"></i>Eliminar todo
                             </button>
                         </form>
                     {% elif product.type == 'product' %}
@@ -82,6 +88,12 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir una unidad" aria-label="Añadir una unidad al producto {{ product.item.name }}">
                                 <i class="bi bi-plus-circle me-1"></i>Añadir unidad
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'menu_app:remove_product_from_cart' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Eliminar todo" aria-label="Eliminar todas las unidades del producto {{ product.item.name }}">
+                                <i class="bi bi-x-circle me-1"></i>Eliminar todo
                             </button>
                         </form>
                     {% endif %}
