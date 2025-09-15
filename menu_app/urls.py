@@ -7,7 +7,8 @@ from menu_app.views import (
     AddComboToOrderView,
     RemoveComboFromCartView,
     DecrementFromCartView,
-
+    AddToOrderFromMakeOrderView,
+    AddComboToOrderFromMakeOrderView,
 )
 
 app_name = 'menu_app'
@@ -21,4 +22,7 @@ urlpatterns = [
     path('add-combo/<int:pk>/', AddComboToOrderView.as_view(), name='add_combo_to_order'),
     path('remove-combo/<int:pk>/', RemoveComboFromCartView.as_view(), name='remove_combo_from_cart'),
     path('decrement-from-cart/<int:pk>/', DecrementFromCartView.as_view(), name='decrement_from_cart'),
+    path('add-to-order-makeorder/<int:pk>/', AddToOrderFromMakeOrderView.as_view(), name='add_to_order_make_order'),
+    path('add-combo-makeorder/<int:pk>/', AddComboToOrderFromMakeOrderView.as_view(), name='add_combo_to_order_make_order'),
+
 ]
