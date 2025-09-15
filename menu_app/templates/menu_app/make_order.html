@@ -2,7 +2,7 @@
 {% block content %}
 <style>
     .transparent-card {
-        background-color: rgba(255, 255, 255, 0.9) !important; /* Fondo blanco con opacidad ligera */
+        background-color: rgba(255, 255, 255, 0.9) !important;
         border-radius: 0.5rem;
         box-shadow: 0 0 15px rgba(0,0,0,0.15);
         padding: 1rem;
@@ -21,7 +21,7 @@
     <h2 class="title-white-outline mb-4 text-center">Tus Reservas</h2>
     {% if reservas_proximas %}
     <div class="row justify-content-center mb-4">
-        <div class="col-12 col-md-8 transparent-card">
+        <div class="col-12 col-md-10 col-lg-8 transparent-card">
             {% if reserva_seleccionada %}
                 <button type="button" class="reserva-btn btn text-start btn-success border-success w-100"
                         data-bs-toggle="modal" data-bs-target="#reservasModal" aria-label="Seleccionar otra reserva">
@@ -50,26 +50,38 @@
 
     {% if reserva_seleccionada %}
     <h3 class="title-white-outline mb-3 text-center">Pedido Temporal de Reserva</h3>
-    <div class="col-md-8 col-lg-6 mx-auto transparent-card shadow-sm">
+    <div class="col-md-10 col-lg-8 mx-auto transparent-card shadow-sm">
         {% if carrito_reserva %}
         <ul class="list-group mb-3">
             {% for product in carrito_reserva %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center flex-wrap">
+                <div class="d-flex align-items-center">
                     {% if product.type == 'combo' %}
                         <strong>Combo:</strong> {{ product.item.name }} x {{ product.quantity }}
-                        <form method="post" action="{% url 'menu_app:remove_combo_from_cart' product.item.id %}" class="d-inline ms-3 mb-0">
+                        <form method="post" action="{% url 'menu_app:remove_combo_from_cart' product.item.id %}" class="d-inline ms-3 mb-0 align-self-center">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar combo" aria-label="Eliminar combo {{ product.item.name }}">
                                 <i class="bi bi-trash"></i> Eliminar
                             </button>
                         </form>
+                        <form method="post" action="{% url 'menu_app:add_combo_to_order_make_order' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir una unidad" aria-label="Añadir una unidad al combo {{ product.item.name }}">
+                                <i class="bi bi-plus-circle me-1"></i>Añadir unidad
+                            </button>
+                        </form>
                     {% elif product.type == 'product' %}
                         <strong>Producto:</strong> {{ product.item.name }} x {{ product.quantity }}
-                        <form method="post" action="{% url 'menu_app:decrement_from_cart' product.item.id %}" class="d-inline ms-3 mb-0">
+                        <form method="post" action="{% url 'menu_app:decrement_from_cart' product.item.id %}" class="d-inline ms-3 mb-0 align-self-center">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar una unidad" aria-label="Quitar una unidad del producto {{ product.item.name }}">
                                 <i class="bi bi-dash-circle me-1"></i>Quitar unidad
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'menu_app:add_to_order_make_order' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir una unidad" aria-label="Añadir una unidad al producto {{ product.item.name }}">
+                                <i class="bi bi-plus-circle me-1"></i>Añadir unidad
                             </button>
                         </form>
                     {% endif %}
