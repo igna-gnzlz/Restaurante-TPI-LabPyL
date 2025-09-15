@@ -4,7 +4,9 @@ from menu_app.views import (
     ProductDetailView,
     AddToOrderView,
     MakeRatingView,
-    AddComboToOrderView
+    AddComboToOrderView,
+    RemoveComboFromCartView,
+    DecrementFromCartView,
 
 )
 
@@ -17,4 +19,6 @@ urlpatterns = [
     path("accounts/", include("accounts_app.urls", namespace="accounts_app")),
     path("make_rating/<int:product_id>/", MakeRatingView.as_view(), name="make_rating"),
     path('add-combo/<int:pk>/', AddComboToOrderView.as_view(), name='add_combo_to_order'),
+    path('remove-combo/<int:pk>/', RemoveComboFromCartView.as_view(), name='remove_combo_from_cart'),
+    path('decrement-from-cart/<int:pk>/', DecrementFromCartView.as_view(), name='decrement_from_cart'),
 ]
