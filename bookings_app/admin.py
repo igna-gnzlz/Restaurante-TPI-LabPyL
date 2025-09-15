@@ -187,7 +187,7 @@ class TableAdmin(admin.ModelAdmin):
             count = Table.objects.filter(id__in=permitidas_ids).delete()[0]
             messages.success(
                 request,
-                f"Se eliminaron correctamente {count} mesa(s) sin reservas activas."
+                f"Se eliminaron correctamente {count} mesa (s) sin reservas activas."
             )
 
 admin.site.register(Table, TableAdmin)
@@ -433,16 +433,11 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = [PendientesFilter, AceptadasFilter, RechazadasFilter, PasadasFilter]
     actions = None
     ordering = ['-issue_date']
-    change_form_template = 'admin/bookings_app/booking/change_form.html'
+    change_form_template = 'admin/booking/change_form.html'
     readonly_fields = [
         'code', 'observations', 'date', 'issue_date',
         'time_slot_info', 'tables_info', 'user_info'
     ]
-    
-    class Media:
-        css = {
-            'all': ('bookings_app/css/admin_custom.css',)
-        }
     
     def response_change(self, request, obj):
         if "_accept" in request.POST:
