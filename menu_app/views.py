@@ -331,3 +331,60 @@ class ConfirmOrderView(LoginRequiredMixin, View):
 
         messages.success(request, f'Pedido confirmado. Código: {order.code}')
         return redirect('bookings_app:my_reservation')
+    
+#vistas para añadir producto y combo desde make_order
+class AddToOrderFromMakeOrderView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        if not booking_selected_id:
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        product_key = str(product.id)
+
+        prod_quantity_cart = cart.get(booking_key, {}).get(product_key, {}).get('quantity', 0)
+
+        if product.quantity <= prod_quantity_cart:
+            messages.warning(request, f"No hay stock suficiente para agregar más unidades de '{product.name}'.")
+            return redirect('make_order')
+
+        if booking_key not in cart:
+            cart[booking_key] = {}
+
+        if product_key in cart[booking_key]:
+            cart[booking_key][product_key]['quantity'] += 1
+        else:
+            cart[booking_key][product_key] = {'quantity': 1}
+
+        request.session['cart'] = cart
+        request.session.modified = True
+
+        return redirect('make_order')
+
+class AddComboToOrderFromMakeOrderView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        combo = get_object_or_404(Combo, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        if not booking_selected_id:
+            return redirect('make_order')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        combo_key = f"combo_{combo.id}"
+
+        if booking_key not in cart:
+            cart[booking_key] = {}
+
+        if combo_key in cart[booking_key]:
+            cart[booking_key][combo_key]['quantity'] += 1
+        else:
+            cart[booking_key][combo_key] = {'quantity': 1}
+
+        request.session['cart'] = cart
+        request.session.modified = True
+
+        return redirect('make_order')
