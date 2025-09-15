@@ -194,7 +194,34 @@ class AddComboToOrderView(LoginRequiredMixin, View):
         request.session.modified = True
 
         return redirect(f"{reverse('menu_app:menu')}#combo-{combo.id}")
-        
+
+#Quitar combo del carrito
+class RemoveComboFromCartView(LoginRequiredMixin, View):
+        def post(self, request, pk):
+            combo = get_object_or_404(Combo, pk=pk)
+            booking_selected_id = request.session.get('booking_selected_id')
+
+            if not booking_selected_id:
+                return redirect('make_order')
+
+            cart = request.session.get('cart', {})
+            booking_key = str(booking_selected_id)
+            combo_key = f"combo_{combo.id}"  # mismo prefijo usado para combos
+
+            if booking_key in cart and combo_key in cart[booking_key]:
+                del cart[booking_key][combo_key]  # eliminar el combo completo
+
+                # Si ya no hay combos/productos en la reserva, quitar la reserva del carrito
+                if not cart[booking_key]:
+                    del cart[booking_key]
+
+                request.session['cart'] = cart
+                request.session.modified = True
+
+                messages.success(request, f"Se eliminó '{combo.name}' del carrito.")
+
+            return redirect('make_order')
+    
 
 
 class DecrementFromCartView(LoginRequiredMixin, View):
