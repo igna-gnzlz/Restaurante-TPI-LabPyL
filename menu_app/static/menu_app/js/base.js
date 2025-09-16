@@ -57,6 +57,7 @@ function toastNoRedirect(message, icon = "warning") {
 document.addEventListener("DOMContentLoaded", function () {
     const btnsAddToOrder = document.querySelectorAll(".add-to-order-btn");
     const btnsDecFromCart = document.querySelectorAll(".dec-from-cart-btn");
+    const btnsDeleteFromCart = document.querySelectorAll(".delete-from-cart-btn");
 
     btnsAddToOrder.forEach(button => {
         button.addEventListener("click", function () {
@@ -80,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             toastRedirect(data.message, urls.makeOrder, "warning");
                             return;
                         }
-                        toastNoRedirect(data.message, "warning");
+                        toastNoRedirect(data.message, "error");
                     }
                 })
                 .catch(error => {

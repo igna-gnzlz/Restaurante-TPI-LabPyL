@@ -228,6 +228,39 @@ class DecrementFromCartView(LoginRequiredMixin, View):
             "cart_empty": len(carrito_reserva) == 0  # True si ya no quedan productos
         })
 
+class DeleteFromCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
+
+        product = get_object_or_404(Product, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        product_key = str(product.id)
+
+        if booking_key in cart and product_key in cart[booking_key]:
+            del cart[booking_key][product_key]
+
+            # Si ya no hay productos en la reserva, la quito del carrito
+            if not cart[booking_key]:
+                del cart[booking_key]
+
+            request.session['cart'] = cart
+            request.session.modified = True
+
+        # Recalcular el carrito actualizado
+        carrito_reserva = get_cart_products_by_booking(request.session, booking_selected_id)
+        total_cart = get_cart_total(carrito_reserva)
+
+        return JsonResponse({
+            "success": True,
+            "message": f'Se eliminó "{product.name}" del pedido.',
+            "product_id": product.id,
+            "total_cart": total_cart,
+            "cart_empty": len(carrito_reserva) == 0  # True si ya no quedan productos
+        })
+
 
 class ConfirmOrderView(LoginRequiredMixin, View):
     def post(self, request):
