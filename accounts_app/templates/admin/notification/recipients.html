@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Destinatarios de: {{ notification.title }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>{% trans "Correo Electrónico" %}</th>
+                        <th>{% trans "Leído" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_notification in user_notifications %}
+                        <tr>
+                            <td>{{ user_notification.user.email }}</td>
+                            <td>
+                                {% if user_notification.is_read %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">
+                                {% trans "No hay destinatarios para esta notificación." %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="{% url 'admin:accounts_app_notification_changelist' %}" class="btn btn-secondary mt-3">
+            {% trans "Volver al listado de notificaciones" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

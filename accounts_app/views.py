@@ -55,30 +55,6 @@ class UserLoginView(LoginView):
         return super().form_valid(form)
 
 
-class NotificationRecipientsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = UserNotification
-    template_name = 'accounts_app/notification_recipients.html'
-    context_object_name = 'user_notifications'
-
-    def test_func(self):
-        # Solo staff/admin puede acceder
-        return self.request.user.is_staff
-
-    def handle_no_permission(self):
-        from django.contrib.auth.views import redirect_to_login
-        return redirect_to_login(self.request.get_full_path())
-
-    def get_queryset(self):
-        notification_id = self.kwargs.get('pk')  # Asumiendo que recibís pk en url
-        notification = get_object_or_404(Notification, pk=notification_id)
-        return UserNotification.objects.filter(notification=notification).select_related('user')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['notification'] = get_object_or_404(Notification, pk=self.kwargs.get('pk'))
-        return context
-
-
 class UserNotificationsListView(LoginRequiredMixin, ListView):
     model = UserNotification
     template_name = 'accounts_app/user_notifications_list.html'

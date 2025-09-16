@@ -3,14 +3,13 @@ from django.contrib.auth.views import LogoutView
 from accounts_app.views import (
     UserRegisterView,
     UserLoginView,
-    NotificationRecipientsView,
     UserNotificationsListView,
     DeleteNotificationView,
     DeleteAllNotificationsView,
     UserNotificationDetailView,
     EditUsernameView,
     ProfileView,
-    MarkNotificationReadView
+    MarkNotificationReadView,
 )
 from . import views
 
@@ -20,7 +19,6 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
-    path('notification_recipients/<int:pk>/', NotificationRecipientsView.as_view(), name='notification_recipients'),
     path('my_notifications/', UserNotificationsListView.as_view(), name='user_notifications_list'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/edit-username/', EditUsernameView.as_view(), name='edit_username'),
