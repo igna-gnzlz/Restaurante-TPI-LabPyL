@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'menu_app/css/make_order.css' %}">
+{% endblock %}
+
 {% block content %}
 <style>
     .transparent-card {
@@ -18,7 +24,7 @@
     }
 </style>
 <div class="container my-4">
-    <h2 class="title-white-outline mb-4 text-center">Tus Reservas</h2>
+    <h2 class="title-white-outline mb-4 text-center">Tus Reservas Aprovadas</h2>
     {% if reservas_proximas %}
     <div class="row justify-content-center mb-4">
         <div class="col-12 col-md-10 col-lg-8 transparent-card">
@@ -52,9 +58,9 @@
     <h3 class="title-white-outline mb-3 text-center">Pedido Temporal de Reserva</h3>
     <div class="col-md-10 col-lg-8 mx-auto transparent-card shadow-sm">
         {% if carrito_reserva %}
-        <ul class="list-group mb-3">
+        <ul class="list-group mb-3" id="cart-items">
             {% for product in carrito_reserva %}
-            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap" id="row-product-{{ product.item.id }}">
                 <div class="d-flex align-items-center flex-wrap">
                     {% if product.type == 'combo' %}
                         <strong>Combo:</strong> {{ product.item.name }} x {{ product.quantity }}
@@ -78,47 +84,50 @@
                         </form>
                     {% elif product.type == 'product' %}
                         <strong>Producto:</strong> {{ product.item.name }} x {{ product.quantity }}
-                        <form method="post" action="{% url 'menu_app:decrement_from_cart' product.item.id %}" class="d-inline ms-3 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar una unidad" aria-label="Quitar una unidad del producto {{ product.item.name }}">
-                                <i class="bi bi-dash-circle me-1"></i>Quitar unidad
+                        <!-- Selección de cantidad -->
+                        <div class="wrapper" data-product-id="{{ product.item.id }}"
+                            data-inc-url="{% url 'menu_app:add_to_order' product.item.id %}">
+                            <button type="button" data-product-id="{{ product.item.id }}"
+                                data-url="{% url 'delete_from_cart' product.item.id %}"
+                                class="btn btn-outline-danger icon-btn delete-from-cart-btn trash" title="Eliminar producto">
+                                <i class="bi bi-trash3"></i>
                             </button>
-                        </form>
-                        <form method="post" action="{% url 'menu_app:add_to_order_make_order' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir una unidad" aria-label="Añadir una unidad al producto {{ product.item.name }}">
-                                <i class="bi bi-plus-circle me-1"></i>Añadir unidad
+                            <button type="button" data-product-id="{{ product.item.id }}"
+                                data-url="{% url 'decrement_from_cart' product.item.id %}"
+                                class="btn btn-outline-secondary icon-btn dec-from-cart-btn" title="Quitar una unidad">
+                                <i class="bi bi-dash-circle"></i>
                             </button>
-                        </form>
-                        <form method="post" action="{% url 'menu_app:remove_product_from_cart' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Eliminar todo" aria-label="Eliminar todas las unidades del producto {{ product.item.name }}">
-                                <i class="bi bi-x-circle me-1"></i>Eliminar todo
+                            <span id="cart-quant-prod-{{ product.item.id }}" class="num">
+                                {{ product.quantity }}
+                            </span>
+                            <button type="button" class="btn btn-outline-success icon-btn plus" title="Agregar una unidad">
+                                <i class="bi bi-plus-circle"></i>
                             </button>
-                        </form>
+                        </div>
                     {% endif %}
                 </div>
-                <span class="fw-bold">${{ product.subtotal|floatformat:2 }}</span>
+                <span id="cart-subtotal-prod-{{ product.item.id }}" class="fw-bold">${{ product.subtotal|floatformat:2 }}</span>
             </li>
             {% endfor %}
         </ul>
-        <h4 class="text-end">Total: <span class="fw-bold">${{ total_carrito|floatformat:2 }}</span></h4>
-        <div>
+        <h4 class="text-end">Total: <span id="cart-total" class="fw-bold">${{ total_carrito|floatformat:2 }}</span></h4>
+        <!-- Botón para abrir el modal de Confirmar Pedido -->
+        <div id="confirm-order-container">
             <button type="button" class="btn btn-success mt-3 mb-2 w-100" data-bs-toggle="modal" data-bs-target="#confirmModal" aria-label="Confirmar Pedido">
                 Confirmar Pedido
             </button>
         </div>
         {% else %}
-        <div class="alert alert-warning text-center">Todavía no hay productos en el carrito.</div>
+        <div class="alert alert-warning text-center">No hay productos en el pedido.</div>
         {% endif %}
     </div>
     {% else %}
     <div class="alert alert-danger text-center mt-4">
-       Para realizar un pedido primero debe SELECCIONAR UNA DE SUS RESERVA
+       Para realizar un pedido primero debe seleccionar una reserva aprovada.
     </div>
     {% endif %}
-    <div class="text-center mt-4 mb-5">
-        <a href="{% url 'menu_app:menu' %}" class="btn btn-primary">Ir al menú</a>
+    <div class="text-center">
+        <a href="{% url 'menu_app:menu' %}" class="btn btn-primary mt-4 mb-3">Ir al menú</a>
     </div>
 
     <!-- Modal Confirmar Pedido -->
@@ -148,7 +157,7 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="reservasModalLabel">Seleccione una Reserva</h5>
+                    <h5 class="modal-title" id="reservasModalLabel">Seleccione una Reserva Aprovada</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -176,4 +185,7 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'menu_app/js/make_order.js' %}"></script>
 {% endblock %}

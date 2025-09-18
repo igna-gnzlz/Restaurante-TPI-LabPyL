@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+<!-- head -->
 <style>
   .content-container-transparent {
     position: relative;
@@ -104,17 +105,6 @@
 <div class="background-image"></div>
 
 <div class="container my-5 content-container-transparent">
-  {% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-    <div class="alert {% if message.tags == 'error' %}fondo-error-rojo{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <h1 class="text-center mb-5 title-white-outline">Menú</h1>
 
   {% for category, items in categorized_items.items %}
@@ -122,7 +112,7 @@
     <h3 class="mb-4 title-white-outline">{{ category.name }}</h3>
     <div class="row row-cols-1 row-cols-md-3 g-3">
       {% for item in items %}
-      <div class="col d-flex align-items-stretch">
+      <div class="col d-flex align-items-stretch"id="producto-{{ item.id }}">
         <div class="item-card w-100">
           {% if item.on_promotion %}
           <div class="ribbon-promo">
@@ -149,10 +139,16 @@
           </p>
           {% if item.quantity > 0 %}
             {% if user.is_authenticated %}
-            <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
+            <button
+              type="button"
+              class="btn btn-primary mt-auto btn-product-animate btn-click-animate mb-2 w-100 product-card-isolated add-to-order-btn"
+              data-url="{% url 'menu_app:add_to_order' item.pk %}">
+              Agregar a pedido
+            </button>
+            <!-- <form method="post" action="{% url 'menu_app:add_to_order' item.pk %}">
               {% csrf_token %}
               <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
-            </form>
+            </form> -->
             <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
               data-bs-toggle="modal"
               data-bs-target="#modalComentar"
@@ -180,6 +176,13 @@
         </div>
       </div>
       {% endfor %}
+<!-- head -->
+<!-- incoming -->
+{% comment %}
+                    <!-- <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
+                        style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a> -->
+{% endcomment %}
+<!-- incoming -->
     </div>
   </div>
   {% empty %}
@@ -254,9 +257,8 @@
   <p class="combo-empty-text">Sin combos disponibles</p>
   {% endif %}
 </div>
-
   <div class="text-center mt-4">
-    <a href="{% url 'home' %}" class="btn btn-primary mt-4">Volver al inicio</a>
+    <a href="{% url 'home' %}" class="btn btn-primary btn-product-animate mt-4">Volver al inicio</a>
   </div>
 </div>
 

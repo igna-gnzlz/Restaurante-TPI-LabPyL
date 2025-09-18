@@ -1,0 +1,65 @@
+/* Botones relacionados con la reserva */
+.reserva-btn {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.reserva-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.reserva-btn.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+.reserva-btn.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.reserva-btn.btn-success::before {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Contenedor */
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    gap: 6px;
+        /* espacio entre íconos y número */
+}
+
+/* Botones de icono */
+.icon-btn {
+    padding: 4px;
+    /* achica el área clickable */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    /* opcional, más redondeado */
+}
+/* Tamaño uniforme de íconos */
+.icon-btn i {
+    font-size: 1.2rem;
+    /* podés ajustar */
+}
+/* Número en el centro */
+.wrapper .num {
+    min-width: 32px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+}

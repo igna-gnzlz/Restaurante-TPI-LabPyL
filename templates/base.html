@@ -16,6 +16,10 @@
         rel="stylesheet"
     >
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <!-- CSS global -->
+    <link rel="stylesheet" href="{% static 'menu_app/css/base.css' %}">
+    <!-- Bloque para CSS de cada template "hijo" -->
+    {% block extra_css %}{% endblock %}
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1"
@@ -99,7 +103,6 @@
         </div>
     </nav>
     {% endif %}
-
     <main class="flex-grow-1">
         {% block content %}
         {% endblock %}
@@ -126,14 +129,11 @@
         </div>
     </footer>
     -->
-    
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-        crossorigin="anonymous"
-    ></script>
 
     <script>
+        const urls = {
+                makeOrder: "{% url 'make_order' %}"
+        };
       // Inicializa todos los tooltips de Bootstrap
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
       var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -155,6 +155,15 @@
         });
       });
     </script>
+    <!-- JS de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- JS global -->
+    <script src="{% static 'menu_app/js/base.js' %}"></script>
+    <!-- Bloque para JS de cada template hijo -->
+    {% block extra_js %}{% endblock %}
 </body>
-
 </html>

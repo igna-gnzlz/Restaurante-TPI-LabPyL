@@ -261,9 +261,6 @@ class MakeReservationView(LoginRequiredMixin, ClienteRequiredMixin, FormView):
             "es_reserva_actual": es_reserva_actual,
         })
 
-        print(f"Selected date: {selected_date}")
-        print(f"TimeSlots disponibles: {list(time_slots.values_list('id', 'name', 'start_time', 'end_time'))}")
-
         return context
 
     def form_valid(self, form):

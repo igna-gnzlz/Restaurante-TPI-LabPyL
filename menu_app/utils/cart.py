@@ -1,11 +1,11 @@
 from menu_app.models import Product, Combo
 
-def get_cart_items_and_total(session, booking_id):
+def get_cart_products_by_booking(session, booking_id):
     cart = session.get('cart', {})
     items = []
-    total = 0
 
     products_data = cart.get(str(booking_id), {})
+    
     for item_key, data in products_data.items():
         quantity = data.get('quantity', 1)
 
