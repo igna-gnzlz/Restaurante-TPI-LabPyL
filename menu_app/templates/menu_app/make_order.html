@@ -83,7 +83,7 @@
                             </button>
                         </form>
                     {% elif product.type == 'product' %}
-                        <strong>Producto:</strong> {{ product.item.name }} x {{ product.quantity }}
+                        <strong>{{ product.item.name }}</strong>
                         <!-- Selección de cantidad -->
                         <div class="wrapper" data-product-id="{{ product.item.id }}"
                             data-inc-url="{% url 'menu_app:add_to_order' product.item.id %}">

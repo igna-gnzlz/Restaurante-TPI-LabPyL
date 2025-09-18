@@ -1,8 +1,10 @@
 from menu_app.models import Product, Combo
+from decimal import Decimal
 
 def get_cart_products_by_booking(session, booking_id):
     cart = session.get('cart', {})
     items = []
+    total = Decimal("0.00")
 
     products_data = cart.get(str(booking_id), {})
     
@@ -14,7 +16,7 @@ def get_cart_products_by_booking(session, booking_id):
             try:
                 combo_id = int(item_key.replace('combo_', ''))
                 combo = Combo.objects.get(id=combo_id)
-                subtotal = combo.price * quantity
+                subtotal = combo.price * Decimal(quantity)
                 total += subtotal
                 items.append({
                     'item': combo,
@@ -30,7 +32,7 @@ def get_cart_products_by_booking(session, booking_id):
             try:
                 product_id = int(item_key)
                 product = Product.objects.get(id=product_id)
-                subtotal = product.price * quantity
+                subtotal = product.price * Decimal(quantity)
                 total += subtotal
                 items.append({
                     'item': product,

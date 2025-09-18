@@ -84,7 +84,7 @@ class MakeOrderView(LoginRequiredMixin, View):
     template_name = 'menu_app/make_order.html'
 
     def get(self, request):
-        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
+        from menu_app.utils.cart import get_cart_products_by_booking
         from django.db.models import Q
         from django.utils import timezone
 
@@ -121,16 +121,15 @@ class MakeOrderView(LoginRequiredMixin, View):
 
 
         carrito_reserva = []
-        total_cart = 0.00
+        total_carrito = 0.00
         if reserva_seleccionada:
-            carrito_reserva = get_cart_products_by_booking(request.session, reserva_seleccionada.id)
-            total_cart = get_cart_total(carrito_reserva)
+            carrito_reserva, total_carrito = get_cart_products_by_booking(request.session, reserva_seleccionada.id)
 
         context = {
             'reservas_proximas': reservas_proximas,
             'reserva_seleccionada': reserva_seleccionada,
             'carrito_reserva': carrito_reserva,
-            'total_cart': total_cart
+            'total_carrito': total_carrito
         }
 
         return render(request, self.template_name, context)
@@ -138,7 +137,7 @@ class MakeOrderView(LoginRequiredMixin, View):
 
 class AddToOrderView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
+        from menu_app.utils.cart import get_cart_products_by_booking
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
 
@@ -174,7 +173,7 @@ class AddToOrderView(LoginRequiredMixin, View):
         subtotal = product.price * cart[booking_key][product_key]["quantity"]
 
         # Calcular el total carrito
-        total_cart = get_cart_total(get_cart_products_by_booking(request.session, booking_selected_id))
+        items, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
 
         return JsonResponse({
             "success": True,
@@ -242,7 +241,7 @@ class RemoveComboFromCartView(LoginRequiredMixin, View):
 
 class DecrementFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
+        from menu_app.utils.cart import get_cart_products_by_booking
 
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
@@ -274,8 +273,7 @@ class DecrementFromCartView(LoginRequiredMixin, View):
             request.session.modified = True
 
          # Recalcular el carrito actualizado
-        carrito_reserva = get_cart_products_by_booking(request.session, booking_selected_id)
-        total_cart = get_cart_total(carrito_reserva)
+        carrito_reserva, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
         
         return JsonResponse({
             "success": True,
@@ -290,7 +288,7 @@ class DecrementFromCartView(LoginRequiredMixin, View):
 
 class DeleteFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        from menu_app.utils.cart import get_cart_products_by_booking, get_cart_total
+        from menu_app.utils.cart import get_cart_products_by_booking
 
         product = get_object_or_404(Product, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
@@ -310,8 +308,7 @@ class DeleteFromCartView(LoginRequiredMixin, View):
             request.session.modified = True
 
         # Recalcular el carrito actualizado
-        carrito_reserva = get_cart_products_by_booking(request.session, booking_selected_id)
-        total_cart = get_cart_total(carrito_reserva)
+        carrito_reserva, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
 
         return JsonResponse({
             "success": True,

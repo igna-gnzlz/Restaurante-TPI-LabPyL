@@ -63,7 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             const url = this.dataset.url;
 
-            console.log("URL de agregar al pedido:", url);
             fetch(url, {
                 method: "POST",
                 headers: {
