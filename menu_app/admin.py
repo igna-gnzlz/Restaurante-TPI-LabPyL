@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import Product, Category, Order,Combo,Rating
-
-#Librerias importadas para calculo de precio de combo
+#Librerias para el cálculo de precio de combo
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import path
 from django.contrib import messages
@@ -34,7 +33,7 @@ class MenuAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'isActive']
     list_filter = ['isActive']
-    search_fields = ['name']
+    search_fields = ['name', 'description']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -126,14 +125,14 @@ class ComboAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'category', 'price', 'quantity', 'on_promotion', 'dicount_percentage']
-    list_filter = ['category']
+    list_display = ['name', 'description', 'category', 'price', 'is_available', 'quantity', 'on_promotion', 'dicount_percentage']
+    list_filter = ['category', 'is_available']
     search_fields = ['name', 'description']
-    ############ Se agrego los campos on_promotion y dicount_percentage para ser editables en la lista
+    # Se agrego los campos on_promotion y dicount_percentage para ser editables en la lista
     list_editable = ['on_promotion', 'dicount_percentage']
-     ############ Se agrego los campos on_promotion y dicount_percentage para ser editables en la lista
+    # Se agrego los campos on_promotion y dicount_percentage para ser editables en la lista
     # Campos adicionales para mejor organización
-    fields = ['name', 'description', 'price', 'quantity', 'category', 'image']
+    fields = ['name', 'description', 'price', 'is_available','quantity', 'category', 'image']
     
     # Mostrar imagen en el admin
     readonly_fields = ['image_preview']

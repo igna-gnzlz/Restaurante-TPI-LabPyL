@@ -126,7 +126,13 @@
           <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
           {% endif %}
           <p>{{ item.description }}</p>
-          <p>Stock: {{ item.quantity }}</p>
+          <p>
+            {% if item.is_available %}
+            <span class="badge bg-success">Disponible</span>
+            {% else %}
+            <span class="badge bg-secondary">No disponible</span>
+            {% endif %}
+          </p>
           <p>
             {% if item.on_promotion and item.dicount_percentage > 0 %}
               <span style="text-decoration: line-through; color: gray;">${{ item.price }}</span>

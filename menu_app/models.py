@@ -12,6 +12,7 @@ class Product(models.Model):
     # Nuevo campo para indicar si el producto está en promoción
     on_promotion = models.BooleanField(default=False)
     dicount_percentage = models.IntegerField(default=0) # 0 a 100
+    is_available = models.BooleanField(default=True)
 
     @property
     def discounted_price(self):
