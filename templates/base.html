@@ -80,19 +80,32 @@
                 </ul>
                 <div class="d-flex gap-2 ms-auto">
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'bookings_app:make_reservation' %}" class="btn btn-light btn-sm">Reservar</a>
-                        <a href="{% url 'make_order' %}" class="btn btn-light btn-sm">Pedir</a>
+                        <a href="{% url 'bookings_app:make_reservation' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-calendar-plus me-1"></i> Reservar
+                        </a>
+                        <a href="{% url 'make_order' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-card-checklist me-1"></i> Pedir
+                        </a>
+
                         <div class="dropdown">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle"
+                          <button class="btn btn-outline-light btn-sm dropdown-toggle"
                                 type="button"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                                {{ request.user.username }}
-                            </button>
+                            <i class="bi bi-person me-1"></i> {{ request.user.username }}
+                        </button>
+
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="{% url 'bookings_app:my_reservation' %}">Mis Reservas</a>
-                                <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">Notificaciones</a>
-                                <a class="dropdown-item" href="{% url 'accounts_app:profile' %}">Mi perfil</a>
+                            <a class="dropdown-item" href="{% url 'bookings_app:my_reservation' %}">
+                            <i class="bi bi-calendar-check me-2"></i>Mis Reservas
+                            </a>
+                            <a class="dropdown-item" href="{% url 'accounts_app:user_notifications_list' %}">
+                            <i class="bi bi-bell me-2"></i>Notificaciones
+                            </a>
+                            <a class="dropdown-item" href="{% url 'accounts_app:profile' %}">
+                            <i class="bi bi-person-circle me-2"></i>Mi perfil
+                            </a>
+
                                 <li>
                                     <form method="post" action="{% url 'accounts_app:logout' %}">
                                         {% csrf_token %}
@@ -102,8 +115,13 @@
                             </ul>
                         </div>
                     {% else %}
-                        <a href="{% url 'accounts_app:login' %}" class="btn btn-outline-light btn-sm">Iniciar Sesión</a>
-                        <a href="{% url 'accounts_app:register' %}" class="btn btn-light btn-sm">Registrarse</a>
+                        <a href="{% url 'accounts_app:login' %}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                        </a>
+                        <a href="{% url 'accounts_app:register' %}" class="btn btn-light btn-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Registrarse
+                        </a>
+
                     {% endif %}
                 </div>
             </div>
