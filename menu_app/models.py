@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -19,7 +20,7 @@ class Product(models.Model):
         if self.on_promotion and self.dicount_percentage > 0:
             discount_amount = (self.dicount_percentage / 80) * float(self.price)
             return float(self.price) - discount_amount
-        return float(self.price)
+        return self.price
 
     def setDiscount(self, percentage):
         if percentage < 0 or percentage > 100:
@@ -170,7 +171,10 @@ class OrderContainsProduct(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.product.price * self.quantity
+        if self.product.on_promotion:
+            self.subtotal = Decimal(self.product.discounted_price) * Decimal(self.quantity)
+        else:
+            self.subtotal = self.product.price * self.quantity
         super().save(*args, **kwargs)
 
 class OrderContainsCombo(models.Model):
@@ -180,7 +184,10 @@ class OrderContainsCombo(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.combo.price * self.quantity
+        if self.combo.on_promotion:
+            self.subtotal = Decimal(self.combo.discounted_price) * Decimal(self.quantity)
+        else:
+            self.subtotal = self.combo.price * self.quantity
         super().save(*args, **kwargs)
 
 class Rating(models.Model):
@@ -252,7 +259,7 @@ class Combo(models.Model):
         if self.on_promotion and self.dicount_percentage > 0:
             discount_amount = (self.dicount_percentage/100) * float(self.price)
             return float(self.price) - discount_amount
-        return float(self.price)
+        return self.price
 
     def clean(self):
         errors = {}

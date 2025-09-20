@@ -187,7 +187,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Helper CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
