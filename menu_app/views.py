@@ -174,7 +174,8 @@ class AddToOrderView(LoginRequiredMixin, View):
 
         # Calcular el total carrito
         items, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
-
+            
+        
         return JsonResponse({
             "success": True,
             "message": f'Se agregó "{product.name}" al pedido.',
@@ -430,8 +431,10 @@ class AddToOrderFromMakeOrderView(LoginRequiredMixin, View):
         request.session.modified = True
 
         return redirect('make_order')
-
+    
 class AddComboToOrderFromMakeOrderView(LoginRequiredMixin, View):
+    MAX_COMBOS_PER_BOOKING = 3
+
     def post(self, request, pk):
         combo = get_object_or_404(Combo, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
@@ -446,13 +449,17 @@ class AddComboToOrderFromMakeOrderView(LoginRequiredMixin, View):
         if booking_key not in cart:
             cart[booking_key] = {}
 
-        if combo_key in cart[booking_key]:
-            cart[booking_key][combo_key]['quantity'] += 1
-        else:
-            cart[booking_key][combo_key] = {'quantity': 1}
+        current_quantity = cart[booking_key].get(combo_key, {}).get('quantity', 0)
 
-        request.session['cart'] = cart
-        request.session.modified = True
+        if current_quantity >= self.MAX_COMBOS_PER_BOOKING:
+            messages.error(request, f"No puedes agregar más de {self.MAX_COMBOS_PER_BOOKING} combos.")
+        else:
+            cart.setdefault(booking_key, {}).setdefault(combo_key, {'quantity': 0})
+            cart[booking_key][combo_key]['quantity'] += 1
+            messages.success(request, f'Se añadió 1 combo "{combo.name}" al pedido.')
+
+            request.session['cart'] = cart
+            request.session.modified = True
 
         return redirect('make_order')
 
