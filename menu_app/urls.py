@@ -30,6 +30,4 @@ urlpatterns = [
     path('remove-product-from-cart/<int:pk>/', RemoveProductFromCartView.as_view(), name='remove_product_from_cart'),
     path('remove-combo-from-cart/<int:pk>/', RemoveComboFromCartView.as_view(), name='remove_combo_from_cart'),
     path('remove-combo-all-from-cart/<int:pk>/', RemoveComboAllFromCartView.as_view(), name='remove_combo_all_from_cart'),
-
-
 ]

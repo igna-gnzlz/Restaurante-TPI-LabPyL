@@ -372,8 +372,6 @@ class ConfirmOrderView(LoginRequiredMixin, View):
                     product_id = int(item_key)
                     product = get_object_or_404(Product, id=product_id)
 
-                    # Descontar stock
-                    product.quantity -= quantity
                     product.save()
 
                     order_product = OrderContainsProduct.objects.create(

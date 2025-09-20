@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (data.cart_empty) {
                             // reemplazar todo el carrito por el aviso
                             document.querySelector("#cart-items").innerHTML = `
-    <div class="alert alert-warning">Todavía no hay productos en el carrito.</div>
+    <div class="alert alert-warning text-center">No hay productos en el pedido.</div>
     `;
                             // Ocultar total y botón de confirmar
                             const cartTotal = document.querySelector("#cart-total");
@@ -133,11 +133,56 @@ document.addEventListener("DOMContentLoaded", function () {
                             }
 
                             // Actualizar total carrito
-                            document.querySelector("#cart-total").textContent = data.total_cart;
+                            document.querySelector("#cart-total").textContent = `$${data.total_cart}`;
                         }
                     }
                 })
                 .catch(err => console.error("Error al decrementar producto del carrito:", err));
+        });
+    });
+
+    btnsDeleteFromCart.forEach(button => {
+        button.addEventListener("click", function () {
+            const url = this.dataset.url;
+            const productId = this.dataset.productId;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        toastNoRedirect(data.message, "success");
+
+                        if (data.cart_empty) {
+                            // reemplazar todo el carrito por un aviso
+                            document.querySelector("#cart-items").innerHTML = `
+    <div class="alert alert-warning text-center">No hay productos en el pedido.</div>
+    `;
+                            // Ocultar total y botón de confirmar
+                            const cartTotal = document.querySelector("#cart-total");
+                            if (cartTotal) {
+                                cartTotal.closest("h4").remove();
+                            }
+
+                            const confirmBtn = document.getElementById("confirm-order-container");
+                            if (confirmBtn) {
+                                confirmBtn.remove();
+                            }
+                        } else {
+                            // Eliminar fila completa del producto
+                            document.querySelector(`#row-product-${productId}`).remove();
+
+                            // Actualizar total carrito
+                            document.querySelector("#cart-total").textContent = `$${data.total_cart}`;
+                        }
+                    }
+                })
+                .catch(err => console.error("Error al eliminar producto del carrito:", err));
         });
     });
 });

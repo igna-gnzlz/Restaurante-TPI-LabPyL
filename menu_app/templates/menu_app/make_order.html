@@ -89,18 +89,22 @@
                             data-inc-url="{% url 'menu_app:add_to_order' product.item.id %}">
                             <button type="button" data-product-id="{{ product.item.id }}"
                                 data-url="{% url 'delete_from_cart' product.item.id %}"
-                                class="btn btn-outline-danger icon-btn delete-from-cart-btn trash" title="Eliminar producto">
+                                class="btn btn-outline-danger icon-btn delete-from-cart-btn trash"
+                                title="Eliminar producto">
                                 <i class="bi bi-trash3"></i>
                             </button>
                             <button type="button" data-product-id="{{ product.item.id }}"
                                 data-url="{% url 'decrement_from_cart' product.item.id %}"
-                                class="btn btn-outline-secondary icon-btn dec-from-cart-btn" title="Quitar una unidad">
+                                class="btn btn-outline-secondary icon-btn dec-from-cart-btn"
+                                title="Quitar una unidad">
                                 <i class="bi bi-dash-circle"></i>
                             </button>
                             <span id="cart-quant-prod-{{ product.item.id }}" class="num">
                                 {{ product.quantity }}
                             </span>
-                            <button type="button" class="btn btn-outline-success icon-btn plus" title="Agregar una unidad">
+                            <button type="button"
+                                class="btn btn-outline-success icon-btn plus"
+                                title="Agregar una unidad">
                                 <i class="bi bi-plus-circle"></i>
                             </button>
                         </div>
