@@ -62,7 +62,7 @@ class MenuListView(ListView):
                 
         context['categorized_items'] = categorized_items
         context['rating_form'] = RatingForm()
-        context['combos'] = Combo.objects.all()
+        context['combos'] = Combo.objects.filter(is_active=True)
         return context
         
 class ComboDetailView(ListView):

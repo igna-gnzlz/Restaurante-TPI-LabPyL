@@ -25,6 +25,13 @@
         content="width=device-width, initial-scale=1"
     />
     <style>
+        .navbar-blur {
+            background-color: rgba(0, 0, 0, 0.7); /* Negro con transparencia */
+            backdrop-filter: blur(8px); /* Aplica el efecto blur */
+            -webkit-backdrop-filter: blur(8px); /* Soporte para Safari */
+            }
+
+
         body {
             padding-top: 56px;  /* altura aproximada navbar */
             padding-bottom: 56px;  /* altura aproximada footer */
@@ -49,7 +56,7 @@
 
     {% comment %} Mostrar navbar solo si usuario NO es Admin ni Cajero {% endcomment %}
     {% if not request.user.is_authenticated or request.user|has_group:"Cliente" %}
-    <nav class="navbar navbar-expand-md navbar-dark bg-primary fixed-top">
+    <nav class="navbar navbar-expand-md navbar-dark navbar-blur fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/"><i class="bi bi-restaurant me-1"></i>Restaurante</a>
 
