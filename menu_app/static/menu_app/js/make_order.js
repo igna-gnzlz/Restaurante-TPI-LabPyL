@@ -21,7 +21,7 @@ document.querySelectorAll(".wrapper .plus").forEach(plusBtn => {
                 document.querySelector(`#cart-quant-prod-${productId}`).textContent = data.quantity;
                 document.querySelector(`#cart-subtotal-prod-${productId}`).textContent = `$${data.subtotal}`;
                 // Actualizo el monto del total carrito
-                document.querySelector("#cart-total").textContent = data.total_cart;
+                document.querySelector("#cart-total").textContent = `$${data.total_cart}`;
 
                 toastNoRedirect(data.message, "success");
             } else {

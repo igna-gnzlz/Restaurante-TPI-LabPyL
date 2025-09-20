@@ -2,10 +2,10 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 class Product(models.Model):
-    name = models.CharField(max_length=20,default="")
+    name = models.CharField(max_length=40,default="")
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField() # stock
+    quantity = models.IntegerField() # stock para limitar pedidos mediante restricción de negocio
     image = models.ImageField(upload_to="products/", null=True, blank=True)
     # El diagrama solo permite una category (pero queda a elección nuestra permitir varias)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)

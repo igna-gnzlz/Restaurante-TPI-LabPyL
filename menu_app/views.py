@@ -154,11 +154,11 @@ class AddToOrderView(LoginRequiredMixin, View):
         # Obtener cantidad actual del producto en el carrito (si existe)
         prod_quantity_cart = cart.get(booking_key, {}).get(product_key, {}).get('quantity', 0)
 
-        # Verificar stock
-        if product.quantity <= prod_quantity_cart:
+        # Verificar no pasarse del stock permitido por pedido
+        if (prod_quantity_cart + 1) > product.quantity:
             return JsonResponse({
                 "success": False,
-                "message": f"No hay stock suficiente de '{product.name}'."
+                "message": f'No puedes agregar más de {product.quantity} unidades de "{product.name}" por pedido.'
             }, status=400)
 
         # Actualizar el carrito de la sesión

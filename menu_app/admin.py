@@ -144,7 +144,7 @@ class ProductAdmin(admin.ModelAdmin):
     image_preview.allow_tags = True
     image_preview.short_description = 'Preview'
 
-    ##########Se agrego el metodo save_model para validar y aplicar el descuento
+    # Se agrego el metodo save_model para validar y aplicar el descuento
     def save_model(self, request, obj, form, change):
         # Validar y aplicar descuento si on_promotion está activo
         if obj.on_promotion:
