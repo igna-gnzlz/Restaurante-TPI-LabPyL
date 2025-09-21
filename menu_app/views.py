@@ -84,12 +84,20 @@ class MenuListView(ListView):
             if products.exists():
                 for product in products:
                     product.rating_form = RatingForm()
-                    product.comments = product.rating_set.select_related('user').order_by('-created_at')
+                    product.comments = product.ratings.select_related('user').order_by('-created_at')
+                    product.calculate_average_rating()  # Aquí calculas y actualizas el promedio
                 categorized_items[category] = products
                 
         context['categorized_items'] = categorized_items
         context['rating_form'] = RatingForm()
+         # 🔹 Combos con rating y comentarios
         context['combos'] = Combo.objects.filter(is_active=True)
+        for combo in context['combos']:
+            combo.rating_form = RatingForm()
+            combo.comments_list = combo.comments.select_related('user').order_by('-created_at')
+            combo.calculate_average_rating()
+
+
         return context
         
 class ComboDetailView(ListView):
@@ -107,6 +115,18 @@ class ProductDetailView(DetailView):
     template_name = "menu_app/product_detail.html"
     context_object_name = "product"
 
+    def get_object(self, queryset=None):
+        product = super().get_object(queryset)
+        product.calculate_average_rating()  # 👈 recalcula antes de mostrar
+        return product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = context['product']
+        context['average_rating_int'] = int(product.average_rating or 0)
+        return context
+
+    
 class MakeOrderView(LoginRequiredMixin, View):
     template_name = 'menu_app/make_order.html'
 

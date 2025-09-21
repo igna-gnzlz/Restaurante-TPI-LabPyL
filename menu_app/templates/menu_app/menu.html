@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load custom_filters %}
 {% block content %}
 <!-- head -->
 <style>
@@ -131,7 +131,7 @@
             <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
             {% endif %}
           </a>
-
+            
           <p>{{ item.description }}</p>
           <p>
             {% if item.is_available %}
@@ -140,6 +140,8 @@
             <span class="badge bg-secondary">No disponible</span>
             {% endif %}
           </p>
+
+    
           <p>
             {% if item.on_promotion and item.dicount_percentage > 0 %}
               <span style="text-decoration: line-through; color: gray;">${{ item.price }}</span>
@@ -150,6 +152,21 @@
               <strong>${{ item.price }}</strong>
             {% endif %}
           </p>
+<p>
+  <span><strong>RATING: </strong></span>
+{% for i in "12345" %}
+  {% if i|to_int <= item.average_rating|to_int %}
+    <i class="bi bi-star-fill" style="color: gold;"></i>
+  {% else %}
+    <i class="bi bi-star" style="color: gold;"></i>
+  {% endif %}
+{% endfor %}
+
+
+  <span>({{ item.average_rating|floatformat:1 }})</span>
+</p>
+
+
           {% if item.quantity > 0 %}
             {% if user.is_authenticated %}
             <button
@@ -236,6 +253,21 @@
             <strong>${{ combo.price }}</strong>
           {% endif %}
         </p>
+<p>
+  <span><strong>RATING: </strong></span>
+  {% for i in "12345" %}
+    {% if i|add:"0" <= combo.average_rating|floatformat:0|add:"0" %}
+      <i class="bi bi-star-fill" style="color: gold;"></i>
+    {% else %}
+      <i class="bi bi-star" style="color: gold;"></i>
+    {% endif %}
+  {% endfor %}
+  <span>({{ combo.average_rating|floatformat:1 }})</span>
+</p>
+
+
+
+
         {% if user.is_authenticated %}
       <button
         type="button"

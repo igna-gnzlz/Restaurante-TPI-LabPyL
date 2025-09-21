@@ -2,6 +2,8 @@ from decimal import Decimal
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.db.models import Avg
+
 
 class Product(models.Model):
     name = models.CharField(max_length=40,default="")
@@ -15,6 +17,8 @@ class Product(models.Model):
     on_promotion = models.BooleanField(default=False)
     dicount_percentage = models.IntegerField(default=0) # 0 a 100
     is_available = models.BooleanField(default=True)
+    avarage_rating = models.FloatField(default=0.0)
+    
 
     @property
     def discounted_price(self):
@@ -83,6 +87,16 @@ class Product(models.Model):
         self.quantity = quantity or self.quantity
 
         self.save()
+    #metodos para calcular el rating promedio
+    def calculate_average_rating(self):
+        avg = self.ratings.aggregate(average=Avg('rating'))['average']
+        self.average_rating = avg if avg is not None else 0.0
+        self.save()
+
+    def update_average_rating(self):
+        self.calculate_average_rating()
+
+
 
 
 class Category(models.Model):
@@ -196,7 +210,7 @@ class Rating(models.Model):
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    product = models.ForeignKey('menu_app.Product', on_delete=models.CASCADE)
+    product = models.ForeignKey('menu_app.Product', on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey('accounts_app.User', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -251,7 +265,8 @@ class Combo(models.Model):
     on_promotion = models.BooleanField(default=False)
     dicount_percentage = models.IntegerField(default=0) # 0 a 80
     is_active = models.BooleanField(default=True)
-
+    avarage_rating = models.FloatField(default=0.0)
+    
     def __str__(self):
         return self.name
 
@@ -317,6 +332,16 @@ class Combo(models.Model):
         total_price = sum([product.price for product in products])
         average_price = total_price / products.count()
         return average_price
+    #metodos para calcular el rating promedio
+    def calculate_average_rating(self):
+        from django.db.models import Avg
+        avg = self.comments.aggregate(average=Avg('rating'))['average']
+        self.average_rating = avg if avg is not None else 0.0
+        self.save()
+
+    def update_average_rating(self):
+        self.calculate_average_rating()
+
 
 class ComboRating(models.Model):
     combo = models.ForeignKey(
