@@ -230,16 +230,18 @@
           {% endif %}
         </p>
         {% if user.is_authenticated %}
-        <form method="post" action="{% url 'menu_app:add_combo_to_order' combo.pk %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-primary btn-click-animate mb-2 w-100">Agregar a pedido</button>
-        </form>
+      <button
+        type="button"
+        class="btn btn-primary mb-2 w-100 add-to-order-combo-btn"
+        data-url="{% url 'menu_app:add_combo_to_order' combo.pk %}">
+        Agregar a pedido
+      </button>
       <button type="button" class="btn btn-warning btn-click-animate mb-2 w-100"
       data-bs-toggle="modal"
       data-bs-target="#modalComentar"
       data-item-id="combo-{{ combo.id }}"
       data-item-name="{{ combo.name }}"
-      data-action-url="{% url 'menu_app:make_rating' combo.id %}">
+      data-action-url="{% url 'menu_app:make_rating_combo' combo.id %}">
       Comentar
     </button>
         <button type="button" class="btn btn-info w-100"
@@ -353,7 +355,7 @@
       "id": "combo-{{ combo.id }}",
       "name": "{{ combo.name }}",
       "comments": [
-        {% for comment in combo.comments %}
+        {% for comment in combo.comments.all %}
           {
             "user": "{{ comment.user.name }} {{ comment.user.last_name }}",
             "title": "{{ comment.title }}",

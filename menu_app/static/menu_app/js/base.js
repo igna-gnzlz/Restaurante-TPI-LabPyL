@@ -58,7 +58,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnsAddToOrder = document.querySelectorAll(".add-to-order-btn");
     const btnsDecFromCart = document.querySelectorAll(".dec-from-cart-btn");
     const btnsDeleteFromCart = document.querySelectorAll(".delete-from-cart-btn");
+    const btnsAddToOrderCombo = document.querySelectorAll(".add-to-order-combo-btn");
 
+
+    //Productos Individuales
     btnsAddToOrder.forEach(button => {
         button.addEventListener("click", function () {
             const url = this.dataset.url;
@@ -90,6 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+
+    //Decrementar Productos
     btnsDecFromCart.forEach(button => {
         button.addEventListener("click", function () {
             const url = this.dataset.url;
@@ -140,7 +145,42 @@ document.addEventListener("DOMContentLoaded", function () {
                 .catch(err => console.error("Error al decrementar producto del carrito:", err));
         });
     });
+    
+    // Agregar Combos
+    btnsAddToOrderCombo.forEach(button => {
+        console.log("Listener agregado para combo:", button.dataset.url);
+        button.addEventListener("click", function () {
+            const url = this.dataset.url;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                body: ""
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirige o muestra mensaje sin recargar página
+                    toastRedirect(data.message, urls.makeOrder, "success");
+                } else {
+                    if (data.message === "Seleccione primero una reserva.") {
+                        toastRedirect(data.message, urls.makeOrder, "warning");
+                    } else {
+                        toastNoRedirect(data.message, "error");
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Error al agregar combo:", err);
+                toastNoRedirect("Error al agregar combo", "error");
+            });
+        });
+    });
 });
+
 
 // Helper CSRF
 function getCookie(name) {

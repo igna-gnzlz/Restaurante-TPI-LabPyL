@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView, FormView
-from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating, Combo, OrderContainsCombo
-from menu_app.forms import RatingForm
+from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating, Combo, ComboRating, OrderContainsCombo
+from menu_app.forms import RatingForm, ComboRatingForm
 from accounts_app.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,7 +10,34 @@ from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.utils.timezone import now
+from django.contrib import messages
 
+
+class MakeRatingCombo(FormView):
+    form_class = ComboRatingForm
+    template_name = "menu_app/rating_form.html"
+    success_url = reverse_lazy("menu_app:menu")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.combo = get_object_or_404(Combo, pk=kwargs.get("combo_id"))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["combo"] = self.combo
+        return context
+
+    def form_valid(self, form):
+        rating = form.save(commit=False)
+        rating.user = self.request.user if self.request.user.is_authenticated else None
+        rating.combo = self.combo
+        rating.save()
+        messages.success(self.request, "¡Comentario creado con éxito para el combo!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Por favor corrija los errores en el formulario.")
+        return super().form_invalid(form)
 
 class MakeRatingView(FormView):
     form_class = RatingForm
@@ -191,15 +218,16 @@ class AddComboToOrderView(LoginRequiredMixin, View):
         booking_selected_id = request.session.get('booking_selected_id')
 
         if not booking_selected_id:
-            return redirect('make_order')
+            return JsonResponse({
+                "success": False,
+                "message": "Seleccione primero una reserva."
+            }, status=400)
 
         cart = request.session.get('cart', {})
         booking_key = str(booking_selected_id)
         combo_key = f"combo_{combo.id}"  # prefijo para distinguir combos de productos
 
-        if booking_key not in cart:
-            cart[booking_key] = {}
-
+        cart.setdefault(booking_key, {})
         if combo_key in cart[booking_key]:
             cart[booking_key][combo_key]['quantity'] += 1
         else:
@@ -208,7 +236,18 @@ class AddComboToOrderView(LoginRequiredMixin, View):
         request.session['cart'] = cart
         request.session.modified = True
 
-        return redirect(f"{reverse('menu_app:menu')}#combo-{combo.id}")
+        # opcional: calcular total de carrito como lo haces con productos
+        total_cart = sum([item['quantity'] for c in cart.values() for item in c.values()])
+
+        return JsonResponse({
+            "success": True,
+            "message": f'Se agregó "{combo.name}" al pedido.',
+            "combo_id": combo.id,
+            "quantity": cart[booking_key][combo_key]['quantity'],
+            "total_cart": total_cart
+        })
+
+
 
 class RemoveComboFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):

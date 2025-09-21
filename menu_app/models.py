@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 class Product(models.Model):
     name = models.CharField(max_length=40,default="")
@@ -309,3 +310,29 @@ class Combo(models.Model):
         total_price = sum([product.price for product in products])
         average_price = total_price / products.count()
         return average_price
+
+class ComboRating(models.Model):
+    combo = models.ForeignKey(
+        "Combo",
+        on_delete=models.CASCADE,
+        related_name="comments"   # 👈 Esto hace que puedas usar combo.comments en el template
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, blank=True, null=True, default="Sin título")
+    text = models.TextField(blank=True, null=True, default="Sin comentario")
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.combo} ({self.rating})"
+
+    @staticmethod
+    def validate(title, text, rating):
+        errors = {}
+        if not title:
+            errors['title'] = "El título es obligatorio."
+        if not text:
+            errors['text'] = "El comentario no puede estar vacío."
+        if rating < 1 or rating > 5:
+            errors['rating'] = "La calificación debe estar entre 1 y 5."
+        return errors
