@@ -16,7 +16,10 @@ def get_cart_products_by_booking(session, booking_id):
             try:
                 combo_id = int(item_key.replace('combo_', ''))
                 combo = Combo.objects.get(id=combo_id)
-                subtotal = combo.price * Decimal(quantity)
+                if combo.on_promotion:
+                    subtotal = Decimal(combo.discounted_price) * Decimal(quantity)
+                else:
+                    subtotal = Decimal(combo.price) * Decimal(quantity)
                 total += subtotal
                 items.append({
                     'item': combo,
@@ -32,7 +35,10 @@ def get_cart_products_by_booking(session, booking_id):
             try:
                 product_id = int(item_key)
                 product = Product.objects.get(id=product_id)
-                subtotal = product.price * Decimal(quantity)
+                if product.on_promotion:
+                    subtotal = Decimal(product.discounted_price) * Decimal(quantity)
+                else:
+                    subtotal = Decimal(product.price) * Decimal(quantity)
                 total += subtotal
                 items.append({
                     'item': product,
