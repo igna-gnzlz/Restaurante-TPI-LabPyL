@@ -2,44 +2,124 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-6">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
-            {% else %}
-                <img src="{% static 'images/default_food.jpg' %}" alt="Sin imagen" class="img-fluid rounded">
-            {% endif %}
-        </div>
-        <div class="col-md-6">
-            <h2 class="mb-3">{{ product.name }}</h2>
-            <p>{{ product.description }}</p>
-            <p class="card-text">Stock: {{ product.quantity }}</p>
-            <h4 class="text">${{ product.price }}</h4>
+<style>
+  /* Estilos mínimos para la card y ribbon (si ya los tenés en CSS global podés sacarlos) */
+  .product-detail-card {
+    border-radius: 0.5rem;
+    overflow: visible;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  }
+ .product-detail-card .card-img-left {
+    max-height: 460px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: inherit;   /* igual que la card */
+    border: 3px solid #000000; /* gris clarito estilo bootstrap */
+    box-shadow: 0 3px 6px rgba(255, 255, 255, 0.1); /* opcional: sombra suave */
+}
 
+  .ribbon-promo {
+    width: 150px;
+    background: #dc3545;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    position: absolute;
+    top: 12px;
+    right: -40px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+  .price-original {
+    text-decoration: line-through;
+    color: gray;
+  }
+  .price-discounted {
+    color: #198754; /* verde bootstrap */
+    font-weight: 700;
+    margin-left: 10px;
+  }
+</style>
+
+<div class="container mt-5">
+  <!-- Card del producto (TODO lo visual dentro de esta card) -->
+  <div class="card product-detail-card p-3 position-relative">
+    {% if product.on_promotion and product.dicount_percentage > 0 %}
+    <div class="ribbon-promo">
+      ¡OFERTA DE {{ product.dicount_percentage }}%!
+    </div>
+    {% endif %}
+
+    <div class="row g-3 align-items-center">
+      <!-- Imagen -->
+      <div class="col-12 col-md-6 d-flex align-items-center justify-content-center p-3">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded card-img-left">
+        {% else %}
+          <img src="{% static 'images/default_food.jpg' %}" alt="Sin imagen" class="img-fluid rounded card-img-left">
+        {% endif %}
+      </div>
+
+      <!-- Datos (titulo, desc, stock, precio, botones) -->
+      <div class="col-12 col-md-6">
+        <div class="card-body p-0">
+          <h2 class="card-title mb-3">{{ product.name }}</h2>
+
+          <p class="card-text mb-3">{{ product.description }}</p>
+
+          <p class="card-text mb-3">
+            Stock:
             {% if product.quantity > 0 %}
-            {% if user.is_authenticated %}
-            <button
-                type="button"
-                class="btn btn-primary mt-auto btn-product-animate product-card-isolated add-to-order-btn"
-                data-url="{% url 'menu_app:add_to_order' product.pk %}">
-                Agregar a pedido
-            </button>
+              <span class="badge bg-success">{{ product.quantity }}</span>
             {% else %}
-            <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
-                class="btn btn-outline-secondary mt-auto btn-product-animate product-card-isolated">
-                Iniciar sesión para pedir
-            </a>
+              <span class="badge bg-secondary">0</span>
             {% endif %}
+          </p>
+
+          <!-- Precio / Descuento -->
+          <p class="card-text mb-4">
+            {% if product.on_promotion and product.dicount_percentage > 0 %}
+              <span class="price-original">${{ product.price }}</span>
+              <span class="price-discounted">${{ product.discounted_price|floatformat:2 }}</span>
             {% else %}
-            <button class="btn btn-secondary mt-auto product-card-isolated" disabled>
+              <strong class="fs-4">${{ product.price }}</strong>
+            {% endif %}
+          </p>
+
+          <!-- Botones: agregar a pedido / requerir login / sin stock -->
+          <div class="d-grid gap-2" style="max-width:320px;">
+            {% if product.quantity > 0 %}
+              {% if user.is_authenticated %}
+                <button
+                  type="button"
+                  class="btn btn-primary btn-product-animate product-card-isolated add-to-order-btn"
+                  data-url="{% url 'menu_app:add_to_order' product.pk %}">
+                  Agregar a pedido
+                </button>
+              {% else %}
+                <a href="{% url 'accounts_app:login' %}?next={% url 'make_order' %}"
+                   class="btn btn-outline-secondary product-card-isolated">
+                  Iniciar sesión para pedir
+                </a>
+              {% endif %}
+            {% else %}
+              <button class="btn btn-secondary product-card-isolated" disabled>
                 Sin stock
-            </button>
+              </button>
             {% endif %}
+          </div>
+
         </div>
+      </div>
     </div>
-    <div class="text-center mt-4">
-        <a href="{% url 'menu_app:menu' %}#producto-{{ product.id }}" class="btn btn-product-animate btn-primary">Volver al menú</a>
-    </div>
+  </div>
+
+  <!-- Botón Volver al menú: fuera de la card como pediste -->
+  <div class="text-center mt-4">
+    <a href="{% url 'menu_app:menu' %}#producto-{{ product.id }}" class="btn btn-product-animate btn-primary">
+      Volver al menú
+    </a>
+  </div>
 </div>
 {% endblock %}

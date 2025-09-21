@@ -63,25 +63,25 @@
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap" id="row-product-{{ product.item.id }}">
                 <div class="d-flex align-items-center flex-wrap">
                     {% if product.type == 'combo' %}
-                        <strong>Combo:</strong> {{ product.item.name }} x {{ product.quantity }}
-                        <form method="post" action="{% url 'menu_app:remove_combo_from_cart' product.item.id %}" class="d-inline ms-3 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Quitar 1 combo" aria-label="Quitar una unidad del combo {{ product.item.name }}">
-                                <i class="bi bi-dash-circle me-1"></i>Quitar 1 combo
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'menu_app:add_combo_to_order_make_order' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-success" title="Añadir 1 combo" aria-label="Añadir una unidad al combo {{ product.item.name }}">
-                                <i class="bi bi-plus-circle me-1"></i>Añadir 1 combo
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'menu_app:remove_combo_all_from_cart' product.item.id %}" class="d-inline ms-2 mb-0 align-self-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Eliminar todo combo" aria-label="Eliminar todas las unidades del combo {{ product.item.name }}">
-                                <i class="bi bi-x-circle me-1"></i>Eliminar todo
-                            </button>
-                        </form>
+                       <strong>Combo:</strong> {{ product.item.name }}
+<div class="wrapper" data-product-id="{{ product.item.id }}"
+     data-inc-url="{% url 'menu_app:add_combo_to_order_make_order' product.item.id %}">
+    <button type="button" data-product-id="{{ product.item.id }}"
+            data-url="{% url 'menu_app:remove_combo_all_from_cart' product.item.id %}"
+            class="btn btn-outline-danger icon-btn trash" title="Eliminar combo">
+        <i class="bi bi-trash3"></i>
+    </button>
+    <button type="button" data-product-id="{{ product.item.id }}"
+            data-url="{% url 'menu_app:remove_combo_from_cart' product.item.id %}"
+            class="btn btn-outline-secondary icon-btn" title="Quitar una unidad">
+        <i class="bi bi-dash-circle"></i>
+    </button>
+    <span id="cart-quant-prod-{{ product.item.id }}" class="num">{{ product.quantity }}</span>
+    <button type="button" class="btn btn-outline-success icon-btn plus" title="Agregar una unidad">
+        <i class="bi bi-plus-circle"></i>
+    </button>
+</div>
+
                     {% elif product.type == 'product' %}
                         <strong>{{ product.item.name }}</strong>
                         <!-- Selección de cantidad -->
