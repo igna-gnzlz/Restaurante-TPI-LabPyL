@@ -119,12 +119,20 @@
             ¡OFERTA DE {{ item.dicount_percentage }}%!
           </div>
           {% endif %}
-          <div class="item-title">{{ item.name }}</div>
-          {% if item.image %}
-          <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-          {% else %}
-          <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
-          {% endif %}
+          <div class="item-title">
+            <a href="{% url 'menu_app:product_detail' item.id %}" class="text-decoration-none text-dark">
+              {{ item.name }}
+            </a>
+          </div>
+
+          <a href="{% url 'menu_app:product_detail' item.id %}">
+            {% if item.image %}
+            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+            {% else %}
+            <img src="{% static 'images/default_product.jpg' %}" class="card-img-top" alt="Producto sin imagen">
+            {% endif %}
+          </a>
+
           <p>{{ item.description }}</p>
           <p>
             {% if item.is_available %}
@@ -185,8 +193,8 @@
 <!-- head -->
 <!-- incoming -->
 {% comment %}
-                    <!-- <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
-                        style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a> -->
+                    <a href="{% url 'menu_app:product_detail' item.id %}" class="stretched-link"
+                        style="z-index: 1; width: calc(100% - 120px); height: calc(100% - 50px);"></a>
 {% endcomment %}
 <!-- incoming -->
     </div>
