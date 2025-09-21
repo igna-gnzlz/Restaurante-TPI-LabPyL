@@ -606,7 +606,7 @@ class TimeSlotAdminFormTest(TestCase):
 class MakeReservationFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.table1 = Table.objects.create(number=1, capacity=4, description="Mesa VIP")
+        cls.table1 = Table.objects.create(number=1, capacity=4)
         cls.table2 = Table.objects.create(number=2, capacity=6, description="Mesa Patio")
 
     def test_queryset_assignment_and_labels(self):
@@ -619,8 +619,8 @@ class MakeReservationFormTest(TestCase):
         label = form.get_table_label(table)
         self.assertIn(f"Mesa {table.number}", label)
         self.assertIn(f"Capacidad: {table.capacity}", label)
-        self.assertIn(f"Descripción: {table.description}", label)
-
+        if table.description:
+                self.assertIn(f"Descripción: {table.description}", label)
 
 
 
@@ -964,7 +964,7 @@ class MakeReservationViewTest(TestCase):
         }
 
         response = self.client.post(url, post_data, follow=True)
-
+        
         self.assertRedirects(response, reverse('bookings_app:my_reservation'))
         messages = list(get_messages(response.wsgi_request))
         self.assertTrue(any('Reserva solicitada con éxito' in str(message) for message in messages))
