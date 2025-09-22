@@ -17,7 +17,7 @@ document.querySelectorAll(".wrapper .plus").forEach(plusBtn => {
             const data = await response.json();
 
             if (data.success) {
-                // Actualizo la cantidad y subtotal del producto
+                // Actualizo la cantidad y subtotal
                 document.querySelector(`#cart-quant-prod-${productId}`).textContent = data.quantity;
                 document.querySelector(`#cart-subtotal-prod-${productId}`).textContent = `$${data.subtotal}`;
                 // Actualizo el monto del total carrito

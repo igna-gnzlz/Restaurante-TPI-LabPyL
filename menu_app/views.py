@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from menu_app.models import Product, Order, OrderContainsProduct, Category, Rating, Combo, ComboRating, OrderContainsCombo
@@ -236,8 +237,11 @@ class AddToOrderView(LoginRequiredMixin, View):
         request.session['cart'] = cart
         request.session.modified = True
 
-        # Calculo el subtotal producto
-        subtotal = product.price * cart[booking_key][product_key]["quantity"]
+        # Calculo el subtotal
+        if product.on_promotion:
+            subtotal = Decimal(product.discounted_price) * Decimal(cart[booking_key][product_key]["quantity"])
+        else:
+            subtotal = Decimal(product.price) * Decimal(cart[booking_key][product_key]["quantity"])
 
         # Calcular el total carrito
         items, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
@@ -253,40 +257,40 @@ class AddToOrderView(LoginRequiredMixin, View):
         })
         
 
-class AddComboToOrderView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        combo = get_object_or_404(Combo, pk=pk)
-        booking_selected_id = request.session.get('booking_selected_id')
+# class AddComboToOrderView(LoginRequiredMixin, View):
+#     def post(self, request, pk):
+#         combo = get_object_or_404(Combo, pk=pk)
+#         booking_selected_id = request.session.get('booking_selected_id')
 
-        if not booking_selected_id:
-            return JsonResponse({
-                "success": False,
-                "message": "Seleccione primero una reserva."
-            }, status=400)
+#         if not booking_selected_id:
+#             return JsonResponse({
+#                 "success": False,
+#                 "message": "Seleccione primero una reserva."
+#             }, status=400)
 
-        cart = request.session.get('cart', {})
-        booking_key = str(booking_selected_id)
-        combo_key = f"combo_{combo.id}"  # prefijo para distinguir combos de productos
+#         cart = request.session.get('cart', {})
+#         booking_key = str(booking_selected_id)
+#         combo_key = f"combo_{combo.id}"  # prefijo para distinguir combos de productos
 
-        cart.setdefault(booking_key, {})
-        if combo_key in cart[booking_key]:
-            cart[booking_key][combo_key]['quantity'] += 1
-        else:
-            cart[booking_key][combo_key] = {'quantity': 1}
+#         cart.setdefault(booking_key, {})
+#         if combo_key in cart[booking_key]:
+#             cart[booking_key][combo_key]['quantity'] += 1
+#         else:
+#             cart[booking_key][combo_key] = {'quantity': 1}
 
-        request.session['cart'] = cart
-        request.session.modified = True
+#         request.session['cart'] = cart
+#         request.session.modified = True
 
-        # opcional: calcular total de carrito como lo haces con productos
-        total_cart = sum([item['quantity'] for c in cart.values() for item in c.values()])
+#         # opcional: calcular total de carrito como lo haces con productos
+#         total_cart = sum([item['quantity'] for c in cart.values() for item in c.values()])
 
-        return JsonResponse({
-            "success": True,
-            "message": f'Se agregó "{combo.name}" al pedido.',
-            "combo_id": combo.id,
-            "quantity": cart[booking_key][combo_key]['quantity'],
-            "total_cart": total_cart
-        })
+#         return JsonResponse({
+#             "success": True,
+#             "message": f'Se agregó "{combo.name}" al pedido.',
+#             "combo_id": combo.id,
+#             "quantity": cart[booking_key][combo_key]['quantity'],
+#             "total_cart": total_cart
+#         })
 
 
 
@@ -387,7 +391,7 @@ class DeleteFromCartView(LoginRequiredMixin, View):
             request.session['cart'] = cart
             request.session.modified = True
 
-        # Recalcular el carrito actualizado
+        # Recalcular el carrito
         carrito_reserva, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
 
         return JsonResponse({
@@ -395,7 +399,7 @@ class DeleteFromCartView(LoginRequiredMixin, View):
             "message": f'Se eliminó "{product.name}" del pedido.',
             "product_id": product.id,
             "total_cart": total_cart,
-            "cart_empty": len(carrito_reserva) == 0  # True si ya no quedan productos
+            "cart_empty": len(carrito_reserva) == 0
         })
 
 
@@ -477,68 +481,110 @@ class ConfirmOrderView(LoginRequiredMixin, View):
         messages.success(request, f'Pedido confirmado. Código: {order.code}')
         return redirect('bookings_app:my_reservation')
     
-#vistas para añadir producto y combo desde make_order
-class AddToOrderFromMakeOrderView(LoginRequiredMixin, View):
+
+class AddComboToOrderView(LoginRequiredMixin, View):
+    MAX_COMBOS_PER_ORDER = 3
     def post(self, request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        booking_selected_id = request.session.get('booking_selected_id')
-
-        if not booking_selected_id:
-            return redirect('make_order')
-
-        cart = request.session.get('cart', {})
-        booking_key = str(booking_selected_id)
-        product_key = str(product.id)
-
-        prod_quantity_cart = cart.get(booking_key, {}).get(product_key, {}).get('quantity', 0)
-
-        if product.quantity <= prod_quantity_cart:
-            messages.warning(request, f"No hay stock suficiente para agregar más unidades de '{product.name}'.")
-            return redirect('make_order')
-
-        if booking_key not in cart:
-            cart[booking_key] = {}
-
-        if product_key in cart[booking_key]:
-            cart[booking_key][product_key]['quantity'] += 1
-        else:
-            cart[booking_key][product_key] = {'quantity': 1}
-
-        request.session['cart'] = cart
-        request.session.modified = True
-
-        return redirect('make_order')
-    
-class AddComboToOrderFromMakeOrderView(LoginRequiredMixin, View):
-    MAX_COMBOS_PER_BOOKING = 3
-
-    def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_products_by_booking
         combo = get_object_or_404(Combo, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
 
         if not booking_selected_id:
-            return redirect('make_order')
+            return JsonResponse({
+                "success": False,
+                "message": "Seleccione primero una reserva."
+            }, status=400)
 
         cart = request.session.get('cart', {})
         booking_key = str(booking_selected_id)
         combo_key = f"combo_{combo.id}"
 
-        if booking_key not in cart:
-            cart[booking_key] = {}
+        # Obtener cantidad actual del combo en el carrito (si existe)
+        combo_quantity_cart = cart.get(booking_key, {}).get(combo_key, {}).get('quantity', 0)
 
-        current_quantity = cart[booking_key].get(combo_key, {}).get('quantity', 0)
+        # Verificar no pasarse del stock permitido por pedido
+        if (combo_quantity_cart + 1) > self.MAX_COMBOS_PER_ORDER:
+            return JsonResponse({
+                "success": False,
+                "message": f'No puedes agregar más de {self.MAX_COMBOS_PER_ORDER} unidades de "{combo.name}" por pedido.'
+            }, status=400)
 
-        if current_quantity >= self.MAX_COMBOS_PER_BOOKING:
-            messages.error(request, f"No puedes agregar más de {self.MAX_COMBOS_PER_BOOKING} combos.")
+        # Actualizar el carrito de la sesión
+        cart.setdefault(booking_key, {}).setdefault(combo_key, {"quantity": 0})
+        cart[booking_key][combo_key]["quantity"] += 1
+
+        # Guardar cambios en la sesión
+        request.session['cart'] = cart
+        request.session.modified = True
+
+        # Calculo el subtotal
+        if combo.on_promotion:
+            subtotal = combo.discounted_price * cart[booking_key][combo_key]["quantity"]
         else:
-            cart.setdefault(booking_key, {}).setdefault(combo_key, {'quantity': 0})
-            cart[booking_key][combo_key]['quantity'] += 1
-            messages.success(request, f'Se añadió 1 combo "{combo.name}" al pedido.')
+            subtotal = combo.price * cart[booking_key][combo_key]["quantity"]
+
+        # Calcular el total carrito
+        items, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
+            
+        
+        return JsonResponse({
+            "success": True,
+            "message": f'Se agregó "{combo.name}" al pedido.',
+            "product_id": combo.id,
+            "quantity": cart[booking_key][combo_key]["quantity"],
+            "subtotal": subtotal,
+            "total_cart": total_cart
+        })
+
+class DecrementComboFromCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_products_by_booking
+
+        combo = get_object_or_404(Combo, pk=pk)
+        booking_selected_id = request.session.get('booking_selected_id')
+
+        cart = request.session.get('cart', {})
+        booking_key = str(booking_selected_id)
+        combo_key = f"combo_{combo.id}"
+
+        combo_quantity = None
+        combo_removed = False
+        combo_subtotal = 0
+
+        if booking_key in cart and combo_key in cart[booking_key]:
+            cart[booking_key][combo_key]['quantity'] -= 1
+
+            # Eliminar si la cantidad es 0 o menos
+            if cart[booking_key][combo_key]['quantity'] <= 0:
+                del cart[booking_key][combo_key]
+                combo_removed = True
+            else:
+                combo_quantity = cart[booking_key][combo_key]['quantity']
+                if combo.on_promotion:
+                    combo_subtotal = combo_quantity * combo.discounted_price
+                else:
+                    combo_subtotal = combo_quantity * combo.price
+
+            # Si ya no hay combos en la reserva, quitar la reserva del carrito
+            if not cart[booking_key]:
+                del cart[booking_key]
 
             request.session['cart'] = cart
             request.session.modified = True
 
-        return redirect('make_order')
+         # Recalcular el carrito actualizado
+        carrito_reserva, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
+        
+        return JsonResponse({
+            "success": True,
+            "message": f'Se quitó una unidad de "{combo.name}" del pedido.',
+            "combo_id": combo.id,
+            "quantity": combo_quantity,            # None si fue eliminado
+            "combo_removed": combo_removed,      # True si ya no está en el carrito
+            "subtotal": combo_subtotal,            # Subtotal del producto actualizado
+            "total_cart": total_cart,                # Total recalculado
+            "cart_empty": len(carrito_reserva) == 0  # True si ya no quedan productos
+        })
 
 #Vistas para eliminar todos los producto o combo del carrito
 class RemoveProductFromCartView(LoginRequiredMixin, View):
@@ -567,13 +613,14 @@ class RemoveProductFromCartView(LoginRequiredMixin, View):
 
 class RemoveComboAllFromCartView(LoginRequiredMixin, View):
     def post(self, request, pk):
+        from menu_app.utils.cart import get_cart_products_by_booking
+        
+        combo = get_object_or_404(Combo, pk=pk)
         booking_selected_id = request.session.get('booking_selected_id')
-        if not booking_selected_id:
-            return redirect('make_order')
 
         cart = request.session.get('cart', {})
         booking_key = str(booking_selected_id)
-        combo_key = f"combo_{pk}"
+        combo_key = f"combo_{combo.id}"
 
         if booking_key in cart and combo_key in cart[booking_key]:
             del cart[booking_key][combo_key]  # Eliminar todas las unidades del combo
@@ -584,6 +631,13 @@ class RemoveComboAllFromCartView(LoginRequiredMixin, View):
             request.session['cart'] = cart
             request.session.modified = True
 
-            messages.success(request, "Combo eliminado completamente del carrito.")
+         # Recalcular el carrito
+        carrito_reserva, total_cart = get_cart_products_by_booking(request.session, booking_selected_id)
 
-        return redirect('make_order')
+        return JsonResponse({
+            "success": True,
+            "message": f'Se eliminó "{combo.name}" del pedido.',
+            "product_id": combo.id,
+            "total_cart": total_cart,
+            "cart_empty": len(carrito_reserva) == 0
+        })

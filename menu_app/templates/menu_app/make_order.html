@@ -63,37 +63,45 @@
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap" id="row-product-{{ product.item.id }}">
                 <div class="d-flex align-items-center flex-wrap">
                     {% if product.type == 'combo' %}
-                       <strong>Combo:</strong> {{ product.item.name }}
-<div class="wrapper" data-product-id="{{ product.item.id }}"
-     data-inc-url="{% url 'menu_app:add_combo_to_order_make_order' product.item.id %}">
-    <button type="button" data-product-id="{{ product.item.id }}"
-            data-url="{% url 'menu_app:remove_combo_all_from_cart' product.item.id %}"
-            class="btn btn-outline-danger icon-btn trash" title="Eliminar combo">
-        <i class="bi bi-trash3"></i>
-    </button>
-    <button type="button" data-product-id="{{ product.item.id }}"
-            data-url="{% url 'menu_app:remove_combo_from_cart' product.item.id %}"
-            class="btn btn-outline-secondary icon-btn" title="Quitar una unidad">
-        <i class="bi bi-dash-circle"></i>
-    </button>
-    <span id="cart-quant-prod-{{ product.item.id }}" class="num">{{ product.quantity }}</span>
-    <button type="button" class="btn btn-outline-success icon-btn plus" title="Agregar una unidad">
-        <i class="bi bi-plus-circle"></i>
-    </button>
-</div>
-
+                        <strong>{{ product.item.name }}</strong>
+                        <div class="wrapper"
+                            data-product-id="{{ product.item.id }}"
+                            data-inc-url="{% url 'menu_app:add_combo_to_order' product.item.id %}">
+                            <button type="button"
+                                    data-product-id="{{ product.item.id }}"
+                                    data-url="{% url 'menu_app:remove_combo_all_from_cart' product.item.id %}"
+                                    class="btn btn-outline-danger delete-from-cart-btn icon-btn trash"
+                                    title="Eliminar combo">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                            <button type="button"
+                                    data-product-id="{{ product.item.id }}"
+                                    data-url="{% url 'menu_app:decrement_combo_from_cart' product.item.id %}"
+                                    class="btn btn-outline-secondary icon-btn dec-combo-from-cart-btn"
+                                    title="Quitar una unidad">
+                                <i class="bi bi-dash-circle"></i>
+                            </button>
+                            <span id="cart-quant-prod-{{ product.item.id }}" class="num">{{ product.quantity }}</span>
+                            <button type="button"
+                                    class="btn btn-outline-success icon-btn plus"
+                                    title="Agregar una unidad">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                        </div>
                     {% elif product.type == 'product' %}
                         <strong>{{ product.item.name }}</strong>
                         <!-- Selección de cantidad -->
                         <div class="wrapper" data-product-id="{{ product.item.id }}"
                             data-inc-url="{% url 'menu_app:add_to_order' product.item.id %}">
-                            <button type="button" data-product-id="{{ product.item.id }}"
+                            <button type="button"
+                                data-product-id="{{ product.item.id }}"
                                 data-url="{% url 'delete_from_cart' product.item.id %}"
                                 class="btn btn-outline-danger icon-btn delete-from-cart-btn trash"
                                 title="Eliminar producto">
                                 <i class="bi bi-trash3"></i>
                             </button>
-                            <button type="button" data-product-id="{{ product.item.id }}"
+                            <button type="button"
+                                data-product-id="{{ product.item.id }}"
                                 data-url="{% url 'decrement_from_cart' product.item.id %}"
                                 class="btn btn-outline-secondary icon-btn dec-from-cart-btn"
                                 title="Quitar una unidad">
