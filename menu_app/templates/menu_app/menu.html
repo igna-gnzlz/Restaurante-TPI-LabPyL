@@ -379,6 +379,82 @@
   document.addEventListener('DOMContentLoaded', function() {
     const comentarModal = document.getElementById('modalComentar');
     const comentariosModal = document.getElementById('modalComentarios');
+    const ratingForm = document.getElementById('ratingForm');
+    
+    ratingForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(ratingForm);
+        const actionUrl = ratingForm.action;
+
+        fetch(actionUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cerrar modal
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modalComentar'));
+                modalInstance.hide();
+
+                // Limpiar formulario
+                ratingForm.reset();
+
+                // Actualizar allItemsData
+                const item = allItemsData.find(i => i.id.toString() === data.comment.product_id.toString());
+                if (item) {
+                    item.comments.push(data.comment);
+                }
+                // Crear un div flotante para el mensaje de éxito
+                const successDiv = document.createElement('div');
+                successDiv.textContent = '¡Comentario agregado con éxito!';
+                successDiv.style.position = 'fixed';
+                successDiv.style.top = '80px';
+                successDiv.style.right = '20px';
+                successDiv.style.padding = '10px 20px';
+                successDiv.style.backgroundColor = '#28a745';
+                successDiv.style.color = 'white';
+                successDiv.style.borderRadius = '5px';
+                successDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+                successDiv.style.zIndex = '1055';
+                successDiv.style.opacity = '0';
+                successDiv.style.transition = 'opacity 0.3s ease';
+
+                // Añadir al body
+                document.body.appendChild(successDiv);
+
+                // Animar la aparición
+                setTimeout(() => {
+                    successDiv.style.opacity = '1';
+                }, 10);
+
+                // Eliminar el div después de 4 segundos
+                setTimeout(() => {
+                    successDiv.style.opacity = '0';
+                    setTimeout(() => successDiv.remove(), 300); // quitar del DOM después de fade out
+                }, 4000);
+            } else if (data.errors) {
+                // Mostrar errores en el modal
+                Object.keys(data.errors).forEach(field => {
+                    const input = ratingForm.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'text-danger small';
+                        errorDiv.textContent = data.errors[field];
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error al enviar el comentario:', error);
+        });
+    });
 
     // Modal Comentar
     comentarModal.addEventListener('show.bs.modal', function(event) {
