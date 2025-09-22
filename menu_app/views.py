@@ -17,7 +17,6 @@ from django.utils.timezone import localtime
 class MakeRatingCombo(FormView):
     form_class = ComboRatingForm
     template_name = "menu_app/rating_form.html"
-    success_url = reverse_lazy("menu_app:menu")
 
     def dispatch(self, request, *args, **kwargs):
         self.combo = get_object_or_404(Combo, pk=kwargs.get("combo_id"))
@@ -33,12 +32,23 @@ class MakeRatingCombo(FormView):
         rating.user = self.request.user if self.request.user.is_authenticated else None
         rating.combo = self.combo
         rating.save()
-        messages.success(self.request, "¡Comentario creado con éxito para el combo!")
-        return super().form_valid(form)
+
+        # Preparar los datos del comentario para enviar al JS
+        comment_data = {
+            "user": f"{rating.user.name} {rating.user.last_name}" if rating.user else "Anon",
+            "title": rating.title,
+            "text": rating.text,
+            "rating": rating.rating,
+            "created_at": localtime(rating.created_at).strftime("%d/%m/%Y %H:%M"),
+            "product_id": f"combo-{self.combo.id}"  # Nota: coincide con tu data-item-id en el template
+        }
+
+        return JsonResponse({"success": True, "comment": comment_data})
 
     def form_invalid(self, form):
-        messages.error(self.request, "Por favor corrija los errores en el formulario.")
-        return super().form_invalid(form)
+        # Devolver los errores como JSON para mostrarlos en el modal
+        errors = {field: error[0] for field, error in form.errors.items()}
+        return JsonResponse({"success": False, "errors": errors})
 
 class MakeRatingView(FormView):
     form_class = RatingForm
