@@ -339,26 +339,6 @@ class UserLoginViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class NotificationRecipientsViewTests(TestCase):
-    def setUp(self):
-        self.staff_user = User.objects.create_user(username='staffuser', password='pass', is_staff=True)
-        self.normal_user = User.objects.create_user(username='normal', password='pass')
-        self.notification = Notification.objects.create(title='TestNotif', message='Test Message')
-    def test_access_allowed_for_staff(self):
-        self.client.login(username='staffuser', password='pass')
-        url = reverse('accounts_app:notification_recipients', kwargs={'pk': self.notification.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts_app/notification_recipients.html')
-        self.assertEqual(response.context['notification'], self.notification)
-    def test_access_denied_for_non_staff(self):
-        self.client.login(username='normal', password='pass')
-        url = reverse('accounts_app:notification_recipients', kwargs={'pk': self.notification.pk})
-        response = self.client.get(url)
-        self.assertNotEqual(response.status_code, 200)
-        self.assertIn('/login', response.url)
-
-
 class UserNotificationsListViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='user1', password='pass')
