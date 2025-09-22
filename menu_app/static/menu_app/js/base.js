@@ -57,9 +57,9 @@ function toastNoRedirect(message, icon = "warning") {
 document.addEventListener("DOMContentLoaded", function () {
     const btnsAddToOrder = document.querySelectorAll(".add-to-order-btn");
     const btnsDecFromCart = document.querySelectorAll(".dec-from-cart-btn");
+    const btnsDecComboFromCart = document.querySelectorAll(".dec-combo-from-cart-btn");
     const btnsDeleteFromCart = document.querySelectorAll(".delete-from-cart-btn");
     const btnsAddToOrderCombo = document.querySelectorAll(".add-to-order-combo-btn");
-
 
     //Productos Individuales
     btnsAddToOrder.forEach(button => {
@@ -191,8 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
      });
 
-
-    // Agregar Combos
+    //Combos
     btnsAddToOrderCombo.forEach(button => {
         console.log("Listener agregado para combo:", button.dataset.url);
         button.addEventListener("click", function () {
@@ -225,6 +224,59 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     });
+
+
+    btnsDecComboFromCart.forEach(button => {
+        button.addEventListener("click", function () {
+            const url = this.dataset.url;
+            const productId = this.dataset.productId;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        toastNoRedirect(data.message, "success");
+
+                        if (data.cart_empty) {
+                            // reemplazar todo el carrito por el aviso
+                            document.querySelector("#cart-items").innerHTML = `
+    <div class="alert alert-warning text-center">No hay productos en el pedido.</div>
+    `;
+                            // Ocultar total y botón de confirmar
+                            const cartTotal = document.querySelector("#cart-total");
+                            if (cartTotal) {
+                                cartTotal.closest("h4").remove();
+                            }
+
+                            const confirmBtn = document.getElementById("confirm-order-container");
+                            if (confirmBtn) {
+                                confirmBtn.remove();
+                            }
+                        } else {
+                            if (!data.combo_removed) {
+                                // Actualizar cantidad del producto y subtotal
+                                document.querySelector(`#cart-quant-prod-${productId}`).textContent = data.quantity;
+                                document.querySelector(`#cart-subtotal-prod-${productId}`).textContent = `$${data.subtotal}`;
+                            } else {
+                                // Eliminar fila completa si quitó todo el producto
+                                document.querySelector(`#row-product-${productId}`).remove();
+                            }
+
+                            // Actualizar total carrito
+                            document.querySelector("#cart-total").textContent = `$${data.total_cart}`;
+                        }
+                    }
+                })
+                .catch(err => console.error("Error al decrementar producto del carrito:", err));
+        });
+    });
+
 });
       
 
