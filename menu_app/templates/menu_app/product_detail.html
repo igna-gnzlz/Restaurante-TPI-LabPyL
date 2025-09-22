@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block content %}
 <style>
@@ -86,6 +87,21 @@
               <strong class="fs-4">${{ product.price }}</strong>
             {% endif %}
           </p>
+          
+            <p class="card-text mb-4">
+ <p>
+  <span><strong>RATING: </strong></span>
+  {% for i in "12345" %}
+    {% if forloop.counter <= average_rating_int %}
+      <i class="bi bi-star-fill" style="color: gold;"></i>
+    {% else %}
+      <i class="bi bi-star" style="color: gold;"></i>
+    {% endif %}
+  {% endfor %}
+  <span>({{ product.average_rating|floatformat:1 }})</span>
+</p>
+
+
 
           <!-- Botones: agregar a pedido / requerir login / sin stock -->
           <div class="d-grid gap-2" style="max-width:320px;">
