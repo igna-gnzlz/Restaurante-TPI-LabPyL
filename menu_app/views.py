@@ -11,6 +11,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.utils.timezone import now
 from django.contrib import messages
+from django.utils.timezone import localtime
 
 
 class MakeRatingCombo(FormView):
@@ -58,9 +59,18 @@ class MakeRatingView(FormView):
         rating.user = self.request.user if self.request.user.is_authenticated else None
         rating.product = self.product
         rating.save()
-        messages.success(self.request, "¡Comentario creado con éxito!")
-        return super().form_valid(form)
 
+        comment_data = {
+            "user": f"{rating.user.name} {rating.user.last_name}" if rating.user else "Anon",
+            "title": rating.title,
+            "text": rating.text,
+            "rating": rating.rating,
+            "created_at": localtime(rating.created_at).strftime("%d/%m/%Y %H:%M"),
+            "product_id": rating.product.id
+        }
+
+        return JsonResponse({"success": True, "comment": comment_data})
+    
     def form_invalid(self, form):
         messages.error(self.request, "Por favor corrija los errores en el formulario.")
         return super().form_invalid(form)
