@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category, Order,Combo,Rating
+from .models import Product, Category, Order,Combo,Rating, ComboRating
 #Librerias para el cálculo de precio de combo
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import path
@@ -167,3 +167,10 @@ class RatingAdmin(admin.ModelAdmin):
     list_display = ('title', 'product', 'user', 'rating', 'created_at')
     list_filter = ('rating', 'created_at')
     search_fields = ('title', 'text', 'product__name', 'user__username')
+
+
+@admin.register(ComboRating)
+class ComboRatingAdmin(admin.ModelAdmin):
+    list_display = ('title', 'combo', 'user', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('title', 'text', 'combo__name', 'user__username')
